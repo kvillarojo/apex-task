@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:root": "tsc -b && VITE_BASE_PATH=/ vite build",
+    "build:subdir": "tsc -b && VITE_BASE_PATH=/apex-task/ vite build",
     "lint": "oxlint",
     "preview": "vite preview"
   },
