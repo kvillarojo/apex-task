@@ -652,8 +652,9 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
-  width: 500px;
+  width: 750px;
   max-width: 90vw;
+  max-height: 85vh;
   box-shadow: var(--shadow-lg);
   display: flex;
   flex-direction: column;

@@ -131,7 +131,7 @@ export const TaskDetailModal: React.FC = () => {
           <div>
             <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DESCRIPTION</label>
             <textarea
-              rows={3}
+              rows={6}
               value={description}
               onChange={e => setDescription(e.target.value)}
               style={{
