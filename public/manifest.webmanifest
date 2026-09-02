@@ -1,0 +1,20 @@
+{
+  "name": "Apex Task",
+  "short_name": "ApexTask",
+  "description": "Apex Task - A productivity suite for tasks, projects, tags, scheduling, and focus sessions.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111827",
+  "theme_color": "#6366f1",
+  "orientation": "portrait",
+  "lang": "en",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/apex-task-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
