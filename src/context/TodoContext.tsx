@@ -193,14 +193,6 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const nextMode = isWork ? 'shortBreak' : 'work';
       const nextDuration = nextMode === 'work' ? pomodoro.workDuration : pomodoro.shortBreakDuration;
 
-      // Update task actual time if attached to a task
-      if (isWork && pomodoro.activeTaskId) {
-        const addedMins = Math.round(pomodoro.workDuration / 60);
-        updateTask(pomodoro.activeTaskId, {
-          actualMinutes: (tasks.find(t => t.id === pomodoro.activeTaskId)?.actualMinutes || 0) + addedMins
-        });
-      }
-
       setPomodoro(prev => ({
         ...prev,
         mode: nextMode,

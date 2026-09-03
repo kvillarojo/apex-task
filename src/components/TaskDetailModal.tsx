@@ -27,8 +27,6 @@ export const TaskDetailModal: React.FC = () => {
   const [dueDate, setDueDate] = useState(editingTask.dueDate || '');
   const [dueTime, setDueTime] = useState(editingTask.dueTime || '');
   const [recurring, setRecurring] = useState<RecurrenceRule>(editingTask.recurring);
-  const [estimatedMinutes, setEstimatedMinutes] = useState<number | undefined>(editingTask.estimatedMinutes);
-  const [actualMinutes, setActualMinutes] = useState<number | undefined>(editingTask.actualMinutes);
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(editingTask.tags);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
@@ -59,8 +57,6 @@ export const TaskDetailModal: React.FC = () => {
       dueDate: dueDate || undefined,
       dueTime: dueTime || undefined,
       recurring,
-      estimatedMinutes,
-      actualMinutes,
       tags
     });
     setEditingTask(null);
@@ -276,44 +272,6 @@ export const TaskDetailModal: React.FC = () => {
                 <option value="weekly">Weekly</option>
                 <option value="monthly">Monthly</option>
               </select>
-            </div>
-          </div>
-
-          {/* Row 3: Time Tracking */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>ESTIMATED MINS</label>
-              <input
-                type="number"
-                value={estimatedMinutes || ''}
-                onChange={e => setEstimatedMinutes(e.target.value ? parseInt(e.target.value, 10) : undefined)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              />
-            </div>
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>ACTUAL MINS SPENT</label>
-              <input
-                type="number"
-                value={actualMinutes || ''}
-                onChange={e => setActualMinutes(e.target.value ? parseInt(e.target.value, 10) : undefined)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              />
             </div>
           </div>
 

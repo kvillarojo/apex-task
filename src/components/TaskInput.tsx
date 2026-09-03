@@ -26,7 +26,6 @@ export const TaskInput: React.FC = () => {
   const [selectedDueDate, setSelectedDueDate] = useState<string>('');
   const [selectedDueTime, setSelectedDueTime] = useState<string>('');
   const [selectedRecurring, setSelectedRecurring] = useState<RecurrenceRule>('none');
-  const [estimatedMinutes, setEstimatedMinutes] = useState<number | undefined>(undefined);
   const [showDetails, setShowDetails] = useState(false);
 
   // Live Natural Language Parsing
@@ -63,9 +62,7 @@ export const TaskInput: React.FC = () => {
       projectId: targetProjectId,
       assigneeId: selectedAssigneeId || undefined,
       tags: parsed.tags,
-      subtasks: [],
-      estimatedMinutes: estimatedMinutes || undefined,
-      actualMinutes: 0
+      subtasks: []
     });
 
     // Reset input
@@ -76,7 +73,6 @@ export const TaskInput: React.FC = () => {
     setSelectedDueDate('');
     setSelectedDueTime('');
     setSelectedRecurring('none');
-    setEstimatedMinutes(undefined);
     setShowDetails(false);
   };
 
@@ -287,25 +283,6 @@ export const TaskInput: React.FC = () => {
               </select>
             </div>
 
-            {/* Estimated Minutes */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Clock size={14} color="var(--text-muted)" />
-              <input
-                type="number"
-                placeholder="Est. mins"
-                value={estimatedMinutes || ''}
-                onChange={e => setEstimatedMinutes(e.target.value ? parseInt(e.target.value, 10) : undefined)}
-                style={{
-                  width: '90px',
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem'
-                }}
-              />
-            </div>
           </div>
         </div>
       )}

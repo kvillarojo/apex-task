@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   Check,
   Calendar,
-  Clock,
   Tag as TagIcon,
   Flag,
   Play,
@@ -123,14 +122,6 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
             <span className="badge">
               <Repeat size={11} />
               {task.recurring}
-            </span>
-          )}
-
-          {/* Time Estimate vs Actual */}
-          {(task.estimatedMinutes || task.actualMinutes) && (
-            <span className="badge">
-              <Clock size={11} />
-              {task.actualMinutes || 0}/{task.estimatedMinutes || '?'}m
             </span>
           )}
 

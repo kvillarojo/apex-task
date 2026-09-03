@@ -33,8 +33,6 @@ export interface Task {
   assigneeId?: string;
   tags: string[];
   subtasks: Subtask[];
-  estimatedMinutes?: number;
-  actualMinutes?: number;
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
 }
@@ -83,4 +81,3 @@ export interface PomodoroState {
   isMaximized: boolean;
   isVisible: boolean;
 }
-
