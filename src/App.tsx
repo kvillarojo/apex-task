@@ -8,6 +8,7 @@ import { EisenhowerView } from './components/EisenhowerView';
 import { CalendarView } from './components/CalendarView';
 import { AnalyticsView } from './components/AnalyticsView';
 import { TaskDetailModal } from './components/TaskDetailModal';
+import { PeopleModal } from './components/PeopleModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { PomodoroWidget } from './components/PomodoroWidget';
 import { ProjectModal } from './components/ProjectModal';
@@ -42,6 +43,7 @@ const MainContent: React.FC = () => {
 
       {/* Global Modals & Widgets */}
       <TaskDetailModal />
+      <PeopleModal />
       <CommandPaletteModal />
       <ProjectModal />
       <TagModal />

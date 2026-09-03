@@ -73,6 +73,11 @@ interface TodoContextType {
  
   // Assignee Actions
   addAssignee: (assignee: Omit<Assignee, 'id'>) => void;
+  updateAssignee: (id: string, updates: Partial<Omit<Assignee, 'id'>>) => void;
+  deleteAssignee: (id: string) => void;
+  peopleModalOpen: boolean;
+  openPeopleModal: () => void;
+  closePeopleModal: () => void;
 
   // View & Filter Actions
   setViewMode: (mode: ViewMode) => void;
@@ -153,6 +158,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
   const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [peopleModalOpen, setPeopleModalOpen] = useState<boolean>(false);
 
   // Sync tasks to localStorage
   useEffect(() => {
@@ -477,6 +483,17 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     soundEffects.playClickSound();
   };
 
+  const updateAssignee = (id: string, updates: Partial<Omit<Assignee, 'id'>>) => {
+    setAssignees(prev => prev.map(assignee => assignee.id === id ? { ...assignee, ...updates } : assignee));
+    soundEffects.playClickSound();
+  };
+
+  const deleteAssignee = (id: string) => {
+    setAssignees(prev => prev.filter(assignee => assignee.id !== id));
+    setTasks(prev => prev.map(task => task.assigneeId === id ? { ...task, assigneeId: undefined } : task));
+    soundEffects.playClickSound();
+  };
+
   // Filter Actions
   const setSmartFilter = (smart: SmartFilter) => {
     setFilterState(prev => ({
@@ -689,6 +706,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         tasks,
         projects,
         assignees,
+        peopleModalOpen,
         viewMode,
         filter,
         theme,
@@ -721,6 +739,10 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         removeCustomTag,
         getTagColor,
         addAssignee,
+        updateAssignee,
+        deleteAssignee,
+        openPeopleModal: () => setPeopleModalOpen(true),
+        closePeopleModal: () => setPeopleModalOpen(false),
         setViewMode,
         setSmartFilter,
         setFilter,

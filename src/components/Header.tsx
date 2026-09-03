@@ -10,6 +10,7 @@ import {
   Moon,
   Volume2,
   VolumeX,
+  Users,
   Download,
   Upload,
   Command
@@ -26,6 +27,7 @@ export const Header: React.FC = () => {
     setTheme,
     soundEnabled,
     toggleSound,
+    openPeopleModal,
     setCommandPaletteOpen,
     exportData,
     importData
@@ -133,6 +135,10 @@ export const Header: React.FC = () => {
           title={soundEnabled ? 'Mute Sounds' : 'Enable Sounds'}
         >
           {soundEnabled ? <Volume2 size={18} color="#10b981" /> : <VolumeX size={18} color="var(--text-muted)" />}
+        </button>
+
+        <button className="icon-button" onClick={openPeopleModal} title="Manage People">
+          <Users size={18} />
         </button>
 
         {/* Theme Toggle */}

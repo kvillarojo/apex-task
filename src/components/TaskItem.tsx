@@ -9,7 +9,8 @@ import {
   Trash2,
   ChevronDown,
   Repeat,
-  Plus
+  Plus,
+  User
 } from 'lucide-react';
 import { useTodo } from '../context/TodoContext';
 import type { Task } from '../types/todo';
@@ -21,6 +22,7 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
     deleteTask,
     setEditingTask,
     projects,
+    assignees,
     startPomodoro,
     addSubtask,
     toggleSubtask,
@@ -31,6 +33,7 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
 
   const project = projects.find(p => p.id === task.projectId) || projects[0];
+  const assignee = assignees.find(person => person.id === task.assigneeId);
   const dateFormatted = formatFriendlyDate(task.dueDate, task.dueTime);
   const overdue = isOverdue(task.dueDate) && !task.completed;
 
@@ -122,6 +125,13 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
             <span className="badge">
               <Repeat size={11} />
               {task.recurring}
+            </span>
+          )}
+
+          {assignee && (
+            <span className="badge" title={`Assigned to ${assignee.name}`}>
+              <User size={11} />
+              {assignee.name}
             </span>
           )}
 

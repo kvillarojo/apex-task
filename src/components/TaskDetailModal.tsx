@@ -10,6 +10,7 @@ export const TaskDetailModal: React.FC = () => {
     updateTask,
     deleteTask,
     projects,
+    assignees,
     addSubtask,
     toggleSubtask,
     deleteSubtask,
@@ -17,19 +18,20 @@ export const TaskDetailModal: React.FC = () => {
     getTagColor
   } = useTodo();
 
-  if (!editingTask) return null;
-
-  const [title, setTitle] = useState(editingTask.title);
-  const [description, setDescription] = useState(editingTask.description || '');
-  const [priority, setPriority] = useState<Priority>(editingTask.priority);
-  const [status, setStatus] = useState<TaskStatus>(editingTask.status);
-  const [projectId, setProjectId] = useState(editingTask.projectId);
-  const [dueDate, setDueDate] = useState(editingTask.dueDate || '');
-  const [dueTime, setDueTime] = useState(editingTask.dueTime || '');
-  const [recurring, setRecurring] = useState<RecurrenceRule>(editingTask.recurring);
+  const [title, setTitle] = useState(editingTask?.title || '');
+  const [description, setDescription] = useState(editingTask?.description || '');
+  const [priority, setPriority] = useState<Priority>(editingTask?.priority || 'p4');
+  const [status, setStatus] = useState<TaskStatus>(editingTask?.status || 'todo');
+  const [projectId, setProjectId] = useState(editingTask?.projectId || '');
+  const [assigneeId, setAssigneeId] = useState(editingTask?.assigneeId || '');
+  const [dueDate, setDueDate] = useState(editingTask?.dueDate || '');
+  const [dueTime, setDueTime] = useState(editingTask?.dueTime || '');
+  const [recurring, setRecurring] = useState<RecurrenceRule>(editingTask?.recurring || 'none');
   const [tagInput, setTagInput] = useState('');
-  const [tags, setTags] = useState<string[]>(editingTask.tags);
+  const [tags, setTags] = useState<string[]>(editingTask?.tags || []);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+
+  if (!editingTask) return null;
 
   // Auto-suggest tags
   const cleanInput = tagInput.trim().toLowerCase().replace(/^#/, '');
@@ -54,6 +56,7 @@ export const TaskDetailModal: React.FC = () => {
       completed: status === 'done',
       completedAt: status === 'done' ? (editingTask.completedAt || new Date().toISOString()) : undefined,
       projectId,
+      assigneeId: assigneeId || undefined,
       dueDate: dueDate || undefined,
       dueTime: dueTime || undefined,
       recurring,
@@ -144,8 +147,8 @@ export const TaskDetailModal: React.FC = () => {
             />
           </div>
 
-          {/* Row 1: Priority & Status & Project */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+          {/* Row 1: Priority, Status, Project & Assignee */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>PRIORITY</label>
               <select
@@ -209,6 +212,28 @@ export const TaskDetailModal: React.FC = () => {
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>ASSIGNEE</label>
+              <select
+                value={assigneeId}
+                onChange={e => setAssigneeId(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border-color)',
+                  backgroundColor: 'var(--bg-input)',
+                  color: 'var(--text-primary)',
+                  marginTop: '4px'
+                }}
+              >
+                <option value="">Unassigned</option>
+                {assignees.map(assignee => (
+                  <option key={assignee.id} value={assignee.id}>{assignee.name}</option>
                 ))}
               </select>
             </div>
