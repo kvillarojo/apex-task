@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Trash2, Plus, Tag as TagIcon } from 'lucide-react';
 import { useTodo } from '../context/TodoContext';
 import type { Priority, RecurrenceRule, TaskStatus } from '../types/todo';
@@ -30,6 +30,37 @@ export const TaskDetailModal: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(editingTask?.tags || []);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+
+  useEffect(() => {
+    if (!editingTask) {
+      setTitle('');
+      setDescription('');
+      setPriority('p4');
+      setStatus('todo');
+      setProjectId('');
+      setAssigneeId('');
+      setDueDate('');
+      setDueTime('');
+      setRecurring('none');
+      setTags([]);
+      setTagInput('');
+      setNewSubtaskTitle('');
+      return;
+    }
+
+    setTitle(editingTask.title);
+    setDescription(editingTask.description || '');
+    setPriority(editingTask.priority);
+    setStatus(editingTask.status);
+    setProjectId(editingTask.projectId);
+    setAssigneeId(editingTask.assigneeId || '');
+    setDueDate(editingTask.dueDate || '');
+    setDueTime(editingTask.dueTime || '');
+    setRecurring(editingTask.recurring);
+    setTags([...editingTask.tags]);
+    setTagInput('');
+    setNewSubtaskTitle('');
+  }, [editingTask]);
 
   if (!editingTask) return null;
 
