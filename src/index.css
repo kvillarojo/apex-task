@@ -830,6 +830,85 @@ body {
   box-shadow: 0 0 0 3px var(--primary-light);
 }
 
+.description-editor {
+  margin-top: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  overflow: hidden;
+}
+
+.description-editor .ql-toolbar,
+.description-editor .ql-container {
+  border: 0;
+  font-family: inherit;
+}
+
+.description-editor .ql-toolbar {
+  background-color: var(--bg-input);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.description-editor .ql-container {
+  min-height: 150px;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.description-editor .ql-editor {
+  color: var(--text-primary);
+  min-height: 150px;
+}
+
+.description-editor .ql-editor.ql-blank::before {
+  color: var(--text-muted);
+  font-style: normal;
+}
+
+.description-editor .ql-toolbar .ql-stroke {
+  stroke: var(--text-secondary);
+}
+
+.description-editor .ql-toolbar .ql-fill {
+  fill: var(--text-secondary);
+}
+
+.description-editor .ql-toolbar .ql-picker {
+  color: var(--text-secondary);
+}
+
+.description-editor .ql-toolbar button:hover .ql-stroke,
+.description-editor .ql-toolbar .ql-picker-label:hover {
+  stroke: var(--primary);
+  color: var(--primary);
+}
+
+.description-editor .ql-toolbar button:hover .ql-fill {
+  fill: var(--primary);
+}
+
+.description-editor .ql-toolbar .ql-picker-options {
+  background-color: var(--bg-modal);
+  border-color: var(--border-color);
+}
+
+.description-editor .ql-toolbar .ql-picker-item {
+  color: var(--text-primary);
+}
+
+.description-editor .ql-tooltip {
+  background-color: var(--bg-modal);
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-lg);
+  color: var(--text-primary);
+}
+
+.description-editor .ql-tooltip input {
+  background-color: var(--bg-input);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
 /* Color Swatches */
 .project-color-grid {
   display: grid;
@@ -1110,6 +1189,4 @@ body {
   border-radius: 999px;
   font-weight: 700;
 }
-
-
 

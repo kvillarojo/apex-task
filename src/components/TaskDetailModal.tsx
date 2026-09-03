@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { X, Trash2, Plus, Tag as TagIcon } from 'lucide-react';
 import { useTodo } from '../context/TodoContext';
 import type { Priority, RecurrenceRule, TaskStatus } from '../types/todo';
+import { DescriptionEditor } from './DescriptionEditor';
 
 export const TaskDetailModal: React.FC = () => {
   const {
@@ -160,22 +161,7 @@ export const TaskDetailModal: React.FC = () => {
           {/* Description */}
           <div>
             <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DESCRIPTION</label>
-            <textarea
-              rows={6}
-              value={description}
-              onChange={e => setDescription(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-input)',
-                color: 'var(--text-primary)',
-                marginTop: '4px',
-                fontFamily: 'inherit',
-                resize: 'vertical'
-              }}
-            />
+            <DescriptionEditor value={description} onChange={setDescription} />
           </div>
 
           {/* Row 1: Priority, Status, Project & Assignee */}

@@ -16,6 +16,13 @@ import { useTodo } from '../context/TodoContext';
 import type { Task } from '../types/todo';
 import { formatFriendlyDate, isOverdue } from '../utils/dateUtils';
 
+const getDescriptionPreview = (description: string) => {
+  if (!/<\/?[a-z][\s\S]*>/i.test(description)) return description;
+  const container = document.createElement('div');
+  container.innerHTML = description;
+  return container.textContent || '';
+};
+
 export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
   const {
     toggleTaskComplete,
@@ -96,7 +103,7 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
         </div>
 
         {/* Description */}
-        {task.description && <p className="task-desc">{task.description}</p>}
+        {task.description && <p className="task-desc">{getDescriptionPreview(task.description)}</p>}
 
         {/* Metadata Badges */}
         <div className="task-meta">
