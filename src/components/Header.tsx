@@ -137,7 +137,7 @@ export const Header: React.FC = () => {
           {soundEnabled ? <Volume2 size={18} color="#10b981" /> : <VolumeX size={18} color="var(--text-muted)" />}
         </button>
 
-        <button className="icon-button" onClick={openPeopleModal} title="Manage People">
+        <button className="icon-button" onClick={openPeopleModal} title="Manage Users">
           <Users size={18} />
         </button>
 

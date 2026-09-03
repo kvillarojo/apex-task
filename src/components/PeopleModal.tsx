@@ -66,8 +66,8 @@ export const PeopleModal: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <Users size={20} color="var(--primary)" />
             <div>
-              <h2 style={{ fontSize: '1.1rem', fontWeight: 800 }}>Manage People</h2>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Add people to assign them to tickets.</p>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 800 }}>Manage Users</h2>
+              <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Add users to assign them to tickets.</p>
             </div>
           </div>
           <button className="icon-button" onClick={closePeopleModal} title="Close">

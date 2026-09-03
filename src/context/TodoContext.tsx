@@ -594,7 +594,18 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Data Actions
   const exportData = () => {
-    const data = JSON.stringify({ tasks, projects }, null, 2);
+    const data = JSON.stringify(
+      {
+        version: 2,
+        exportedAt: new Date().toISOString(),
+        tasks,
+        projects,
+        mytodo_assignees_v1: assignees,
+        tagDefinitions
+      },
+      null,
+      2
+    );
     const blob = new Blob([data], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -607,11 +618,35 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const importData = (jsonString: string): boolean => {
     try {
       const parsed = JSON.parse(jsonString);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        return false;
+      }
+
+      const hasImportableData =
+        Array.isArray(parsed.tasks) ||
+        Array.isArray(parsed.projects) ||
+        Array.isArray(parsed.mytodo_assignees_v1) ||
+        Array.isArray(parsed.assignees) ||
+        Array.isArray(parsed.tagDefinitions);
+
+      if (!hasImportableData) {
+        return false;
+      }
+
       if (Array.isArray(parsed.tasks)) {
         setTasks(parsed.tasks);
       }
       if (Array.isArray(parsed.projects)) {
         setProjects(parsed.projects);
+      }
+      const importedAssignees = Array.isArray(parsed.mytodo_assignees_v1)
+        ? parsed.mytodo_assignees_v1
+        : parsed.assignees;
+      if (Array.isArray(importedAssignees)) {
+        setAssignees(importedAssignees);
+      }
+      if (Array.isArray(parsed.tagDefinitions)) {
+        setTagDefinitions(parsed.tagDefinitions);
       }
       return true;
     } catch {
