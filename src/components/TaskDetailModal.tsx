@@ -124,354 +124,266 @@ export const TaskDetailModal: React.FC = () => {
 
   return (
     <div className="modal-overlay" onClick={() => setEditingTask(null)}>
-      <div className="modal-card" onClick={e => e.stopPropagation()}>
+      <div className="modal-card ticket-modal-card" onClick={e => e.stopPropagation()}>
         {/* Header */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Edit Task Details</h2>
+        <header className="ticket-modal-header">
+          <div>
+            <span className="ticket-modal-eyebrow">Ticket details</span>
+          </div>
           <button
             onClick={() => setEditingTask(null)}
-            style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+            className="ticket-modal-close-btn"
+            aria-label="Close modal"
           >
             <X size={20} />
           </button>
-        </div>
+        </header>
 
-        {/* Form Body */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '70vh', overflowY: 'auto', paddingRight: '4px' }}>
-          {/* Title */}
-          <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>TITLE</label>
-            <input
-              type="text"
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '8px 12px',
-                borderRadius: '8px',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-input)',
-                color: 'var(--text-primary)',
-                fontWeight: 600,
-                marginTop: '4px'
-              }}
-            />
-          </div>
-
-          {/* Description */}
-          <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DESCRIPTION</label>
-            <DescriptionEditor value={description} onChange={setDescription} />
-          </div>
-
-          {/* Row 1: Priority, Status, Project & Assignee */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>PRIORITY</label>
-              <select
-                value={priority}
-                onChange={e => setPriority(e.target.value as Priority)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              >
-                <option value="p1">P1 - Urgent</option>
-                <option value="p2">P2 - High</option>
-                <option value="p3">P3 - Medium</option>
-                <option value="p4">P4 - Low</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>STATUS</label>
-              <select
-                value={status}
-                onChange={e => setStatus(e.target.value as TaskStatus)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              >
-                <option value="todo">To Do</option>
-                <option value="in_progress">In Progress</option>
-                <option value="done">Done</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>PROJECT</label>
-              <select
-                value={projectId}
-                onChange={e => setProjectId(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              >
-                {projects.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>ASSIGNEE</label>
-              <select
-                value={assigneeId}
-                onChange={e => setAssigneeId(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              >
-                <option value="">Unassigned</option>
-                {assignees.map(assignee => (
-                  <option key={assignee.id} value={assignee.id}>{assignee.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Row 2: Due Date & Time & Recurrence */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DUE DATE</label>
+        {/* Main Body: Two-Column Layout */}
+        <div className="ticket-modal-body">
+          {/* Left Column: Main Content */}
+          <div className="ticket-modal-column-left">
+            {/* Title Section */}
+            <div className="form-group">
+              <label>TITLE</label>
               <input
-                type="date"
-                value={dueDate}
-                onChange={e => setDueDate(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
+                type="text"
+                value={title}
+                onChange={e => setTitle(e.target.value)}
+                className="form-input form-input-title"
               />
             </div>
 
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>DUE TIME</label>
-              <input
-                type="time"
-                value={dueTime}
-                onChange={e => setDueTime(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              />
+            {/* Description Section */}
+            <div className="form-group">
+              <label>DESCRIPTION</label>
+              <DescriptionEditor value={description} onChange={setDescription} />
             </div>
 
-            <div>
-              <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>RECURRING</label>
-              <select
-                value={recurring}
-                onChange={e => setRecurring(e.target.value as RecurrenceRule)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  marginTop: '4px'
-                }}
-              >
-                <option value="none">None</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Subtasks */}
-          <div>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>SUBTASKS</label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '6px' }}>
-              {editingTask.subtasks.map(st => (
-                <div key={st.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '4px 8px', borderRadius: '6px', backgroundColor: 'var(--bg-input)' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <input
-                      type="checkbox"
-                      checked={st.completed}
-                      onChange={() => toggleSubtask(editingTask.id, st.id)}
-                    />
-                    <span style={{ fontSize: '0.85rem', textDecoration: st.completed ? 'line-through' : 'none' }}>{st.title}</span>
-                  </div>
-                  <button
-                    onClick={() => deleteSubtask(editingTask.id, st.id)}
-                    style={{ background: 'none', border: 'none', color: 'var(--priority-p1)', cursor: 'pointer' }}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))}
-
-              <form onSubmit={handleAddSubtask} style={{ display: 'flex', gap: '6px' }}>
-                <input
-                  type="text"
-                  placeholder="New subtask title..."
-                  value={newSubtaskTitle}
-                  onChange={e => setNewSubtaskTitle(e.target.value)}
-                  style={{
-                    flex: 1,
-                    padding: '6px 10px',
-                    borderRadius: '6px',
-                    border: '1px solid var(--border-color)',
-                    backgroundColor: 'var(--bg-input)',
-                    color: 'var(--text-primary)',
-                    fontSize: '0.8rem'
-                  }}
-                />
-                <button type="submit" className="btn-secondary" style={{ padding: '6px 10px', fontSize: '0.8rem' }}>
-                  <Plus size={14} />
-                </button>
-              </form>
-            </div>
-          </div>
-
-          {/* Tags */}
-          <div style={{ position: 'relative' }}>
-            <label style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>TAGS</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-              {tags.map(t => {
-                const color = getTagColor(t);
-                return (
-                  <span
-                    key={t}
-                    className="badge"
-                    style={{
-                      padding: '4px 8px',
-                      fontSize: '0.8rem',
-                      color,
-                      backgroundColor: `${color}18`,
-                      borderColor: `${color}40`
-                    }}
-                  >
-                    <TagIcon size={12} /> #{t}
+            {/* Subtasks Section */}
+            <div className="form-group">
+              <label>SUBTASKS</label>
+              <div className="subtasks-list">
+                {editingTask.subtasks.map(st => (
+                  <div key={st.id} className="subtask-item">
+                    <div className="subtask-content">
+                      <input
+                        type="checkbox"
+                        checked={st.completed}
+                        onChange={() => toggleSubtask(editingTask.id, st.id)}
+                        className="subtask-checkbox"
+                      />
+                      <span className={st.completed ? 'subtask-text completed' : 'subtask-text'}>
+                        {st.title}
+                      </span>
+                    </div>
                     <button
-                      onClick={() => handleRemoveTag(t)}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        color: 'inherit',
-                        cursor: 'pointer',
-                        marginLeft: '4px',
-                        fontWeight: 700
-                      }}
+                      onClick={() => deleteSubtask(editingTask.id, st.id)}
+                      className="subtask-delete-btn"
+                      aria-label="Delete subtask"
                     >
-                      ×
+                      <Trash2 size={14} />
                     </button>
-                  </span>
-                );
-              })}
-            </div>
-            <input
-              type="text"
-              placeholder="Type tag and press Enter..."
-              value={tagInput}
-              onChange={e => setTagInput(e.target.value)}
-              onKeyDown={handleAddTag}
-              style={{
-                width: '100%',
-                padding: '6px 10px',
-                borderRadius: '6px',
-                border: '1px solid var(--border-color)',
-                backgroundColor: 'var(--bg-input)',
-                color: 'var(--text-primary)',
-                fontSize: '0.8rem',
-                marginTop: '6px'
-              }}
-            />
-
-            {/* Auto-suggest Dropdown */}
-            {tagSuggestions.length > 0 && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: 0,
-                  right: 0,
-                  marginTop: '4px',
-                  backgroundColor: 'var(--bg-modal)',
-                  border: '1px solid var(--border-highlight)',
-                  borderRadius: '8px',
-                  boxShadow: 'var(--shadow-lg)',
-                  zIndex: 20,
-                  maxHeight: '140px',
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  padding: '4px'
-                }}
-              >
-                {tagSuggestions.map(suggestion => (
-                  <button
-                    key={suggestion}
-                    type="button"
-                    onClick={() => selectSuggestion(suggestion)}
-                    className="suggestion-item"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '6px 10px',
-                      borderRadius: '6px',
-                      border: 'none',
-                      backgroundColor: 'transparent',
-                      color: 'var(--text-primary)',
-                      fontSize: '0.8rem',
-                      cursor: 'pointer',
-                      textAlign: 'left'
-                    }}
-                  >
-                    <TagIcon size={12} color="var(--primary)" />
-                    <span>#{suggestion}</span>
-                  </button>
+                  </div>
                 ))}
+
+                <form onSubmit={handleAddSubtask} className="subtask-input-form">
+                  <input
+                    type="text"
+                    placeholder="New subtask title..."
+                    value={newSubtaskTitle}
+                    onChange={e => setNewSubtaskTitle(e.target.value)}
+                    className="form-input form-input-subtask"
+                  />
+                  <button type="submit" className="btn-secondary btn-icon">
+                    <Plus size={14} />
+                  </button>
+                </form>
               </div>
-            )}
+            </div>
+
+            {/* Tags Section */}
+            <div className="form-group form-group-tags">
+              <label>TAGS</label>
+              <div className="tags-container">
+                <div className="tags-list">
+                  {tags.map(t => {
+                    const color = getTagColor(t);
+                    return (
+                      <span
+                        key={t}
+                        className="badge"
+                        style={{
+                          color,
+                          backgroundColor: `${color}18`,
+                          borderColor: `${color}40`
+                        }}
+                      >
+                        <TagIcon size={12} /> #{t}
+                        <button
+                          onClick={() => handleRemoveTag(t)}
+                          className="badge-close-btn"
+                          aria-label={`Remove tag ${t}`}
+                        >
+                          ×
+                        </button>
+                      </span>
+                    );
+                  })}
+                </div>
+
+                <div style={{ position: 'relative' }}>
+                  <input
+                    type="text"
+                    placeholder="Type tag and press Enter..."
+                    value={tagInput}
+                    onChange={e => setTagInput(e.target.value)}
+                    onKeyDown={handleAddTag}
+                    className="form-input form-input-tag"
+                  />
+
+                  {/* Auto-suggest Dropdown */}
+                  {tagSuggestions.length > 0 && (
+                    <div className="tag-suggestions">
+                      {tagSuggestions.map(suggestion => (
+                        <button
+                          key={suggestion}
+                          type="button"
+                          onClick={() => selectSuggestion(suggestion)}
+                          className="suggestion-item"
+                        >
+                          <TagIcon size={12} />
+                          <span>#{suggestion}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
+
+          {/* Right Column: Sidebar Panels */}
+          <aside className="ticket-modal-column-right">
+            {/* Details Panel */}
+            <section className="details-panel">
+              <h3 className="panel-title">Details</h3>
+              <div className="panel-content">
+                {/* Priority & Status Row */}
+                <div className="form-row">
+                  <div className="form-group form-group-half">
+                    <label>PRIORITY</label>
+                    <select
+                      value={priority}
+                      onChange={e => setPriority(e.target.value as Priority)}
+                      className="form-input"
+                    >
+                      <option value="p1">P1 - Urgent</option>
+                      <option value="p2">P2 - High</option>
+                      <option value="p3">P3 - Medium</option>
+                      <option value="p4">P4 - Low</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group form-group-half">
+                    <label>STATUS</label>
+                    <select
+                      value={status}
+                      onChange={e => setStatus(e.target.value as TaskStatus)}
+                      className="form-input"
+                    >
+                      <option value="todo">To Do</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="done">Done</option>
+                      <option value="archived">Archived</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Project & Assignee Row */}
+                <div className="form-row">
+                  <div className="form-group form-group-half">
+                    <label>PROJECT</label>
+                    <select
+                      value={projectId}
+                      onChange={e => setProjectId(e.target.value)}
+                      className="form-input"
+                    >
+                      <option value="">Select project</option>
+                      {projects.map(p => (
+                        <option key={p.id} value={p.id}>
+                          {p.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-group form-group-half">
+                    <label>ASSIGNEE</label>
+                    <select
+                      value={assigneeId}
+                      onChange={e => setAssigneeId(e.target.value)}
+                      className="form-input"
+                    >
+                      <option value="">Unassigned</option>
+                      {assignees.map(assignee => (
+                        <option key={assignee.id} value={assignee.id}>
+                          {assignee.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Planning Panel */}
+            <section className="planning-panel">
+              <h3 className="panel-title">Planning</h3>
+              <div className="panel-content">
+                {/* Due Date & Time & Recurrence */}
+                <div className="form-group">
+                  <label>DUE DATE</label>
+                  <input
+                    type="date"
+                    value={dueDate}
+                    onChange={e => setDueDate(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>DUE TIME</label>
+                  <input
+                    type="time"
+                    value={dueTime}
+                    onChange={e => setDueTime(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>RECURRING</label>
+                  <select
+                    value={recurring}
+                    onChange={e => setRecurring(e.target.value as RecurrenceRule)}
+                    className="form-input"
+                  >
+                    <option value="none">None</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+          </aside>
         </div>
 
         {/* Footer */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '12px', borderTop: '1px solid var(--border-color)' }}>
+        <footer className="ticket-modal-footer">
           <button
-            className="btn-secondary"
-            style={{ color: 'var(--priority-p1)' }}
+            className="btn-secondary btn-danger"
             onClick={() => {
               deleteTask(editingTask.id);
               setEditingTask(null);
@@ -479,7 +391,7 @@ export const TaskDetailModal: React.FC = () => {
           >
             Delete Task
           </button>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div className="footer-actions">
             <button className="btn-secondary" onClick={() => setEditingTask(null)}>
               Cancel
             </button>
@@ -487,7 +399,7 @@ export const TaskDetailModal: React.FC = () => {
               Save Changes
             </button>
           </div>
-        </div>
+        </footer>
       </div>
     </div>
   );

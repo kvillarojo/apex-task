@@ -661,6 +661,508 @@ body {
   gap: 18px;
 }
 
+/* Ticket detail workspace */
+/* ===== Ticket Modal Card ===== */
+.ticket-modal-card {
+  width: min(1200px, 94vw);
+  max-height: 90vh;
+  padding: 0;
+  gap: 0;
+  overflow: hidden;
+  background: var(--bg-modal);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.ticket-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(120deg, var(--bg-modal), var(--primary-light));
+  flex-shrink: 0;
+}
+
+.ticket-modal-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--primary);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ticket-modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.ticket-modal-close-btn:hover {
+  background-color: var(--bg-hover);
+}
+
+/* Main Body: Two-Column Master Layout */
+.ticket-modal-body {
+  display: flex;
+  flex-direction: row;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* Left Column: Main Content */
+.ticket-modal-column-left {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Right Column: Sidebar Panels */
+.ticket-modal-column-right {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 320px;
+  flex-shrink: 0;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+/* ===== Form Elements ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-input {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.form-input:hover {
+  border-color: var(--border-highlight);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: var(--bg-modal);
+}
+
+/* Select & Date/Time Input Styling */
+select.form-input,
+input[type="date"].form-input,
+input[type="time"].form-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding: 10px 12px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 32px;
+  cursor: pointer;
+}
+
+input[type="date"].form-input,
+input[type="time"].form-input {
+  cursor: pointer;
+  padding-right: 12px;
+}
+
+select.form-input option {
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+  padding: 8px;
+}
+
+select.form-input option:checked {
+  background: var(--primary);
+  color: white;
+}
+
+select.form-input:hover,
+input[type="date"].form-input:hover,
+input[type="time"].form-input:hover {
+  border-color: var(--border-highlight);
+}
+
+select.form-input:focus,
+input[type="date"].form-input:focus,
+input[type="time"].form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background-color: var(--bg-modal);
+}
+
+/* Webkit calendar icon styling */
+input[type="date"].form-input::-webkit-calendar-picker-indicator,
+input[type="time"].form-input::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 4px;
+  transition: background-color 0.2s;
+}
+
+input[type="date"].form-input::-webkit-calendar-picker-indicator:hover,
+input[type="time"].form-input::-webkit-calendar-picker-indicator:hover {
+  background-color: var(--bg-hover);
+}
+
+.form-input-title {
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.form-input-subtask {
+  font-size: 0.8rem;
+}
+
+.form-input-tag {
+  font-size: 0.8rem;
+}
+
+/* Form Rows: Two-Column Flex Layout */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.form-group-half {
+  flex: 1 1 calc(50% - 5px);
+  min-width: 0;
+}
+
+.form-row .form-group {
+  gap: 6px;
+}
+
+/* ===== Panels ===== */
+.details-panel,
+.planning-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-card);
+}
+
+.panel-title {
+  margin: 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.panel-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ===== Subtasks ===== */
+.subtasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subtask-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: var(--bg-input);
+  gap: 8px;
+}
+
+.subtask-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.subtask-checkbox {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.subtask-text {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.subtask-text.completed {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.subtask-delete-btn {
+  background: none;
+  border: none;
+  color: var(--priority-p1);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.subtask-delete-btn:hover {
+  opacity: 0.7;
+}
+
+.subtask-input-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.subtask-input-form .form-input {
+  flex: 1;
+}
+
+/* ===== Tags ===== */
+.form-group-tags {
+  min-height: 0;
+}
+
+.tags-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border: 1px solid;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.badge-close-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 0;
+  margin-left: 2px;
+  display: flex;
+  align-items: center;
+  transition: opacity 0.2s;
+}
+
+.badge-close-btn:hover {
+  opacity: 0.7;
+}
+
+/* Tag Suggestions Dropdown */
+.tag-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background-color: var(--bg-modal);
+  border: 1px solid var(--border-highlight);
+  border-radius: 8px;
+  box-shadow: var(--shadow-lg);
+  z-index: 20;
+  max-height: 140px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background-color: transparent;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.suggestion-item:hover {
+  background-color: var(--bg-hover);
+}
+
+/* ===== Footer ===== */
+.ticket-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px 20px;
+  border-top: 1px solid var(--border-color);
+  background: var(--bg-card);
+  flex-shrink: 0;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-danger {
+  color: var(--priority-p1);
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 850px) {
+  .ticket-modal-body {
+    flex-direction: column;
+    gap: 16px;
+    padding: 18px;
+  }
+
+  .ticket-modal-column-right {
+    width: 100%;
+    max-height: none;
+  }
+
+  .form-row {
+    flex-direction: row;
+  }
+
+  .form-group-half {
+    flex: 1 1 calc(50% - 6px);
+  }
+
+  .details-panel,
+  .planning-panel {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .ticket-modal-column-left {
+    gap: 16px;
+  }
+
+  .ticket-modal-column-right {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .ticket-modal-card {
+    width: 96vw;
+    max-height: 95vh;
+  }
+
+  .ticket-modal-body {
+    padding: 14px;
+  }
+
+  .ticket-modal-footer {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-actions {
+    width: 100%;
+  }
+
+  .footer-actions .btn-primary {
+    flex: 1;
+  }
+
+  .btn-secondary {
+    flex: 1;
+  }
+
+  .form-group-half {
+    flex: 1 1 100%;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .panel-title {
+    font-size: 0.75rem;
+  }
+
+  .tags-list {
+    gap: 4px;
+  }
+
+  .badge {
+    font-size: 0.75rem;
+    padding: 3px 6px;
+  }
+}
+
 /* Button Styles */
 .btn-primary {
   background: linear-gradient(135deg, var(--primary), var(--primary-hover));
@@ -842,6 +1344,15 @@ body {
   border: 0;
   font-family: inherit;
 }
+
+.description-editor > .ql-toolbar.ql-snow {
+  border-color: transparent;
+}
+
+.description-editor > .ql-container.ql-snow {
+  border-color: transparent;
+}
+
 
 .description-editor .ql-toolbar {
   background-color: var(--bg-input);
@@ -1189,4 +1700,3 @@ body {
   border-radius: 999px;
   font-weight: 700;
 }
-
