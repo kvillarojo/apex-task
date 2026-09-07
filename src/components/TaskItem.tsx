@@ -23,7 +23,12 @@ const getDescriptionPreview = (description: string) => {
   return container.textContent || '';
 };
 
-export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
+interface TaskItemProps {
+  task: Task;
+  variant?: 'default' | 'kanban';
+}
+
+export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' }) => {
   const {
     toggleTaskComplete,
     deleteTask,
@@ -47,6 +52,39 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
   const completedSubtasksCount = task.subtasks.filter(s => s.completed).length;
   const totalSubtasksCount = task.subtasks.length;
 
+  const actionButtons = (
+    <>
+      {!task.completed && (
+        <button
+          className="icon-button"
+          style={{ width: '28px', height: '28px' }}
+          onClick={() => startPomodoro(task.id)}
+          title="Start Focus Timer on this task"
+        >
+          <Play size={12} color="var(--primary)" />
+        </button>
+      )}
+
+      <button
+        className="icon-button"
+        style={{ width: '28px', height: '28px' }}
+        onClick={() => setEditingTask(task)}
+        title="Edit Task"
+      >
+        <Edit2 size={12} />
+      </button>
+
+      <button
+        className="icon-button"
+        style={{ width: '28px', height: '28px', color: 'var(--priority-p1)' }}
+        onClick={() => deleteTask(task.id)}
+        title="Delete Task"
+      >
+        <Trash2 size={12} />
+      </button>
+    </>
+  );
+
   const handleAddSubtaskSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newSubtaskTitle.trim()) return;
@@ -55,7 +93,7 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
   };
 
   return (
-    <div className={`task-card ${task.completed ? 'completed' : ''}`}>
+    <div className={`task-card ${task.completed ? 'completed' : ''} ${variant === 'kanban' ? 'kanban-card' : ''}`}>
       {/* Checkbox */}
       <div
         className={`task-checkbox ${task.completed ? 'checked' : ''}`}
@@ -67,40 +105,13 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
       {/* Task Content */}
       <div className="task-content">
         <div className="task-header-row">
-          <span className="task-title">{task.title}</span>
+          <span className="task-title" title={task.title}>{task.title}</span>
 
           {/* Quick Action Buttons */}
-          <div className="task-action-buttons">
-            {!task.completed && (
-              <button
-                className="icon-button"
-                style={{ width: '28px', height: '28px' }}
-                onClick={() => startPomodoro(task.id)}
-                title="Start Focus Timer on this task"
-              >
-                <Play size={12} color="var(--primary)" />
-              </button>
-            )}
-
-            <button
-              className="icon-button"
-              style={{ width: '28px', height: '28px' }}
-              onClick={() => setEditingTask(task)}
-              title="Edit Task"
-            >
-              <Edit2 size={12} />
-            </button>
-
-            <button
-              className="icon-button"
-              style={{ width: '28px', height: '28px', color: 'var(--priority-p1)' }}
-              onClick={() => deleteTask(task.id)}
-              title="Delete Task"
-            >
-              <Trash2 size={12} />
-            </button>
-          </div>
+          {variant === 'default' && <div className="task-action-buttons">{actionButtons}</div>}
         </div>
+
+        {variant === 'kanban' && <div className="task-action-row task-action-buttons">{actionButtons}</div>}
 
         {/* Description */}
         {task.description && <p className="task-desc">{getDescriptionPreview(task.description)}</p>}
@@ -179,7 +190,7 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
         </div>
 
         {/* Subtasks Expanded List */}
-        {(expandedSubtasks || totalSubtasksCount > 0) && (
+        {expandedSubtasks && totalSubtasksCount > 0 && (
           <div className="task-subtasks-container">
             {task.subtasks.map(st => (
               <div key={st.id} className="task-subtask-row">

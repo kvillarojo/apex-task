@@ -44,7 +44,7 @@ export const KanbanView: React.FC = () => {
               <span className="nav-badge">{columnTasks.length}</span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, overflowY: 'auto' }}>
+            <div className="kanban-task-list" style={{ display: 'flex', flexDirection: 'column', gap: '10px', flex: 1, overflowY: 'auto' }}>
               {columnTasks.map((task: Task) => (
                 <div
                   key={task.id}
@@ -52,7 +52,7 @@ export const KanbanView: React.FC = () => {
                   onDragStart={e => e.dataTransfer.setData('text/plain', task.id)}
                   style={{ cursor: 'grab' }}
                 >
-                  <TaskItem task={task} />
+                  <TaskItem task={task} variant="kanban" />
                 </div>
               ))}
 
