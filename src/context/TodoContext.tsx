@@ -885,10 +885,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     ])
   ).sort();
 
-  // Notes use an independent selector so task-only tags never surface there.
+  // Notes only expose tags that are actually attached to notes.
   const noteTags = Array.from(
     new Set([
-      ...tagDefinitions.map(t => t.name),
       ...notes.flatMap(note => note.tags)
     ])
   ).sort();

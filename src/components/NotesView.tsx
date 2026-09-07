@@ -74,15 +74,6 @@ export const NotesView: React.FC = () => {
             Project documentation, quick memos, tags & reminders
           </p>
         </div>
-
-        <button
-          type="button"
-          className="btn-primary notes-create-btn"
-          onClick={() => openCreateNoteModal()}
-        >
-          <Plus size={18} />
-          <span>New Note</span>
-        </button>
       </div>
 
       {/* Quick Take A Note Bar */}
