@@ -143,7 +143,7 @@ export const Sidebar: React.FC = () => {
             >
               <div className="nav-item-left">
                 <Inbox size={18} color="#3b82f6" />
-                <span>Inbox</span>
+                <span>Tasks</span>
               </div>
               {inboxCount > 0 && <span className="nav-badge">{inboxCount}</span>}
             </button>

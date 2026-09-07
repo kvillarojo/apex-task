@@ -6,7 +6,6 @@ import {
   Flag,
   Play,
   Edit2,
-  Trash2,
   ChevronDown,
   Repeat,
   Plus,
@@ -58,30 +57,15 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
         <button
           className="icon-button"
           style={{ width: '28px', height: '28px' }}
-          onClick={() => startPomodoro(task.id)}
+          onClick={(e) => {
+            e.stopPropagation();
+            startPomodoro(task.id);
+          }}
           title="Start Focus Timer on this task"
         >
           <Play size={12} color="var(--primary)" />
         </button>
       )}
-
-      <button
-        className="icon-button"
-        style={{ width: '28px', height: '28px' }}
-        onClick={() => setEditingTask(task)}
-        title="Edit Task"
-      >
-        <Edit2 size={12} />
-      </button>
-
-      <button
-        className="icon-button"
-        style={{ width: '28px', height: '28px', color: 'var(--priority-p1)' }}
-        onClick={() => deleteTask(task.id)}
-        title="Delete Task"
-      >
-        <Trash2 size={12} />
-      </button>
     </>
   );
 
@@ -93,11 +77,19 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
   };
 
   return (
-    <div className={`task-card ${task.completed ? 'completed' : ''} ${variant === 'kanban' ? 'kanban-card' : ''}`}>
+    <div className={`task-card ${task.completed ? 'completed' : ''} ${variant === 'kanban' ? 'kanban-card' : ''}`}
+      onClick={(e) => {
+          e.stopPropagation();
+          setEditingTask(task);
+        }}
+    >
       {/* Checkbox */}
       <div
         className={`task-checkbox ${task.completed ? 'checked' : ''}`}
-        onClick={() => toggleTaskComplete(task.id)}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleTaskComplete(task.id)}
+        }
       >
         {task.completed && <Check size={14} />}
       </div>
