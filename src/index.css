@@ -1845,3 +1845,423 @@ input[type="time"].form-input::-webkit-calendar-picker-indicator:hover {
   border-radius: 999px;
   font-weight: 700;
 }
+
+/* ==========================================================================
+   Notes workspace
+   ========================================================================== */
+.notes-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.notes-header-bar,
+.notes-quick-bar,
+.notes-filter-chips-wrapper,
+.notes-empty-state,
+.note-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-lg);
+}
+
+.notes-header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-radius: 18px;
+}
+
+.notes-page-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.notes-counter-badge,
+.mobile-tab-badge {
+  min-width: 20px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+.notes-page-subtitle {
+  margin-top: 4px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.notes-create-btn,
+.notes-quick-bar .btn-secondary,
+.notification-permission-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.notes-quick-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.notes-quick-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--primary-light);
+}
+
+.notes-quick-bar input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+}
+
+.notes-filter-chips-wrapper {
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.notes-filter-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 12px;
+  scrollbar-width: none;
+}
+
+.notes-filter-chips::-webkit-scrollbar { display: none; }
+
+.filter-chip {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 11px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.filter-chip.active {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.chips-separator {
+  width: 1px;
+  margin: 4px 2px;
+  background: var(--border-color);
+  flex: 0 0 auto;
+}
+
+.notes-section { display: flex; flex-direction: column; gap: 10px; }
+
+.notes-section-header {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.note-card {
+  display: flex;
+  min-height: 168px;
+  flex-direction: column;
+  gap: 13px;
+  padding: 17px;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.note-card:hover { transform: translateY(-2px); border-color: var(--border-highlight); }
+.note-card-header, .note-card-actions, .note-card-footer { display: flex; align-items: center; }
+.note-card-header { justify-content: space-between; gap: 12px; }
+.note-card-actions { gap: 4px; }
+.note-card-title { overflow: hidden; font-size: 0.95rem; text-overflow: ellipsis; white-space: nowrap; }
+.note-card-snippet { display: -webkit-box; overflow: hidden; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.55; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.note-card-footer { flex-wrap: wrap; gap: 6px; margin-top: auto; }
+
+.note-pin-btn, .note-delete-btn {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+.note-pin-btn.active { color: var(--primary); background: var(--primary-light); }
+.note-delete-btn:hover { color: var(--priority-p1); background: var(--priority-p1-bg); }
+.note-project-badge, .note-reminder-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 7px; border: 1px solid; border-radius: 999px; font-size: 0.69rem; font-weight: 700; }
+.note-reminder-pill { border-color: var(--border-color); color: var(--text-secondary); }
+.note-reminder-pill.overdue { border-color: var(--priority-p1); color: var(--priority-p1); background: var(--priority-p1-bg); }
+
+.notes-empty-state {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  padding: 54px 24px;
+  border-radius: 18px;
+  text-align: center;
+}
+.notes-empty-icon { display: grid; width: 68px; height: 68px; place-items: center; border-radius: 22px; background: var(--primary-light); color: var(--primary); }
+.notes-empty-desc { max-width: 440px; color: var(--text-secondary); font-size: 0.86rem; }
+
+.note-pin-pill-btn, .mobile-picker-trigger, .notification-permission-btn {
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+.note-pin-pill-btn { display: inline-flex; align-items: center; gap: 5px; padding: 5px 9px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+.note-pin-pill-btn.active { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+.mobile-picker-trigger { display: none; }
+.notification-permission-btn { width: 100%; min-height: 36px; margin-top: 2px; border-radius: 8px; font: inherit; font-size: 0.75rem; font-weight: 700; }
+
+.mobile-bottom-nav, .mobile-fab, .sidebar-mobile-close-btn, .mobile-picker-overlay { display: none; }
+
+@media (max-width: 900px) {
+  .app-container { height: 100dvh; }
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 110;
+    box-shadow: 22px 0 46px rgba(0, 0, 0, 0.3);
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+  }
+  .sidebar.mobile-open { transform: translateX(0); }
+  .sidebar-backdrop { position: fixed; z-index: 105; inset: 0; background: rgba(4, 8, 17, 0.56); backdrop-filter: blur(2px); }
+  .sidebar-header { justify-content: space-between; }
+  .sidebar-mobile-close-btn { display: grid; width: 44px; height: 44px; place-items: center; border: 0; border-radius: 12px; background: var(--bg-input); color: var(--text-primary); }
+  .main-wrapper { width: 100%; }
+  .app-header { height: 60px; padding: 0 14px; }
+  .header-left { width: 100%; gap: 10px; }
+  .mobile-menu-btn { flex: 0 0 44px; width: 44px; height: 44px; }
+  .search-box { width: auto; flex: 1; }
+  .search-box input { min-height: 42px; }
+  .cmd-palette-btn, .header-right { display: none !important; }
+  .page-container { padding: 16px 14px calc(104px + env(safe-area-inset-bottom)); }
+
+  .mobile-bottom-nav {
+    position: fixed;
+    z-index: 90;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    min-height: calc(65px + env(safe-area-inset-bottom));
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+  }
+  .mobile-tab-btn { display: flex; min-height: 52px; align-items: center; justify-content: center; flex-direction: column; gap: 3px; border: 0; background: transparent; color: var(--text-muted); font: inherit; font-size: 0.64rem; font-weight: 700; }
+  .mobile-tab-btn.active { color: var(--primary); }
+  .mobile-tab-icon-wrapper { position: relative; display: grid; width: 26px; height: 24px; place-items: center; }
+  .mobile-tab-badge { position: absolute; top: -7px; right: -14px; min-width: 16px; padding: 0 4px; font-size: 0.6rem; background: var(--primary); color: #fff; }
+  .mobile-fab { position: fixed; z-index: 95; right: 18px; bottom: calc(76px + env(safe-area-inset-bottom)); display: grid; width: 56px; height: 56px; place-items: center; border: 1px solid rgba(255,255,255,0.3); border-radius: 18px; background: linear-gradient(145deg, var(--primary), #8b5cf6); color: #fff; box-shadow: 0 12px 28px var(--accent-glow); }
+
+  .notes-page-container { gap: 14px; }
+  .notes-header-bar { padding: 16px; border-radius: 16px; }
+  .notes-page-title { font-size: 1.2rem; }
+  .notes-page-subtitle { display: none; }
+  .notes-create-btn { min-width: 44px; min-height: 44px; padding: 0 12px; }
+  .notes-create-btn span { display: none; }
+  .notes-quick-bar { min-height: 54px; padding: 8px; }
+  .notes-quick-bar .btn-secondary { display: none; }
+  .notes-filter-chips { padding: 9px 10px; }
+  .filter-chip { min-height: 44px; padding: 7px 13px; }
+  .notes-grid { grid-template-columns: 1fr; gap: 10px; }
+  .note-card { min-height: 148px; padding: 15px; border-radius: 14px; }
+  .note-card:hover { transform: none; }
+  .note-pin-btn, .note-delete-btn { width: 44px; height: 44px; }
+  .note-card-actions { margin: -7px -7px -7px 0; }
+  .notes-empty-state { padding: 44px 20px; }
+
+  .note-modal-card {
+    width: 100vw !important;
+    height: 100dvh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+  }
+  .note-modal-card .ticket-modal-header { min-height: 64px; padding: 10px 16px; }
+  .note-modal-card .ticket-modal-close-btn { width: 44px; height: 44px; }
+  .note-modal-card .ticket-modal-body { display: block; overflow-y: auto; padding: 16px 16px 28px; }
+  .note-modal-card .ticket-modal-column-left,
+  .note-modal-card .ticket-modal-column-right { overflow: visible; }
+  .note-modal-card .ticket-modal-column-left { gap: 14px; }
+  .note-modal-card .ticket-modal-column-right { margin-top: 20px; }
+  .note-modal-card .description-editor .ql-toolbar { position: sticky; top: 0; z-index: 3; padding: 8px 4px; overflow-x: auto; white-space: nowrap; }
+  .note-modal-card .description-editor .ql-container,
+  .note-modal-card .description-editor .ql-editor { min-height: 36dvh; }
+  .note-modal-card .ticket-modal-footer { min-height: 72px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); }
+  .note-modal-card .form-input { min-height: 44px; }
+  .note-modal-card .details-panel, .note-modal-card .planning-panel { padding: 14px; }
+  .note-modal-card .desktop-project-select,
+  .note-modal-card .tags-container > div[style*='position'] { display: none; }
+  .note-modal-card .mobile-picker-trigger { display: flex; width: 100%; min-height: 48px; align-items: center; gap: 10px; justify-content: flex-start; padding: 0 12px; border-radius: 10px; font: inherit; font-size: 0.86rem; font-weight: 700; }
+  .note-modal-card .mobile-picker-trigger svg:last-child { margin-left: auto; }
+  .mobile-project-dot { width: 10px; height: 10px; border-radius: 50%; flex: 0 0 auto; }
+  .note-modal-card .mobile-tag-trigger { margin-top: 8px; }
+  .note-modal-card .reminder-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .note-modal-card .preset-chip { display: flex; min-height: 44px; align-items: center; justify-content: center; padding: 8px; white-space: normal; }
+  .notification-permission-btn { min-height: 44px; }
+
+  .mobile-picker-overlay { position: fixed; z-index: 130; inset: 0; display: flex; align-items: flex-end; background: rgba(4, 8, 17, 0.58); backdrop-filter: blur(3px); }
+  .mobile-picker-sheet { width: 100%; max-height: min(78dvh, 680px); padding: 8px 16px calc(18px + env(safe-area-inset-bottom)); overflow-y: auto; border: 1px solid var(--glass-border); border-bottom: 0; border-radius: 24px 24px 0 0; background: var(--bg-modal); box-shadow: 0 -18px 60px rgba(0,0,0,0.34); animation: mobileSheetIn 200ms ease-out; }
+  .mobile-sheet-handle { width: 38px; height: 4px; margin: 0 auto 12px; border-radius: 999px; background: var(--text-muted); opacity: 0.55; }
+  .mobile-sheet-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .mobile-sheet-heading h3 { margin-top: 2px; font-size: 1.05rem; }
+  .mobile-project-list, .mobile-tag-list { display: flex; flex-direction: column; gap: 7px; }
+  .mobile-project-option, .mobile-tag-option { display: flex; width: 100%; min-height: 52px; align-items: center; gap: 12px; padding: 0 13px; border: 1px solid var(--border-color); border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font: inherit; font-size: 0.88rem; font-weight: 700; text-align: left; }
+  .mobile-project-option svg, .mobile-tag-option svg:last-child { margin-left: auto; color: var(--primary); }
+  .mobile-project-option.selected { border-color: var(--primary); background: var(--primary-light); }
+  .mobile-tag-search { display: flex; min-height: 46px; align-items: center; gap: 9px; margin-bottom: 12px; padding: 0 12px; border: 1px solid var(--border-color); border-radius: 11px; background: var(--bg-input); color: var(--text-muted); }
+  .mobile-tag-search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--text-primary); font: inherit; }
+  .mobile-tag-option { border-color: color-mix(in srgb, var(--tag-color) 38%, var(--border-color)); color: var(--tag-color); background: color-mix(in srgb, var(--tag-color) 12%, var(--bg-input)); }
+  .mobile-tag-option.selected { background: color-mix(in srgb, var(--tag-color) 21%, var(--bg-input)); }
+  .mobile-tag-option.create { color: var(--primary); }
+  .mobile-sheet-done { width: 100%; min-height: 48px; margin-top: 14px; }
+}
+
+@keyframes mobileSheetIn { from { transform: translateY(100%); } to { transform: translateY(0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+
+/* Note identity and reminder scheduling */
+.note-control-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.note-control-heading > div { display: flex; flex-direction: column; gap: 2px; }
+.note-control-heading > div > span { color: var(--text-muted); font-size: 0.72rem; line-height: 1.35; }
+
+.note-accent-current {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 7px;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  color: var(--text-secondary);
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.note-accent-current > span { width: 8px; height: 8px; border-radius: 50%; }
+
+.note-color-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.note-color-swatch {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 9px;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-align: left;
+  transition: border-color 150ms ease, background-color 150ms ease, color 150ms ease;
+}
+
+.note-color-swatch:hover { border-color: var(--accent-color); color: var(--text-primary); }
+.note-color-swatch.active { border-color: var(--accent-color); background: color-mix(in srgb, var(--accent-color) 15%, var(--bg-input)); color: var(--text-primary); }
+.note-color-swatch-dot { width: 13px; height: 13px; flex: 0 0 auto; border: 2px solid color-mix(in srgb, var(--accent-color) 70%, white); border-radius: 5px; background: var(--accent-color); box-shadow: inset 0 0 0 2px rgba(255,255,255,0.2); }
+.note-color-swatch.active svg { margin-left: auto; color: var(--accent-color); }
+
+.reminder-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  background: var(--bg-input);
+}
+
+.reminder-status.is-set { border-color: rgba(99, 102, 241, 0.45); background: linear-gradient(135deg, var(--primary-light), var(--bg-input)); }
+.reminder-status-icon { display: grid; width: 32px; height: 32px; flex: 0 0 auto; place-items: center; border-radius: 9px; background: rgba(100, 116, 139, 0.16); color: var(--text-muted); }
+.reminder-status.is-set .reminder-status-icon { background: var(--primary); color: #fff; box-shadow: 0 4px 12px var(--accent-glow); }
+.reminder-status > div:nth-child(2) { display: flex; min-width: 0; flex: 1; flex-direction: column; }
+.reminder-status strong { color: var(--text-primary); font-size: 0.78rem; }
+.reminder-status span { overflow: hidden; color: var(--text-muted); font-size: 0.7rem; text-overflow: ellipsis; white-space: nowrap; }
+.reminder-clear-btn { border: 0; background: transparent; color: var(--text-muted); cursor: pointer; font: inherit; font-size: 0.7rem; font-weight: 800; }
+.reminder-clear-btn:hover { color: var(--priority-p1); }
+
+.reminder-section-label { margin-top: 2px; color: var(--text-muted); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
+.reminder-presets { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.reminder-preset { display: flex; min-height: 48px; align-items: center; gap: 8px; padding: 7px 8px; border: 1px solid var(--border-color); border-radius: 9px; background: var(--bg-input); color: var(--text-secondary); cursor: pointer; font: inherit; text-align: left; transition: border-color 150ms ease, background-color 150ms ease; }
+.reminder-preset:hover { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+.reminder-preset > span { display: flex; min-width: 0; flex-direction: column; font-size: 0.7rem; font-weight: 800; line-height: 1.25; }
+.reminder-preset small { color: var(--text-muted); font-size: 0.62rem; font-weight: 600; }
+.reminder-custom-fields { display: grid; grid-template-columns: 1fr 0.78fr; gap: 8px; }
+
+@media (max-width: 900px) {
+  .note-color-swatch { min-height: 44px; }
+  .note-modal-card .reminder-presets { gap: 8px; }
+  .note-modal-card .reminder-preset { min-height: 56px; padding: 9px; }
+  .note-modal-card .reminder-custom-fields { gap: 10px; }
+}

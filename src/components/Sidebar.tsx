@@ -10,7 +10,9 @@ import {
   Plus,
   Folder,
   Trash2,
-  Edit2
+  Edit2,
+  StickyNote,
+  X
 } from 'lucide-react';
 import { useTodo } from '../context/TodoContext';
 import type { SmartFilter } from '../types/todo';
@@ -20,16 +22,21 @@ import { PROJECT_ICONS } from './ProjectModal';
 export const Sidebar: React.FC = () => {
   const {
     tasks,
+    notes,
     projects,
     filter,
     setSmartFilter,
     setFilter,
+    viewMode,
     setViewMode,
+    mobileDrawerOpen,
+    setMobileDrawerOpen,
     openCreateProjectModal,
     openEditProjectModal,
     openTagModal,
     deleteProject,
     allTags,
+    noteTags,
     getTagColor,
     stats
   } = useTodo();
@@ -41,17 +48,30 @@ export const Sidebar: React.FC = () => {
   const importantCount = tasks.filter(t => (t.priority === 'p1' || t.priority === 'p2') && !t.completed).length;
   const completedCount = tasks.filter(t => t.completed).length;
   const allCount = tasks.filter(t => !t.completed).length;
+  const notesCount = notes.length;
+  const visibleTags = viewMode === 'notes' ? noteTags : allTags;
 
   const handleSmartClick = (smart: SmartFilter) => {
+    if (viewMode === 'notes') {
+      setViewMode('list');
+    }
     setSmartFilter(smart);
+    setMobileDrawerOpen(false);
+  };
+
+  const handleNotesClick = () => {
+    setViewMode('notes');
+    setFilter({ projectId: null, tag: null });
+    setMobileDrawerOpen(false);
   };
 
   const handleProjectClick = (projectId: string) => {
     const targetProj = projects.find(p => p.id === projectId);
-    if (targetProj?.defaultView) {
+    if (targetProj?.defaultView && viewMode !== 'notes') {
       setViewMode(targetProj.defaultView);
     }
     setFilter({ projectId, smartFilter: 'all', tag: null });
+    setMobileDrawerOpen(false);
   };
 
   const handleTagClick = (tag: string) => {
@@ -60,36 +80,70 @@ export const Sidebar: React.FC = () => {
     } else {
       setFilter({ tag, projectId: null, smartFilter: 'all' });
     }
+    setMobileDrawerOpen(false);
   };
 
   return (
-    <aside className="sidebar">
-      {/* Sidebar Header */}
-      <div className="sidebar-header">
-        <div className="logo-badge">
-          <CheckSquare size={22} />
-        </div>
-        <div>
-          <h1 className="logo-title">Apex Task</h1>
-          <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Productivity Suite</span>
-        </div>
-      </div>
-
-      <div className="sidebar-content">
-        {/* Smart Filters Navigation */}
-        <div className="nav-section">
-          <span className="nav-section-title">Views</span>
-          
-          <button
-            className={`nav-item ${filter.smartFilter === 'inbox' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-            onClick={() => handleSmartClick('inbox')}
-          >
-            <div className="nav-item-left">
-              <Inbox size={18} color="#3b82f6" />
-              <span>Inbox</span>
+    <>
+      {mobileDrawerOpen && (
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setMobileDrawerOpen(false)}
+        />
+      )}
+      <aside className={`sidebar ${mobileDrawerOpen ? 'mobile-open' : ''}`}>
+        {/* Sidebar Header */}
+        <div className="sidebar-header">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div className="logo-badge">
+              <CheckSquare size={22} />
             </div>
-            {inboxCount > 0 && <span className="nav-badge">{inboxCount}</span>}
+            <div>
+              <h1 className="logo-title">Apex Task</h1>
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Productivity Suite</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="sidebar-mobile-close-btn"
+            onClick={() => setMobileDrawerOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <X size={20} />
           </button>
+        </div>
+
+        <div className="sidebar-content">
+          {/* Smart Filters Navigation */}
+          <div className="nav-section">
+            <span className="nav-section-title">Views</span>
+
+            <button
+              className={`nav-item ${viewMode === 'notes' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={handleNotesClick}
+            >
+              <div className="nav-item-left">
+                <StickyNote size={18} color="#ec4899" />
+                <span>Notes</span>
+              </div>
+              {notesCount > 0 && (
+                <span className="nav-badge" style={{ backgroundColor: 'rgba(236, 72, 153, 0.15)', color: '#ec4899' }}>
+                  {notesCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              className={`nav-item ${viewMode !== 'notes' && filter.smartFilter === 'inbox' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleSmartClick('inbox')}
+            >
+              <div className="nav-item-left">
+                <Inbox size={18} color="#3b82f6" />
+                <span>Inbox</span>
+              </div>
+              {inboxCount > 0 && <span className="nav-badge">{inboxCount}</span>}
+            </button>
 
           <button
             className={`nav-item ${filter.smartFilter === 'today' && !filter.projectId && !filter.tag ? 'active' : ''}`}
@@ -223,7 +277,7 @@ export const Sidebar: React.FC = () => {
         {/* Tags Section */}
         <div className="nav-section">
           <div className="nav-section-title">
-            <span>Tags</span>
+            <span>{viewMode === 'notes' ? 'Note tags' : 'Tags'}</span>
             <button
               style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
               onClick={openTagModal}
@@ -234,10 +288,12 @@ export const Sidebar: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '4px 6px' }}>
-            {allTags.length > 0 ? (
+            {visibleTags.length > 0 ? (
               <div className="sidebar-tags-cloud">
-                {allTags.map(tag => {
-                  const count = tasks.filter(t => t.tags.includes(tag) && !t.completed).length;
+                {visibleTags.map(tag => {
+                  const count = viewMode === 'notes'
+                    ? notes.filter(note => note.tags.includes(tag)).length
+                    : tasks.filter(task => task.tags.includes(tag) && !task.completed).length;
                   const isSelected = filter.tag === tag;
                   const color = getTagColor(tag);
 
@@ -320,5 +376,6 @@ export const Sidebar: React.FC = () => {
         </div>
       </div>
     </aside>
+  </>
   );
 };

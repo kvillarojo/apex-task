@@ -13,6 +13,10 @@ import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { PomodoroWidget } from './components/PomodoroWidget';
 import { ProjectModal } from './components/ProjectModal';
 import { TagModal } from './components/TagModal';
+import { NotesView } from './components/NotesView';
+import { NoteDetailModal } from './components/NoteDetailModal';
+import { MobileBottomNav } from './components/MobileBottomNav';
+import { ReminderToast } from './components/ReminderToast';
 
 const MainContent: React.FC = () => {
   const { viewMode } = useTodo();
@@ -27,6 +31,8 @@ const MainContent: React.FC = () => {
         return <CalendarView />;
       case 'analytics':
         return <AnalyticsView />;
+      case 'notes':
+        return <NotesView />;
       case 'list':
       default:
         return <ListView />;
@@ -40,9 +46,12 @@ const MainContent: React.FC = () => {
         <Header />
         <main className="page-container">{renderView()}</main>
       </div>
+      <MobileBottomNav />
 
       {/* Global Modals & Widgets */}
       <TaskDetailModal />
+      <NoteDetailModal />
+      <ReminderToast />
       <PeopleModal />
       <CommandPaletteModal />
       <ProjectModal />

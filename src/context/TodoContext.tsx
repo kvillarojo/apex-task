@@ -10,11 +10,15 @@ import type {
   Priority,
   TaskStatus,
   PomodoroState,
-  TagDefinition
+  TagDefinition,
+  Note,
+  ActiveReminderAlert
 } from '../types/todo';
 import {
   loadTasksFromStorage,
   saveTasksToStorage,
+  loadNotesFromStorage,
+  saveNotesToStorage,
   loadProjectsFromStorage,
   saveProjectsToStorage,
   loadThemePreference,
@@ -29,6 +33,8 @@ import { soundEffects } from '../utils/audio';
 
 interface TodoContextType {
   tasks: Task[];
+  notes: Note[];
+  filteredNotes: Note[];
   projects: Project[];
   assignees: Assignee[];
   viewMode: ViewMode;
@@ -37,7 +43,11 @@ interface TodoContextType {
   soundEnabled: boolean;
   pomodoro: PomodoroState;
   editingTask: Task | null;
+  editingNote: Note | null;
+  noteModalOpen: boolean;
   commandPaletteOpen: boolean;
+  activeAlert: ActiveReminderAlert | null;
+  mobileDrawerOpen: boolean;
 
   // Task Actions
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
@@ -45,6 +55,23 @@ interface TodoContextType {
   deleteTask: (id: string) => void;
   toggleTaskComplete: (id: string) => void;
   moveTaskStatus: (id: string, newStatus: TaskStatus) => void;
+
+  // Note Actions
+  addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => Note;
+  updateNote: (id: string, updates: Partial<Note>) => void;
+  deleteNote: (id: string) => void;
+  togglePinNote: (id: string) => void;
+  openCreateNoteModal: (initialProjectId?: string, initialTitle?: string) => void;
+  openEditNoteModal: (note: Note) => void;
+  closeNoteModal: () => void;
+
+  // Reminder & Alert Actions
+  dismissActiveAlert: () => void;
+  snoozeActiveAlert: (minutes?: number) => void;
+  requestNotificationPermission: () => Promise<boolean>;
+
+  // Mobile Drawer Actions
+  setMobileDrawerOpen: (open: boolean) => void;
 
   // Subtask Actions
   addSubtask: (taskId: string, title: string) => void;
@@ -116,6 +143,7 @@ interface TodoContextType {
     p1Count: number;
   };
   allTags: string[];
+  noteTags: string[];
 }
 
 const initialFilter: FilterState = {
@@ -145,6 +173,7 @@ const TodoContext = createContext<TodoContextType | undefined>(undefined);
 
 export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [tasks, setTasks] = useState<Task[]>(loadTasksFromStorage);
+  const [notes, setNotes] = useState<Note[]>(loadNotesFromStorage);
   const [projects, setProjects] = useState<Project[]>(loadProjectsFromStorage);
   const [assignees, setAssignees] = useState<Assignee[]>(loadAssigneesFromStorage);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
@@ -155,6 +184,10 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>(loadTagDefinitionsFromStorage);
   const [tagModalOpen, setTagModalOpen] = useState<boolean>(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingNote, setEditingNote] = useState<Note | null>(null);
+  const [noteModalOpen, setNoteModalOpen] = useState<boolean>(false);
+  const [activeAlert, setActiveAlert] = useState<ActiveReminderAlert | null>(null);
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState<boolean>(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState<boolean>(false);
   const [projectModalOpen, setProjectModalOpen] = useState<boolean>(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
@@ -164,6 +197,11 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     saveTasksToStorage(tasks);
   }, [tasks]);
+
+  // Sync notes to localStorage
+  useEffect(() => {
+    saveNotesToStorage(notes);
+  }, [notes]);
 
   // Sync projects to localStorage
   useEffect(() => {
@@ -283,6 +321,177 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
+  // Note Actions
+  const addNote = (noteData: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>): Note => {
+    const newNote: Note = {
+      ...noteData,
+      id: 'note-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setNotes(prev => [newNote, ...prev]);
+    soundEffects.playClickSound();
+    return newNote;
+  };
+
+  const updateNote = (id: string, updates: Partial<Note>) => {
+    setNotes(prev =>
+      prev.map(n => {
+        if (n.id === id) {
+          return {
+            ...n,
+            ...updates,
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return n;
+      })
+    );
+  };
+
+  const deleteNote = (id: string) => {
+    setNotes(prev => prev.filter(n => n.id !== id));
+    if (editingNote?.id === id) {
+      setEditingNote(null);
+      setNoteModalOpen(false);
+    }
+  };
+
+  const togglePinNote = (id: string) => {
+    setNotes(prev =>
+      prev.map(n => {
+        if (n.id === id) {
+          return { ...n, isPinned: !n.isPinned, updatedAt: new Date().toISOString() };
+        }
+        return n;
+      })
+    );
+  };
+
+  const openCreateNoteModal = (initialProjectId?: string, initialTitle?: string) => {
+    setEditingNote({
+      id: '',
+      title: initialTitle?.trim() || '',
+      content: '',
+      projectId: initialProjectId || filter.projectId || 'inbox',
+      tags: filter.tag ? [filter.tag] : [],
+      isPinned: false,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    setNoteModalOpen(true);
+  };
+
+  const openEditNoteModal = (note: Note) => {
+    setEditingNote(note);
+    setNoteModalOpen(true);
+  };
+
+  const closeNoteModal = () => {
+    setEditingNote(null);
+    setNoteModalOpen(false);
+  };
+
+  // Reminder & Alert Actions
+  const dismissActiveAlert = () => {
+    setActiveAlert(null);
+  };
+
+  const snoozeActiveAlert = (minutes: number = 15) => {
+    if (!activeAlert) return;
+    if (activeAlert.type === 'note') {
+      const targetNote = notes.find(n => n.id === activeAlert.itemId);
+      if (targetNote) {
+        const snoozeDate = new Date(Date.now() + minutes * 60 * 1000);
+        const yyyy = snoozeDate.getFullYear();
+        const mm = String(snoozeDate.getMonth() + 1).padStart(2, '0');
+        const dd = String(snoozeDate.getDate()).padStart(2, '0');
+        const hh = String(snoozeDate.getHours()).padStart(2, '0');
+        const min = String(snoozeDate.getMinutes()).padStart(2, '0');
+        updateNote(targetNote.id, {
+          reminder: {
+            date: `${yyyy}-${mm}-${dd}`,
+            time: `${hh}:${min}`,
+            notified: false
+          }
+        });
+      }
+    }
+    setActiveAlert(null);
+  };
+
+  const requestNotificationPermission = async (): Promise<boolean> => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      try {
+        const perm = await Notification.requestPermission();
+        return perm === 'granted';
+      } catch {
+        return false;
+      }
+    }
+    return false;
+  };
+
+  // Reminder Background Checker Loop
+  useEffect(() => {
+    const checkReminders = () => {
+      const now = new Date();
+      const currentDate = getTodayString();
+      const currentHours = String(now.getHours()).padStart(2, '0');
+      const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+      const currentTime = `${currentHours}:${currentMinutes}`;
+
+      let notesModified = false;
+      const updatedNotes = notes.map(note => {
+        if (!note.reminder || note.reminder.notified) return note;
+        const remDate = note.reminder.date;
+        const remTime = note.reminder.time || '09:00';
+        const isDue = remDate < currentDate || (remDate === currentDate && remTime <= currentTime);
+
+        if (isDue) {
+          notesModified = true;
+          const project = projects.find(p => p.id === note.projectId);
+          setActiveAlert({
+            id: `note-${note.id}-${Date.now()}`,
+            type: 'note',
+            title: note.title || 'Untitled Note',
+            projectName: project ? project.name : 'Inbox',
+            dueText: `${remDate} ${remTime}`,
+            itemId: note.id
+          });
+          soundEffects.playTimerFinishSound();
+          if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+            navigator.vibrate?.([150, 80, 150]);
+          }
+          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+            try {
+              new Notification(`Apex Note Reminder: ${note.title || 'Untitled Note'}`, {
+                body: `Project: ${project ? project.name : 'Inbox'} • ${remTime}`,
+                icon: '/favicon.ico'
+              });
+            } catch {}
+          }
+          return {
+            ...note,
+            reminder: {
+              ...note.reminder,
+              notified: true
+            }
+          };
+        }
+        return note;
+      });
+
+      if (notesModified) {
+        setNotes(updatedNotes);
+      }
+    };
+
+    const intervalId = setInterval(checkReminders, 10000);
+    checkReminders();
+    return () => clearInterval(intervalId);
+  }, [notes, projects]);
+
   // Subtask Actions
   const addSubtask = (taskId: string, title: string) => {
     const trimmed = title.trim();
@@ -359,6 +568,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setProjects(prev => prev.filter(p => p.id !== id));
     // Reassign tasks in this project to inbox
     setTasks(prev => prev.map(t => (t.projectId === id ? { ...t, projectId: 'inbox' } : t)));
+    setNotes(prev => prev.map(note => (note.projectId === id ? { ...note, projectId: 'inbox' } : note)));
     if (filter.projectId === id) {
       setFilterState(prev => ({ ...prev, projectId: null, smartFilter: 'inbox' }));
     }
@@ -448,6 +658,12 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
           tags: task.tags.map(t => (t === cleanOld ? cleanNew : t))
         }))
       );
+      setNotes(prev =>
+        prev.map(note => ({
+          ...note,
+          tags: note.tags.map(tag => (tag === cleanOld ? cleanNew : tag))
+        }))
+      );
       if (filter.tag === cleanOld) {
         setFilterState(prev => ({ ...prev, tag: cleanNew }));
       }
@@ -463,6 +679,10 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setTasks(prev => prev.map(task => ({
       ...task,
       tags: task.tags.filter(existingTag => existingTag !== clean)
+    })));
+    setNotes(prev => prev.map(note => ({
+      ...note,
+      tags: note.tags.filter(existingTag => existingTag !== clean)
     })));
 
     if (filter.tag === clean) {
@@ -597,6 +817,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         version: 2,
         exportedAt: new Date().toISOString(),
         tasks,
+        notes,
         projects,
         mytodo_assignees_v1: assignees,
         tagDefinitions
@@ -622,6 +843,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       const hasImportableData =
         Array.isArray(parsed.tasks) ||
+        Array.isArray(parsed.notes) ||
         Array.isArray(parsed.projects) ||
         Array.isArray(parsed.mytodo_assignees_v1) ||
         Array.isArray(parsed.assignees) ||
@@ -633,6 +855,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (Array.isArray(parsed.tasks)) {
         setTasks(parsed.tasks);
+      }
+      if (Array.isArray(parsed.notes)) {
+        setNotes(parsed.notes);
       }
       if (Array.isArray(parsed.projects)) {
         setProjects(parsed.projects);
@@ -652,8 +877,45 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Extract All Unique Tags (from tasks + defined tags)
-  const allTags = Array.from(new Set([...tagDefinitions.map(t => t.name), ...tasks.flatMap(t => t.tags)])).sort();
+  // Task tags remain scoped to task views.
+  const allTags = Array.from(
+    new Set([
+      ...tagDefinitions.map(t => t.name),
+      ...tasks.flatMap(t => t.tags)
+    ])
+  ).sort();
+
+  // Notes use an independent selector so task-only tags never surface there.
+  const noteTags = Array.from(
+    new Set([
+      ...tagDefinitions.map(t => t.name),
+      ...notes.flatMap(note => note.tags)
+    ])
+  ).sort();
+
+  // Filter Notes
+  const filteredNotes = notes.filter(note => {
+    if (filter.searchQuery.trim()) {
+      const q = filter.searchQuery.toLowerCase();
+      const matchTitle = note.title.toLowerCase().includes(q);
+      const matchContent = note.content.toLowerCase().includes(q);
+      const matchTags = note.tags.some(tag => tag.toLowerCase().includes(q));
+      if (!matchTitle && !matchContent && !matchTags) return false;
+    }
+
+    if (filter.projectId && note.projectId !== filter.projectId) {
+      return false;
+    }
+
+    if (filter.tag && !note.tags.includes(filter.tag)) {
+      return false;
+    }
+
+    return true;
+  }).sort((a, b) => {
+    if (a.isPinned !== b.isPinned) return a.isPinned ? -1 : 1;
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  });
 
   // Filter Tasks
   const filteredTasks = tasks.filter(task => {
@@ -737,6 +999,8 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <TodoContext.Provider
       value={{
         tasks,
+        notes,
+        filteredNotes,
         projects,
         assignees,
         peopleModalOpen,
@@ -746,12 +1010,27 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         soundEnabled,
         pomodoro,
         editingTask,
+        editingNote,
+        noteModalOpen,
         commandPaletteOpen,
+        activeAlert,
+        mobileDrawerOpen,
         addTask,
         updateTask,
         deleteTask,
         toggleTaskComplete,
         moveTaskStatus,
+        addNote,
+        updateNote,
+        deleteNote,
+        togglePinNote,
+        openCreateNoteModal,
+        openEditNoteModal,
+        closeNoteModal,
+        dismissActiveAlert,
+        snoozeActiveAlert,
+        requestNotificationPermission,
+        setMobileDrawerOpen,
         addSubtask,
         toggleSubtask,
         deleteSubtask,
@@ -797,7 +1076,8 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         importData,
         filteredTasks,
         stats,
-        allTags
+        allTags,
+        noteTags
       }}
     >
       {children}

@@ -1,6 +1,7 @@
-import type { Task, Project, Assignee, TagDefinition } from '../types/todo';
+import type { Task, Project, Assignee, TagDefinition, Note } from '../types/todo';
 
 const TASKS_STORAGE_KEY = 'mytodo_tasks_v1';
+const NOTES_STORAGE_KEY = 'mytodo_notes_v1';
 const PROJECTS_STORAGE_KEY = 'mytodo_projects_v1';
 const ASSIGNEES_STORAGE_KEY = 'mytodo_assignees_v1';
 const THEME_STORAGE_KEY = 'mytodo_theme_v1';
@@ -129,4 +130,21 @@ export function saveAssigneesToStorage(assignees: Assignee[]): void {
   }
 }
 
+export function loadNotesFromStorage(): Note[] {
+  try {
+    const raw = localStorage.getItem(NOTES_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (err) {
+    console.error('Failed to load notes from localStorage', err);
+    return [];
+  }
+}
+
+export function saveNotesToStorage(notes: Note[]): void {
+  try {
+    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
+  } catch (err) {
+    console.error('Failed to save notes to localStorage', err);
+  }
+}
 

@@ -6,6 +6,8 @@ import {
   Grid,
   Calendar as CalendarIcon,
   BarChart3,
+  StickyNote,
+  Menu,
   Sun,
   Moon,
   Volume2,
@@ -30,7 +32,9 @@ export const Header: React.FC = () => {
     openPeopleModal,
     setCommandPaletteOpen,
     exportData,
-    importData
+    importData,
+    mobileDrawerOpen,
+    setMobileDrawerOpen
   } = useTodo();
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,12 +58,22 @@ export const Header: React.FC = () => {
   return (
     <header className="app-header">
       <div className="header-left">
+        {/* Mobile Hamburger Drawer Button */}
+        <button
+          className="icon-button mobile-menu-btn"
+          onClick={() => setMobileDrawerOpen(!mobileDrawerOpen)}
+          title="Open Navigation Menu"
+          aria-label="Open navigation menu"
+        >
+          <Menu size={18} />
+        </button>
+
         {/* Search Box */}
         <div className="search-box">
           <Search className="search-icon" />
           <input
             type="text"
-            placeholder="Search tasks, tags, or description..."
+            placeholder="Search tasks, notes, tags..."
             value={filter.searchQuery}
             onChange={e => setFilter({ searchQuery: e.target.value })}
           />
@@ -67,7 +81,7 @@ export const Header: React.FC = () => {
 
         {/* Command Palette Hotkey button */}
         <button
-          className="icon-button"
+          className="icon-button cmd-palette-btn"
           onClick={() => setCommandPaletteOpen(true)}
           title="Command Palette (Cmd+K)"
           style={{ width: 'auto', padding: '0 10px', gap: '6px', fontSize: '0.8rem' }}
@@ -96,6 +110,15 @@ export const Header: React.FC = () => {
           >
             <Kanban size={16} />
             <span>Kanban</span>
+          </button>
+
+          <button
+            className={`view-btn ${viewMode === 'notes' ? 'active' : ''}`}
+            onClick={() => setViewMode('notes')}
+            title="Notes Workspace"
+          >
+            <StickyNote size={16} />
+            <span>Notes</span>
           </button>
 
           <button

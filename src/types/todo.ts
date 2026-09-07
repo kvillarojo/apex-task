@@ -55,7 +55,35 @@ export interface CustomTags {
   tag: string;
 }
 
-export type ViewMode = 'list' | 'kanban' | 'eisenhower' | 'calendar' | 'analytics';
+export type ViewMode = 'list' | 'kanban' | 'eisenhower' | 'calendar' | 'analytics' | 'notes';
+
+export interface NoteReminder {
+  date: string; // YYYY-MM-DD
+  time?: string; // HH:mm
+  notified?: boolean; // whether notification has already fired
+}
+
+export interface Note {
+  id: string;
+  title: string;
+  content: string; // HTML formatted string from rich editor
+  projectId: string; // Maps to Project id
+  tags: string[];
+  isPinned: boolean;
+  color?: string; // Optional card accent/background tint
+  reminder?: NoteReminder;
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
+}
+
+export interface ActiveReminderAlert {
+  id: string;
+  type: 'note' | 'task';
+  title: string;
+  projectName: string;
+  dueText: string;
+  itemId: string;
+}
 
 export type SmartFilter = 'inbox' | 'today' | 'upcoming' | 'important' | 'completed' | 'all';
 
