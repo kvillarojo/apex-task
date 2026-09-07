@@ -242,14 +242,12 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const isNowCompleted = !t.completed;
           if (isNowCompleted) {
             soundEffects.playCompleteSound();
-            // Trigger confetti for high priority tasks or completing all
-            if (t.priority === 'p1' || t.priority === 'p2') {
-              confetti({
-                particleCount: 80,
-                spread: 70,
-                origin: { y: 0.6 }
-              });
-            }
+            // Trigger celebration confetti on task completion
+            confetti({
+              particleCount: t.priority === 'p1' || t.priority === 'p2' ? 75 : 45,
+              spread: t.priority === 'p1' || t.priority === 'p2' ? 70 : 50,
+              origin: { y: 0.65 }
+            });
           }
           return {
             ...t,

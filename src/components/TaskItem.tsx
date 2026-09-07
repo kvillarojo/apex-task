@@ -66,11 +66,11 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
 
       {/* Task Content */}
       <div className="task-content">
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="task-header-row">
           <span className="task-title">{task.title}</span>
 
           {/* Quick Action Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="task-action-buttons">
             {!task.completed && (
               <button
                 className="icon-button"
@@ -180,16 +180,16 @@ export const TaskItem: React.FC<{ task: Task }> = ({ task }) => {
 
         {/* Subtasks Expanded List */}
         {(expandedSubtasks || totalSubtasksCount > 0) && (
-          <div style={{ marginTop: '8px', paddingLeft: '12px', borderLeft: '2px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div className="task-subtasks-container">
             {task.subtasks.map(st => (
-              <div key={st.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.825rem' }}>
+              <div key={st.id} className="task-subtask-row">
                 <input
                   type="checkbox"
                   checked={st.completed}
                   onChange={() => toggleSubtask(task.id, st.id)}
-                  style={{ cursor: 'pointer', accentColor: 'var(--primary)' }}
+                  style={{ cursor: 'pointer', accentColor: 'var(--primary)', flexShrink: 0 }}
                 />
-                <span style={{ textDecoration: st.completed ? 'line-through' : 'none', color: st.completed ? 'var(--text-muted)' : 'var(--text-primary)' }}>
+                <span className="task-subtask-title" style={{ textDecoration: st.completed ? 'line-through' : 'none', color: st.completed ? 'var(--text-muted)' : 'var(--text-primary)' }}>
                   {st.title}
                 </span>
               </div>

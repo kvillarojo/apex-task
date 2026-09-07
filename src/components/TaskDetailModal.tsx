@@ -65,6 +65,10 @@ export const TaskDetailModal: React.FC = () => {
 
   if (!editingTask) return null;
 
+  const completedSubtasksCount = editingTask.subtasks.filter(s => s.completed).length;
+  const totalSubtasksCount = editingTask.subtasks.length;
+  const subtasksPercent = totalSubtasksCount > 0 ? Math.round((completedSubtasksCount / totalSubtasksCount) * 100) : 0;
+
   // Auto-suggest tags
   const cleanInput = tagInput.trim().toLowerCase().replace(/^#/, '');
   const tagSuggestions = cleanInput
@@ -127,8 +131,11 @@ export const TaskDetailModal: React.FC = () => {
       <div className="modal-card ticket-modal-card" onClick={e => e.stopPropagation()}>
         {/* Header */}
         <header className="ticket-modal-header">
-          <div>
-            <span className="ticket-modal-eyebrow">Ticket details</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span className="ticket-modal-eyebrow">Task details</span>
+            <span className={`badge badge-priority ${priority}`}>
+              {priority.toUpperCase()}
+            </span>
           </div>
           <button
             onClick={() => setEditingTask(null)}
@@ -162,7 +169,22 @@ export const TaskDetailModal: React.FC = () => {
 
             {/* Subtasks Section */}
             <div className="form-group">
-              <label>SUBTASKS</label>
+              <div className="subtasks-section-header">
+                <label>SUBTASKS</label>
+                {totalSubtasksCount > 0 && (
+                  <span className="subtasks-count-pill">
+                    {completedSubtasksCount}/{totalSubtasksCount} completed ({subtasksPercent}%)
+                  </span>
+                )}
+              </div>
+              {totalSubtasksCount > 0 && (
+                <div className="subtasks-progress-track">
+                  <div
+                    className="subtasks-progress-fill"
+                    style={{ width: `${subtasksPercent}%` }}
+                  />
+                </div>
+              )}
               <div className="subtasks-list">
                 {editingTask.subtasks.map(st => (
                   <div key={st.id} className="subtask-item">
