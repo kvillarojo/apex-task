@@ -44,6 +44,7 @@ export interface Project {
   icon: string;
   description?: string;
   defaultView?: ViewMode;
+  scope?: 'tasks' | 'notes' | 'shared';
 }
 
 export interface TagDefinition {

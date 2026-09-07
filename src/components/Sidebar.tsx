@@ -37,6 +37,8 @@ export const Sidebar: React.FC = () => {
     deleteProject,
     allTags,
     noteTags,
+    taskProjects,
+    noteProjects,
     getTagColor,
     stats
   } = useTodo();
@@ -50,6 +52,7 @@ export const Sidebar: React.FC = () => {
   const allCount = tasks.filter(t => !t.completed).length;
   const notesCount = notes.length;
   const visibleTags = viewMode === 'notes' ? noteTags : allTags;
+  const visibleProjects = viewMode === 'notes' ? noteProjects : taskProjects;
 
   const handleSmartClick = (smart: SmartFilter) => {
     if (viewMode === 'notes') {
@@ -222,8 +225,10 @@ export const Sidebar: React.FC = () => {
             </button>
           </div>
 
-          {projects.map(project => {
-            const count = tasks.filter(t => t.projectId === project.id && !t.completed).length;
+          {visibleProjects.map(project => {
+            const count = viewMode === 'notes'
+              ? notes.filter(note => note.projectId === project.id).length
+              : tasks.filter(task => task.projectId === project.id && !task.completed).length;
             const isActive = filter.projectId === project.id;
             const IconComponent = PROJECT_ICONS[project.icon] || Folder;
 

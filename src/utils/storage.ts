@@ -11,7 +11,7 @@ const CUSTOM_TAGS_STORAGE_KEY = 'mytodo_custom_tags_v1';
 export const DEFAULT_ASSIGNEES: Assignee[] = [];
 
 export const DEFAULT_PROJECTS: Project[] = [
-  { id: 'inbox', name: 'Inbox', color: '#3b82f6', icon: 'Inbox' }
+  { id: 'inbox', name: 'Inbox', color: '#3b82f6', icon: 'Inbox', scope: 'shared' }
 ];
 
 export function loadTasksFromStorage(): Task[] {
@@ -147,4 +147,3 @@ export function saveNotesToStorage(notes: Note[]): void {
     console.error('Failed to save notes to localStorage', err);
   }
 }
-

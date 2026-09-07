@@ -183,7 +183,8 @@ export const ProjectModal: React.FC = () => {
     closeProjectModal,
     addProject,
     updateProject,
-    deleteProject
+    deleteProject,
+    viewMode
   } = useTodo();
 
   const [name, setName] = useState('');
@@ -240,7 +241,8 @@ export const ProjectModal: React.FC = () => {
         description: description.trim() || undefined,
         color,
         icon,
-        defaultView
+        defaultView,
+        scope: viewMode === 'notes' ? 'notes' : 'tasks'
       });
     }
     closeProjectModal();
@@ -574,4 +576,3 @@ export const ProjectModal: React.FC = () => {
     </div>
   );
 };
-

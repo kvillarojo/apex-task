@@ -144,6 +144,8 @@ interface TodoContextType {
   };
   allTags: string[];
   noteTags: string[];
+  taskProjects: Project[];
+  noteProjects: Project[];
 }
 
 const initialFilter: FilterState = {
@@ -176,7 +178,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [notes, setNotes] = useState<Note[]>(loadNotesFromStorage);
   const [projects, setProjects] = useState<Project[]>(loadProjectsFromStorage);
   const [assignees, setAssignees] = useState<Assignee[]>(loadAssigneesFromStorage);
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
+  const [viewMode, setViewModeState] = useState<ViewMode>('list');
   const [filter, setFilterState] = useState<FilterState>(initialFilter);
   const [theme, setThemeState] = useState<'dark' | 'light'>(loadThemePreference);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(soundEffects.isEnabled());
@@ -722,6 +724,14 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }));
   };
 
+  const setViewMode = (mode: ViewMode) => {
+    const isWorkspaceChange = (viewMode === 'notes') !== (mode === 'notes');
+    if (isWorkspaceChange) {
+      setFilterState(prev => ({ ...prev, projectId: null, tag: null }));
+    }
+    setViewModeState(mode);
+  };
+
   const setFilter = (updates: Partial<FilterState>) => {
     setFilterState(prev => ({ ...prev, ...updates }));
   };
@@ -891,6 +901,18 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       ...notes.flatMap(note => note.tags)
     ])
   ).sort();
+
+  const getProjectScope = (project: Project): 'tasks' | 'notes' | 'shared' => {
+    if (project.scope) return project.scope;
+    const hasTasks = tasks.some(task => task.projectId === project.id);
+    const hasNotes = notes.some(note => note.projectId === project.id);
+    if (hasTasks && hasNotes) return 'shared';
+    if (hasNotes) return 'notes';
+    return 'tasks';
+  };
+
+  const taskProjects = projects.filter(project => getProjectScope(project) !== 'notes');
+  const noteProjects = projects.filter(project => getProjectScope(project) !== 'tasks');
 
   // Filter Notes
   const filteredNotes = notes.filter(note => {
@@ -1076,7 +1098,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         filteredTasks,
         stats,
         allTags,
-        noteTags
+        noteTags,
+        taskProjects,
+        noteProjects
       }}
     >
       {children}

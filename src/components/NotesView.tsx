@@ -13,7 +13,7 @@ export const NotesView: React.FC = () => {
   const {
     filteredNotes,
     notes,
-    projects,
+    noteProjects,
     noteTags,
     filter,
     setFilter,
@@ -132,7 +132,7 @@ export const NotesView: React.FC = () => {
 
           {/* Project Chips */}
           <div className="chips-separator" />
-          {projects.map(p => (
+          {noteProjects.map(p => (
             <button
               key={p.id}
               type="button"
