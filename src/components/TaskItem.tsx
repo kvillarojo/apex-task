@@ -5,7 +5,6 @@ import {
   Tag as TagIcon,
   Flag,
   Play,
-  Edit2,
   ChevronDown,
   Repeat,
   Plus,
@@ -30,7 +29,6 @@ interface TaskItemProps {
 export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' }) => {
   const {
     toggleTaskComplete,
-    deleteTask,
     setEditingTask,
     projects,
     assignees,
