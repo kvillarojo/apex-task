@@ -633,7 +633,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return prev;
       }
-      return [...prev, { name: clean, color: color || '#6366f1' }];
+      return [...prev, { name: clean, color: color || '#6366f1', scope: viewMode}];
     });
     soundEffects.playClickSound();
   };

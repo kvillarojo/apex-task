@@ -12,7 +12,7 @@ import { PeopleModal } from './components/PeopleModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { PomodoroWidget } from './components/PomodoroWidget';
 import { ProjectModal } from './components/ProjectModal';
-import { TagModal } from './components/TagModal';
+import { TagModal } from './components/TagModal/index';
 import { NotesView } from './components/NotesView';
 import { NoteDetailModal } from './components/NoteDetailModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
