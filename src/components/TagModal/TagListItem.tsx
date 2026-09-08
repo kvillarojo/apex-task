@@ -1,5 +1,6 @@
 import React from 'react';
 import { Edit2, Trash2, Hash } from 'lucide-react';
+import styles from './TagModal.module.css';
 
 interface TagListItemProps {
   tag: string;
@@ -17,25 +18,49 @@ export const TagListItem: React.FC<TagListItemProps> = ({
   isCurrentlyEditing,
   onEdit,
   onDelete
-}) => (
-  <div className={`tag-manager-item ${isCurrentlyEditing ? 'active-edit' : ''}`}>
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <span className="tag-pill-badge" style={{ backgroundColor: `${color}20`, borderColor: `${color}55`, color }}>
-        <Hash size={12} />
-        <span>{tag}</span>
-      </span>
-      <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
-        {usageCount} {usageCount === 1 ? 'task' : 'tasks'}
-      </span>
-    </div>
+}) => {
+  // Combine native global classes with structural module classes cleanly
+  const containerClass = `tag-manager-item ${styles.itemContainer} ${
+    isCurrentlyEditing ? `active-edit ${styles.itemContainerActive}` : ''
+  }`;
 
-    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-      <button type="button" className="tag-action-btn" onClick={() => onEdit(tag)} title={`Edit #${tag}`}>
-        <Edit2 size={13} />
-      </button>
-      <button type="button" className="tag-action-btn delete-btn" onClick={() => onDelete(tag)} title={`Delete #${tag}`}>
-        <Trash2 size={13} />
-      </button>
+  // Keep dynamic database hex codes cleanly scoped to a style constant
+  const dynamicBadgeStyle = {
+    backgroundColor: `${color}20`,
+    borderColor: `${color}55`,
+    color
+  };
+
+  return (
+    <div className={containerClass}>
+      <div className={styles.leftSection}>
+        <span className="tag-pill-badge" style={dynamicBadgeStyle}>
+          <Hash size={12} />
+          <span>{tag}</span>
+        </span>
+        <span className={styles.usageCounter}>
+          {usageCount} {usageCount === 1 ? 'task' : 'tasks'}
+        </span>
+      </div>
+
+      <div className={styles.rightSection}>
+        <button 
+          type="button" 
+          className="tag-action-btn" 
+          onClick={() => onEdit(tag)} 
+          title={`Edit #${tag}`}
+        >
+          <Edit2 size={13} />
+        </button>
+        <button 
+          type="button" 
+          className="tag-action-btn delete-btn" 
+          onClick={() => onDelete(tag)} 
+          title={`Delete #${tag}`}
+        >
+          <Trash2 size={13} />
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};

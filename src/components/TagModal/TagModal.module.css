@@ -1,0 +1,29 @@
+.itemContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.itemContainerActive {
+  background-color: var(--bg-modifier-selected, rgba(255, 255, 255, 0.05));
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.usageCounter {
+  font-size: 0.725rem;
+  color: var(--text-muted);
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
