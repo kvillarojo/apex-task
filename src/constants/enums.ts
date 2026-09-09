@@ -65,7 +65,8 @@ export const ModalSize = {
   Md: 'md',
   Lg: 'lg',
   Xl: 'xl',
-  Ticket: 'ticket'
+  Ticket: 'ticket',
+  Auto: 'auto'
 } as const;
 export type ModalSize = (typeof ModalSize)[keyof typeof ModalSize];
 

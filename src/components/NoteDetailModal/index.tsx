@@ -1,11 +1,11 @@
 import React from 'react';
-import { Trash2, Pin } from 'lucide-react';
-import { Modal, ModalHeader, ModalFooter, ModalId, ModalSize } from '../common';
-import { DescriptionEditor } from '../DescriptionEditor';
+import { Modal, ModalId, ModalSize } from '../common';
 import { useNoteDetailModal } from './useNoteDetailModal';
-import { NoteOrganizationPanel } from './NoteOrganizationPanel';
-import { ReminderPanel } from './ReminderPanel';
+import { NoteChrome } from './NoteChrome';
+import { NoteWritingArea } from './NoteWritingArea';
+import { NoteMetaRail } from './NoteMetaRail';
 import { MobilePickerSheet } from './MobilePickerSheet';
+import styles from './NoteDetailModal.module.css';
 
 export const NoteDetailModal: React.FC = () => {
   const {
@@ -50,102 +50,63 @@ export const NoteDetailModal: React.FC = () => {
     createTagFromSearch
   } = useNoteDetailModal();
 
+  const sheetStyle = {
+    '--note-accent': color || 'var(--primary)',
+    borderTopColor: color || 'transparent'
+  } as React.CSSProperties;
+
   return (
     <Modal
       open={open}
       onClose={close}
-      size={ModalSize.Ticket}
+      size={ModalSize.Auto}
       themeComponent={ModalId.NoteDetail}
-      className="ticket-modal-card note-modal-card"
-      style={{ borderLeft: color ? `6px solid ${color}` : undefined }}
+      className={styles.sheet}
+      style={sheetStyle}
     >
-      <ModalHeader
-        variant="ticket"
-        title={isNew ? 'New Note' : 'Edit Note'}
+      <NoteChrome
+        isNew={isNew}
+        isPinned={isPinned}
+        onTogglePin={() => setIsPinned(!isPinned)}
         onClose={close}
-      >
-        <button
-          type="button"
-          className={`note-pin-pill-btn ${isPinned ? 'active' : ''}`}
-          onClick={() => setIsPinned(!isPinned)}
-          title={isPinned ? 'Pinned to top' : 'Click to pin note'}
-        >
-          <Pin size={13} />
-          <span>{isPinned ? 'Pinned' : 'Pin note'}</span>
-        </button>
-      </ModalHeader>
+      />
 
-      <div className="ticket-modal-body">
-        <div className="ticket-modal-column-left">
-          <div className="form-group">
-            <label>TITLE</label>
-            <input
-              type="text"
-              value={title}
-              placeholder="Note title..."
-              onChange={event => setTitle(event.target.value)}
-              className="form-input form-input-title"
-              autoFocus={isNew}
-            />
-          </div>
+      <NoteWritingArea
+        title={title}
+        setTitle={setTitle}
+        content={content}
+        setContent={setContent}
+        autoFocusTitle={isNew}
+      />
 
-          <div className="form-group" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            <label>CONTENT</label>
-            <div style={{ flex: 1, minHeight: '260px' }}>
-              <DescriptionEditor value={content} onChange={setContent} />
-            </div>
-          </div>
-        </div>
-
-        <aside className="ticket-modal-column-right">
-          <NoteOrganizationPanel
-            projectId={projectId}
-            setProjectId={setProjectId}
-            projects={projects}
-            selectedProject={selectedProject}
-            tags={tags}
-            setTags={setTags}
-            tagInput={tagInput}
-            setTagInput={setTagInput}
-            noteTags={noteTags}
-            getTagColor={getTagColor}
-            color={color}
-            setColor={setColor}
-            onOpenProjectPicker={() => setMobilePicker('project')}
-            onOpenTagsPicker={() => setMobilePicker('tags')}
-          />
-          <ReminderPanel
-            reminderDate={reminderDate}
-            reminderTime={reminderTime}
-            reminderSummary={reminderSummary}
-            notificationsEnabled={notificationsEnabled}
-            setReminderDate={setReminderDate}
-            setReminderTime={setReminderTime}
-            onApplyPreset={applyPreset}
-            onEnableNotifications={handleEnableNotifications}
-          />
-        </aside>
-      </div>
-
-      <ModalFooter variant="ticket">
-        {!isNew && editingNote ? (
-          <button type="button" className="btn-secondary btn-danger" onClick={handleDelete}>
-            <Trash2 size={14} style={{ marginRight: '4px' }} />
-            Delete Note
-          </button>
-        ) : (
-          <div />
-        )}
-
-        <div className="footer-actions">
-          <button type="button" className="btn-secondary" onClick={close}>
-            Cancel
-          </button>
-          <button type="button" className="btn-primary" onClick={handleSave}>
-            {isNew ? 'Create Note' : 'Save Changes'}
-          </button>
-        </div>
-      </ModalFooter>
+      <NoteMetaRail
+        isNew={isNew}
+        projectId={projectId}
+        setProjectId={setProjectId}
+        projects={projects}
+        selectedProject={selectedProject}
+        tags={tags}
+        setTags={setTags}
+        tagInput={tagInput}
+        setTagInput={setTagInput}
+        noteTags={noteTags}
+        getTagColor={getTagColor}
+        color={color}
+        setColor={setColor}
+        reminderDate={reminderDate}
+        reminderTime={reminderTime}
+        reminderSummary={reminderSummary}
+        notificationsEnabled={notificationsEnabled}
+        setReminderDate={setReminderDate}
+        setReminderTime={setReminderTime}
+        onApplyPreset={applyPreset}
+        onEnableNotifications={handleEnableNotifications}
+        onOpenProjectPicker={() => setMobilePicker('project')}
+        onOpenTagsPicker={() => setMobilePicker('tags')}
+        onDelete={!isNew && editingNote ? handleDelete : undefined}
+        onClose={close}
+        onSave={handleSave}
+      />
 
       {mobilePicker && (
         <MobilePickerSheet

@@ -9,7 +9,8 @@ const SIZE_CLASS: Record<ModalSizeType, string> = {
   [ModalSize.Md]: styles.sizeMd,
   [ModalSize.Lg]: styles.sizeLg,
   [ModalSize.Xl]: styles.sizeXl,
-  [ModalSize.Ticket]: styles.sizeTicket
+  [ModalSize.Ticket]: styles.sizeTicket,
+  [ModalSize.Auto]: styles.sizeAuto
 };
 
 export interface ModalProps {

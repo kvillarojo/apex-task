@@ -35,6 +35,11 @@
   animation-name: modalTicketIn;
 }
 
+.sizeAuto {
+  width: auto;
+  max-width: none;
+}
+
 .headerLeft {
   display: flex;
   align-items: center;
