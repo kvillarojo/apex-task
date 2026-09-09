@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { useTodo } from '../context/TodoContext';
-import { type TagPreset } from '../components/TagModal/tagPresets.data';
+import { useTodo } from '../../context/TodoContext';
+import { DEFAULT_ACCENT } from '../../constants/colors';
+import { normalizeTagName } from '../../utils/tagUtils';
+import { type TagPreset } from './tagPresets.data';
 
 export function useTagModal() {
   const {
@@ -13,7 +15,7 @@ export function useTagModal() {
   } = useTodo();
 
   const [tagName, setTagName] = useState('');
-  const [tagColor, setTagColor] = useState('#6366f1');
+  const [tagColor, setTagColor] = useState(DEFAULT_ACCENT);
   const [editingTagName, setEditingTagName] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -28,12 +30,12 @@ export function useTagModal() {
   const handleCancelEdit = () => {
     setEditingTagName(null);
     setTagName('');
-    setTagColor('#6366f1');
+    setTagColor(DEFAULT_ACCENT);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const clean = tagName.trim().toLowerCase().replace(/^#/, '');
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    const clean = normalizeTagName(tagName);
     if (!clean) return;
 
     if (isEditing && editingTagName) {
@@ -62,13 +64,13 @@ export function useTagModal() {
     }
   };
 
-  const filteredTagsList = allTags.filter(t =>
-    t.toLowerCase().includes(searchQuery.trim().toLowerCase())
+  const filteredTagsList = allTags.filter(tag =>
+    tag.toLowerCase().includes(searchQuery.trim().toLowerCase())
   );
 
-  const cleanPreviewName = tagName.trim().toLowerCase().replace(/^#/, '') || 'example-tag';
+  const cleanPreviewName = normalizeTagName(tagName) || 'example-tag';
 
-  const tagUsageCount = (tag: string) => tasks.filter(t => t.tags.includes(tag)).length;
+  const tagUsageCount = (tag: string) => tasks.filter(task => task.tags.includes(tag)).length;
 
   return {
     allTags,

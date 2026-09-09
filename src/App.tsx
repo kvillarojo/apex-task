@@ -12,14 +12,16 @@ import { PeopleModal } from './components/PeopleModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { PomodoroWidget } from './components/PomodoroWidget';
 import { ProjectModal } from './components/ProjectModal';
-import { TagModal } from './components/TagModal/index';
+import { TagModal } from './components/TagModal';
 import { NotesView } from './components/NotesView';
 import { NoteDetailModal } from './components/NoteDetailModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { ReminderToast } from './components/ReminderToast';
+import { useThemeOverrides } from './theme';
 
 const MainContent: React.FC = () => {
   const { viewMode } = useTodo();
+  useThemeOverrides();
 
   const renderView = () => {
     switch (viewMode) {

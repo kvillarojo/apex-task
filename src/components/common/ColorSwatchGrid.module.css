@@ -1,0 +1,30 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.customRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.customLabel {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.customInput {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: transparent;
+}
+
+.grid {
+  gap: 6px;
+}

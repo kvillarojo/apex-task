@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useTodo } from '../context/TodoContext';
 import type { Note } from '../types/todo';
-import { PROJECT_ICONS } from './ProjectModal';
+import { PROJECT_ICONS } from '../constants/projectIcons';
 import { getTodayString } from '../utils/dateUtils';
 
 interface NoteCardProps {

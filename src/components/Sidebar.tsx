@@ -17,7 +17,7 @@ import {
 import { useTodo } from '../context/TodoContext';
 import type { SmartFilter } from '../types/todo';
 import { isToday, isUpcoming } from '../utils/dateUtils';
-import { PROJECT_ICONS } from './ProjectModal';
+import { PROJECT_ICONS } from '../constants/projectIcons';
 
 export const Sidebar: React.FC = () => {
   const {

@@ -1,0 +1,90 @@
+.overlay {
+  animation: modalOverlayIn 220ms ease-out both;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  animation: modalCardIn 260ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sizeSm {
+  width: 420px;
+  max-width: 92vw;
+}
+
+.sizeMd {
+  width: 580px;
+  max-width: 92vw;
+}
+
+.sizeLg {
+  width: 640px;
+  max-width: 92vw;
+}
+
+.sizeXl {
+  width: 750px;
+  max-width: 92vw;
+}
+
+.sizeTicket {
+  /* Relies on global .ticket-modal-card sizing */
+  width: auto;
+  max-width: none;
+  animation-name: modalTicketIn;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+@keyframes modalOverlayIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes modalCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes modalTicketIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .card {
+    animation: none;
+  }
+}
