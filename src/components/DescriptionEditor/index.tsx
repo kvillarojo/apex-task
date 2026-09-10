@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
 
 interface DescriptionEditorProps {
   value: string;
@@ -82,5 +84,5 @@ export const DescriptionEditor: React.FC<DescriptionEditorProps> = ({ value, onC
     syncingValueRef.current = false;
   }, [value]);
 
-  return <div ref={containerRef} className="description-editor" />;
+  return <div {...getThemeComponentProps(ThemeComponent.DescriptionEditor)} ref={containerRef} className="description-editor" />;
 };

@@ -6,7 +6,9 @@ import {
   Menu,
   Plus
 } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
 
 export const MobileBottomNav: React.FC = () => {
   const {
@@ -48,7 +50,7 @@ export const MobileBottomNav: React.FC = () => {
       </button>
 
       {/* Mobile Bottom Navigation Bar */}
-      <nav className="mobile-bottom-nav">
+      <nav {...getThemeComponentProps(ThemeComponent.MobileBottomNav)} className="mobile-bottom-nav">
         <button
           type="button"
           className={`mobile-tab-btn ${viewMode !== 'notes' && viewMode !== 'calendar' ? 'active' : ''}`}

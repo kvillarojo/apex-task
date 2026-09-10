@@ -1,7 +1,10 @@
 import React from 'react';
-import { useTodo } from '../context/TodoContext';
-import { TaskItem } from './TaskItem';
-import type { Priority } from '../types/todo';
+import { useTodo } from '../../context/TodoContext';
+import { TaskItem } from '../TaskItem';
+import type { Priority } from '../../types/todo';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
+import styles from './EisenhowerView.module.css';
 
 const QUADRANTS: { priority: Priority; title: string; subtitle: string; class: string }[] = [
   { priority: 'p1', title: 'Quadrant 1: Do First', subtitle: 'Urgent & High Priority', class: 'matrix-q1' },
@@ -14,26 +17,26 @@ export const EisenhowerView: React.FC = () => {
   const { filteredTasks } = useTodo();
 
   return (
-    <div className="matrix-grid">
+    <div {...getThemeComponentProps(ThemeComponent.EisenhowerView)} className="matrix-grid">
       {QUADRANTS.map(q => {
         const qTasks = filteredTasks.filter(t => t.priority === q.priority && !t.completed);
         return (
           <div key={q.priority} className={`matrix-quadrant ${q.class}`}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className={styles.quadrantHeader}>
               <div>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>{q.title}</h3>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{q.subtitle}</span>
+                <h3 className={styles.quadrantTitle}>{q.title}</h3>
+                <span className={styles.quadrantSubtitle}>{q.subtitle}</span>
               </div>
               <span className="nav-badge">{qTasks.length}</span>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flex: 1, overflowY: 'auto' }}>
+            <div className={styles.taskList}>
               {qTasks.map(task => (
                 <TaskItem key={task.id} task={task} />
               ))}
 
               {qTasks.length === 0 && (
-                <div style={{ padding: '20px', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                <div className={styles.emptyQuadrant}>
                   No tasks in this quadrant
                 </div>
               )}

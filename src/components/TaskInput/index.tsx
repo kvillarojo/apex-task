@@ -11,9 +11,12 @@ import {
   Repeat,
   User
 } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
-import { parseNaturalLanguageTask } from '../utils/naturalLanguageParser';
-import type { Priority, RecurrenceRule } from '../types/todo';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
+import { parseNaturalLanguageTask } from '../../utils/naturalLanguageParser';
+import type { Priority, RecurrenceRule } from '../../types/todo';
+import styles from './TaskInput.module.css';
 
 export const TaskInput: React.FC = () => {
   const { addTask, projects, assignees, filter } = useTodo();
@@ -77,9 +80,9 @@ export const TaskInput: React.FC = () => {
   };
 
   return (
-    <form className="task-input-card" onSubmit={handleSubmit}>
+    <form {...getThemeComponentProps(ThemeComponent.TaskInput)} className="task-input-card" onSubmit={handleSubmit}>
       <div className="task-input-main">
-        <button type="submit" className="btn-primary" style={{ padding: '8px', borderRadius: '10px' }}>
+        <button type="submit" className={`btn-primary ${styles.submitButton}`}>
           <Plus size={20} />
         </button>
 
@@ -92,19 +95,18 @@ export const TaskInput: React.FC = () => {
 
         <button
           type="button"
-          className="btn-secondary"
-          style={{ fontSize: '0.75rem', padding: '6px 10px', display: 'flex', alignItems: 'center', gap: '4px' }}
+          className={`btn-secondary ${styles.optionsButton}`}
           onClick={() => setShowDetails(!showDetails)}
         >
           <span>Options</span>
-          <ChevronDown size={14} style={{ transform: showDetails ? 'rotate(180deg)' : 'none', transition: '0.2s' }} />
+          <ChevronDown size={14} className={`${styles.optionsChevron} ${showDetails ? styles.optionsChevronOpen : ''}`} />
         </button>
       </div>
 
       {/* Live Natural Language Parsing Indicators */}
       {(parsed.dueDate || parsed.dueTime || parsed.priority || parsed.tags.length > 0 || parsed.projectHint) && (
         <div className="nlp-badges">
-          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <span className={styles.parsedLabel}>
             <Sparkles size={12} color="var(--primary)" /> Parsed:
           </span>
 
@@ -130,13 +132,13 @@ export const TaskInput: React.FC = () => {
           )}
 
           {parsed.tags.map(tag => (
-            <span key={tag} className="nlp-chip" style={{ backgroundColor: 'var(--bg-input)' }}>
+            <span key={tag} className={`nlp-chip ${styles.neutralChip}`}>
               <TagIcon size={12} />#{tag}
             </span>
           ))}
 
           {parsed.projectHint && (
-            <span className="nlp-chip" style={{ backgroundColor: 'var(--bg-input)' }}>
+            <span className={`nlp-chip ${styles.neutralChip}`}>
               <Folder size={12} />@{parsed.projectHint}
             </span>
           )}
@@ -145,37 +147,23 @@ export const TaskInput: React.FC = () => {
 
       {/* Expanded Details Bar */}
       {showDetails && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-color)' }}>
+        <div className={styles.details}>
           <input
             type="text"
             placeholder="Add detailed description or notes..."
             value={description}
             onChange={e => setDescription(e.target.value)}
-            style={{
-              padding: '8px 12px',
-              borderRadius: '8px',
-              border: '1px solid var(--border-color)',
-              backgroundColor: 'var(--bg-input)',
-              color: 'var(--text-primary)',
-              fontSize: '0.85rem'
-            }}
+            className={styles.descriptionInput}
           />
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+          <div className={styles.fieldList}>
             {/* Priority Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className={styles.field}>
               <Flag size={14} color="var(--text-muted)" />
               <select
                 value={selectedPriority}
                 onChange={e => setSelectedPriority(e.target.value as Priority)}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem'
-                }}
+                className={styles.fieldControl}
               >
                 <option value="p1">P1 - Urgent (Red)</option>
                 <option value="p2">P2 - High (Orange)</option>
@@ -185,19 +173,12 @@ export const TaskInput: React.FC = () => {
             </div>
 
             {/* Project Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className={styles.field}>
               <Folder size={14} color="var(--text-muted)" />
               <select
                 value={selectedProjectId}
                 onChange={e => setSelectedProjectId(e.target.value)}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem'
-                }}
+                className={styles.fieldControl}
               >
                 {projects.map(p => (
                   <option key={p.id} value={p.id}>
@@ -207,19 +188,12 @@ export const TaskInput: React.FC = () => {
               </select>
             </div>
             {/* Assignee Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className={styles.field}>
               <User size={14} color="var(--text-muted)" />
               <select
                 value={selectedAssigneeId}
                 onChange={e => setSelectedAssigneeId(e.target.value)}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem'
-                }}
+                className={styles.fieldControl}
               >
                 <option value="">Unassigned</option>
                 {assignees.map(a => (
@@ -231,50 +205,29 @@ export const TaskInput: React.FC = () => {
             </div>
 
             {/* Due Date & Time */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className={styles.field}>
               <Calendar size={14} color="var(--text-muted)" />
               <input
                 type="date"
                 value={selectedDueDate}
                 onChange={e => setSelectedDueDate(e.target.value)}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem'
-                }}
+                className={styles.fieldControl}
               />
               <input
                 type="time"
                 value={selectedDueTime}
                 onChange={e => setSelectedDueTime(e.target.value)}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem'
-                }}
+                className={styles.fieldControl}
               />
             </div>
 
             {/* Recurrence Selector */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div className={styles.field}>
               <Repeat size={14} color="var(--text-muted)" />
               <select
                 value={selectedRecurring}
                 onChange={e => setSelectedRecurring(e.target.value as RecurrenceRule)}
-                style={{
-                  padding: '4px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.8rem'
-                }}
+                className={styles.fieldControl}
               >
                 <option value="none">No Recurrence</option>
                 <option value="daily">Daily</option>

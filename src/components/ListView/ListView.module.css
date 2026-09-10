@@ -1,0 +1,13 @@
+.view { display: flex; flex-direction: column; gap: 16px; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+.taskCount, .sortLabel, .emptyDescription { color: var(--text-muted); }
+.taskCount { font-size: .85rem; }
+.taskCountValue { color: var(--text-primary); font-weight: 600; }
+.sortControls { display: flex; align-items: center; gap: 8px; font-size: .8rem; }
+.sortButton { padding: 4px 8px; font-size: .75rem; }
+.sortIcon { margin-left: 4px; }
+.emptyState { display: flex; flex-direction: column; align-items: center; gap: 12px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--bg-card); padding: 60px 20px; text-align: center; }
+.emptyIcon { opacity: .5; }
+.emptyTitle { font-size: 1.1rem; font-weight: 600; }
+.emptyDescription { font-size: .85rem; }
+@media (max-width: 640px) { .toolbar { align-items: flex-start; flex-direction: column; gap: 10px; } .sortControls { flex-wrap: wrap; } }

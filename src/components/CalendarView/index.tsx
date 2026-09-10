@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
-import { getCalendarGrid } from '../utils/dateUtils';
-import { TaskItem } from './TaskItem';
-import type { Task } from '../types/todo';
+import { useTodo } from '../../context/TodoContext';
+import { getCalendarGrid } from '../../utils/dateUtils';
+import { TaskItem } from '../TaskItem';
+import type { Task } from '../../types/todo';
 import styles from './CalendarView.module.css';
 
 type EventCategory = 'deployment' | 'training' | 'goLive' | 'priority' | 'default';

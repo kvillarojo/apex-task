@@ -14,10 +14,12 @@ import {
   StickyNote,
   X
 } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
-import type { SmartFilter } from '../types/todo';
-import { isToday, isUpcoming } from '../utils/dateUtils';
-import { PROJECT_ICONS } from '../constants/projectIcons';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
+import type { SmartFilter } from '../../types/todo';
+import { isToday, isUpcoming } from '../../utils/dateUtils';
+import { PROJECT_ICONS } from '../../constants/projectIcons';
 
 export const Sidebar: React.FC = () => {
   const {
@@ -94,7 +96,7 @@ export const Sidebar: React.FC = () => {
           onClick={() => setMobileDrawerOpen(false)}
         />
       )}
-      <aside className={`sidebar ${mobileDrawerOpen ? 'mobile-open' : ''}`}>
+      <aside {...getThemeComponentProps(ThemeComponent.Sidebar)} className={`sidebar ${mobileDrawerOpen ? 'mobile-open' : ''}`}>
         {/* Sidebar Header */}
         <div className="sidebar-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>

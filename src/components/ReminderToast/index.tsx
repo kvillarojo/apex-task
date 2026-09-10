@@ -1,6 +1,8 @@
 import React from 'react';
 import { Bell, X, ExternalLink, Clock } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
 
 export const ReminderToast: React.FC = () => {
   const {
@@ -33,7 +35,7 @@ export const ReminderToast: React.FC = () => {
   };
 
   return (
-    <div className="reminder-toast-container">
+    <div {...getThemeComponentProps(ThemeComponent.ReminderToast)} className="reminder-toast-container">
       <div className="reminder-toast-card">
         <div className="reminder-toast-left">
           <div className="reminder-bell-badge">

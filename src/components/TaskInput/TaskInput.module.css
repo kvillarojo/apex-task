@@ -1,0 +1,9 @@
+.submitButton { border-radius: 10px; padding: 8px; }
+.optionsButton, .parsedLabel, .field { display: flex; align-items: center; gap: 4px; }
+.optionsButton { padding: 6px 10px; font-size: .75rem; }
+.optionsChevron { transition: transform .2s; }.optionsChevronOpen { transform: rotate(180deg); }
+.parsedLabel { gap: 4px; color: var(--text-muted); font-size: .75rem; }.neutralChip { background: var(--bg-input); }
+.details { display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--border-color); padding-top: 10px; }
+.descriptionInput { border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-input); padding: 8px 12px; color: var(--text-primary); font-size: .85rem; }
+.fieldList { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }.field { gap: 6px; }
+.fieldControl { border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-input); padding: 4px 8px; color: var(--text-primary); font-size: .8rem; }

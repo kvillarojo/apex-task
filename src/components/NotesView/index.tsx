@@ -6,8 +6,17 @@ import {
   Clock,
   Sparkles
 } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
-import { NoteCard } from './NoteCard';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
+import styled from 'styled-components';
+import styles from './NotesView.module.css';
+
+const ProjectChip = styled.button<{ $color: string; $active: boolean }>`
+  border-color: ${({ $color, $active }) => ($active ? $color : undefined)};
+`;
+const ProjectDot = styled.span<{ $color: string }>`background-color: ${({ $color }) => $color};`;
+import { NoteCard } from '../NoteCard';
 
 export const NotesView: React.FC = () => {
   const {
@@ -61,7 +70,7 @@ export const NotesView: React.FC = () => {
   };
 
   return (
-    <div className="notes-page-container">
+    <div {...getThemeComponentProps(ThemeComponent.NotesView)} className="notes-page-container">
       {/* Top Banner & Quick Create Header */}
       <div className="notes-header-bar">
         <div>
@@ -89,11 +98,10 @@ export const NotesView: React.FC = () => {
         />
         <button
           type="button"
-          className="btn-secondary"
+          className={`btn-secondary ${styles.composeButton}`}
           onClick={() => openCreateNoteModal()}
-          style={{ fontSize: '0.8rem', padding: '6px 12px' }}
         >
-          <Plus size={14} style={{ marginRight: '4px' }} />
+          <Plus size={14} className={styles.composeIcon} />
           Compose
         </button>
       </form>
@@ -133,25 +141,17 @@ export const NotesView: React.FC = () => {
           {/* Project Chips */}
           <div className="chips-separator" />
           {noteProjects.map(p => (
-            <button
+            <ProjectChip
               key={p.id}
               type="button"
               className={`filter-chip project-chip ${filter.projectId === p.id ? 'active' : ''}`}
+              $color={p.color}
+              $active={filter.projectId === p.id}
               onClick={() => handleProjectFilterClick(p.id)}
-              style={{
-                borderColor: filter.projectId === p.id ? p.color : undefined
-              }}
             >
-              <span
-                style={{
-                  width: '7px',
-                  height: '7px',
-                  borderRadius: '50%',
-                  backgroundColor: p.color
-                }}
-              />
+              <ProjectDot className={styles.projectDot} $color={p.color} />
               <span>{p.name}</span>
-            </button>
+            </ProjectChip>
           ))}
 
           {/* Tag Chips */}
@@ -187,9 +187,8 @@ export const NotesView: React.FC = () => {
           </p>
           <button
             type="button"
-            className="btn-primary"
+            className={`btn-primary ${styles.createButton}`}
             onClick={() => openCreateNoteModal()}
-            style={{ marginTop: '8px' }}
           >
             <Plus size={16} />
             <span>Create First Note</span>

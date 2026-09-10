@@ -7,10 +7,12 @@ import {
   Folder,
   AlertCircle
 } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
-import type { Note } from '../types/todo';
-import { PROJECT_ICONS } from '../constants/projectIcons';
-import { getTodayString } from '../utils/dateUtils';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { mergeThemeStyles } from '../../theme';
+import type { Note } from '../../types/todo';
+import { PROJECT_ICONS } from '../../constants/projectIcons';
+import { getTodayString } from '../../utils/dateUtils';
 
 interface NoteCardProps {
   note: Note;
@@ -77,9 +79,10 @@ export const NoteCard: React.FC<NoteCardProps> = ({ note }) => {
     <article
       className={`note-card ${note.isPinned ? 'pinned' : ''}`}
       onClick={handleCardClick}
-      style={{
+      data-theme-component={ThemeComponent.NoteCard}
+      style={mergeThemeStyles(ThemeComponent.NoteCard, {
         borderLeft: note.color ? `4px solid ${note.color}` : undefined
-      }}
+      })}
     >
       {/* Top Header */}
       <div className="note-card-header">

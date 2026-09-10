@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Play, Pause, RotateCcw, Timer, Settings, Plus, Minus, Check, Edit3, Maximize2, Minimize2, X } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { mergeThemeStyles } from '../../theme';
 
 export const PomodoroWidget: React.FC = () => {
   const {
@@ -124,7 +126,8 @@ export const PomodoroWidget: React.FC = () => {
          setPomodoroVisible(true);
          setPomodoroMaximized(true);
        }}
-       style={floatingIconStyle}
+       data-theme-component={ThemeComponent.PomodoroWidget}
+       style={mergeThemeStyles(ThemeComponent.PomodoroWidget, floatingIconStyle)}
        title="Open Focus Timer"
      >
        <Timer size={26} />
@@ -394,10 +397,21 @@ export const PomodoroWidget: React.FC = () => {
  );
 
  return isMaximized ? (
-   <div style={maxOverlayStyle}>
+   <div
+     data-theme-component={ThemeComponent.PomodoroWidget}
+     style={mergeThemeStyles(ThemeComponent.PomodoroWidget, maxOverlayStyle)}
+   >
      <div style={maxPanelStyle}>{widgetBody}</div>
    </div>
  ) : (
-   <div style={{ ...normalWidgetStyle, animation: 'focusTimerWidgetIn 260ms ease-out forwards' }}>{widgetBody}</div>
+   <div
+     data-theme-component={ThemeComponent.PomodoroWidget}
+     style={mergeThemeStyles(ThemeComponent.PomodoroWidget, {
+       ...normalWidgetStyle,
+       animation: 'focusTimerWidgetIn 260ms ease-out forwards'
+     })}
+   >
+     {widgetBody}
+   </div>
  );
 };

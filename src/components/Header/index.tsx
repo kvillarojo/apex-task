@@ -17,7 +17,10 @@ import {
   Upload,
   Command
 } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
+import styles from './Header.module.css';
 
 export const Header: React.FC = () => {
   const {
@@ -56,7 +59,7 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="app-header">
+    <header {...getThemeComponentProps(ThemeComponent.Header)} className="app-header">
       <div className="header-left">
         {/* Mobile Hamburger Drawer Button */}
         <button
@@ -81,10 +84,9 @@ export const Header: React.FC = () => {
 
         {/* Command Palette Hotkey button */}
         <button
-          className="icon-button cmd-palette-btn"
+          className={`icon-button cmd-palette-btn ${styles.commandButton}`}
           onClick={() => setCommandPaletteOpen(true)}
           title="Command Palette (Cmd+K)"
-          style={{ width: 'auto', padding: '0 10px', gap: '6px', fontSize: '0.8rem' }}
         >
           <Command size={14} />
           <span>Cmd+K</span>
@@ -149,7 +151,7 @@ export const Header: React.FC = () => {
           </button>
         </div>
 
-        <div style={{ width: '1px', height: '24px', backgroundColor: 'var(--border-color)', margin: '0 4px' }} />
+        <div className={styles.divider} />
 
         {/* Sound Toggle */}
         <button
@@ -179,9 +181,9 @@ export const Header: React.FC = () => {
         </button>
 
         {/* Import Backup */}
-        <label className="icon-button" title="Import JSON Backup" style={{ cursor: 'pointer' }}>
+        <label className={`icon-button ${styles.importLabel}`} title="Import JSON Backup">
           <Upload size={18} />
-          <input type="file" accept=".json" onChange={handleImportFile} style={{ display: 'none' }} />
+          <input className={styles.fileInput} type="file" accept=".json" onChange={handleImportFile} />
         </label>
       </div>
     </header>

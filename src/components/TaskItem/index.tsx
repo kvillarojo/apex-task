@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import styled from 'styled-components';
 import {
   Check,
   Calendar,
@@ -10,9 +11,26 @@ import {
   Plus,
   User
 } from 'lucide-react';
-import { useTodo } from '../context/TodoContext';
-import type { Task } from '../types/todo';
-import { formatFriendlyDate, isOverdue } from '../utils/dateUtils';
+import { useTodo } from '../../context/TodoContext';
+import { ThemeComponent } from '../../constants/enums';
+import { getThemeComponentProps } from '../../theme';
+import type { Task } from '../../types/todo';
+import { formatFriendlyDate, isOverdue } from '../../utils/dateUtils';
+import styles from './TaskItem.module.css';
+
+const ProjectBadge = styled.span<{ $color: string }>`
+  color: ${({ $color }) => $color};
+`;
+
+const ProjectDot = styled.span<{ $color: string }>`
+  background-color: ${({ $color }) => $color};
+`;
+
+const TagBadge = styled.span<{ $color: string }>`
+  color: ${({ $color }) => $color};
+  background-color: ${({ $color }) => `${$color}18`};
+  border-color: ${({ $color }) => `${$color}40`};
+`;
 
 const getDescriptionPreview = (description: string) => {
   if (!/<\/?[a-z][\s\S]*>/i.test(description)) return description;
@@ -53,8 +71,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
     <>
       {!task.completed && (
         <button
-          className="icon-button"
-          style={{ width: '28px', height: '28px' }}
+          className={`icon-button ${styles.focusButton}`}
           onClick={(e) => {
             e.stopPropagation();
             startPomodoro(task.id);
@@ -75,7 +92,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
   };
 
   return (
-    <div className={`task-card ${task.completed ? 'completed' : ''} ${variant === 'kanban' ? 'kanban-card' : ''}`}
+    <div {...getThemeComponentProps(ThemeComponent.TaskItem)} className={`task-card ${task.completed ? 'completed' : ''} ${variant === 'kanban' ? 'kanban-card' : ''}`}
       onClick={(e) => {
           e.stopPropagation();
           setEditingTask(task);
@@ -115,14 +132,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
           </span>
 
           {/* Project */}
-          <span className="badge" style={{ color: project.color, backgroundColor: 'var(--bg-input)' }}>
-            <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: project.color }} />
+          <ProjectBadge className={`badge ${styles.projectBadge}`} $color={project.color}>
+            <ProjectDot className={styles.projectDot} $color={project.color} />
             {project.name}
-          </span>
+          </ProjectBadge>
 
           {/* Due Date */}
           {dateFormatted && (
-            <span className="badge" style={{ color: overdue ? 'var(--priority-p1)' : 'var(--text-secondary)' }}>
+            <span className={`badge ${overdue ? styles.overdueBadge : styles.dueBadge}`}>
               <Calendar size={11} />
               {dateFormatted}
             </span>
@@ -147,17 +164,13 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
           {task.tags.map(tag => {
             const color = getTagColor(tag);
             return (
-              <span
+              <TagBadge
                 key={tag}
                 className="badge"
-                style={{
-                  color,
-                  backgroundColor: `${color}18`,
-                  borderColor: `${color}40`
-                }}
+                $color={color}
               >
                 <TagIcon size={11} />#{tag}
-              </span>
+              </TagBadge>
             );
           })}
 
@@ -165,15 +178,14 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
           {totalSubtasksCount > 0 && (
             <button
               onClick={() => setExpandedSubtasks(!expandedSubtasks)}
-              className="badge"
-              style={{ cursor: 'pointer', border: '1px solid var(--border-color)' }}
+              className={`badge ${styles.subtaskToggle}`}
             >
               <span>
                 {completedSubtasksCount}/{totalSubtasksCount} subtasks
               </span>
               <ChevronDown
                 size={12}
-                style={{ transform: expandedSubtasks ? 'rotate(180deg)' : 'none', transition: '0.2s' }}
+                className={`${styles.subtaskChevron} ${expandedSubtasks ? styles.subtaskChevronOpen : ''}`}
               />
             </button>
           )}
@@ -188,32 +200,24 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
                   type="checkbox"
                   checked={st.completed}
                   onChange={() => toggleSubtask(task.id, st.id)}
-                  style={{ cursor: 'pointer', accentColor: 'var(--primary)', flexShrink: 0 }}
+                  className={styles.subtaskCheckbox}
                 />
-                <span className="task-subtask-title" style={{ textDecoration: st.completed ? 'line-through' : 'none', color: st.completed ? 'var(--text-muted)' : 'var(--text-primary)' }}>
+                <span className={`task-subtask-title ${st.completed ? styles.completedSubtask : ''}`}>
                   {st.title}
                 </span>
               </div>
             ))}
 
             {/* Quick add subtask */}
-            <form onSubmit={handleAddSubtaskSubmit} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+            <form onSubmit={handleAddSubtaskSubmit} className={styles.addSubtaskForm}>
               <input
                 type="text"
                 placeholder="Add subtask..."
                 value={newSubtaskTitle}
                 onChange={e => setNewSubtaskTitle(e.target.value)}
-                style={{
-                  flex: 1,
-                  padding: '3px 8px',
-                  borderRadius: '6px',
-                  border: '1px solid var(--border-color)',
-                  backgroundColor: 'var(--bg-input)',
-                  color: 'var(--text-primary)',
-                  fontSize: '0.775rem'
-                }}
+                className={styles.addSubtaskInput}
               />
-              <button type="submit" style={{ background: 'none', border: 'none', color: 'var(--primary)', cursor: 'pointer' }}>
+              <button type="submit" className={styles.addSubtaskButton}>
                 <Plus size={14} />
               </button>
             </form>

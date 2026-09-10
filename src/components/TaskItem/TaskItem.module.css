@@ -1,0 +1,6 @@
+.focusButton { width: 28px; height: 28px; }
+.projectBadge { background: var(--bg-input); }.projectDot { width: 6px; height: 6px; border-radius: 50%; }
+.dueBadge { color: var(--text-secondary); }.overdueBadge { color: var(--priority-p1); }
+.subtaskToggle { cursor: pointer; border: 1px solid var(--border-color); }.subtaskChevron { transition: transform .2s; }.subtaskChevronOpen { transform: rotate(180deg); }
+.subtaskCheckbox { flex-shrink: 0; cursor: pointer; accent-color: var(--primary); }.completedSubtask { color: var(--text-muted); text-decoration: line-through; }
+.addSubtaskForm { display: flex; align-items: center; gap: 6px; margin-top: 4px; }.addSubtaskInput { flex: 1; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-input); padding: 3px 8px; color: var(--text-primary); font-size: .775rem; }.addSubtaskButton { border: 0; background: none; color: var(--primary); cursor: pointer; }

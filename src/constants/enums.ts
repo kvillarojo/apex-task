@@ -60,6 +60,25 @@ export const ModalId = {
 } as const;
 export type ModalId = (typeof ModalId)[keyof typeof ModalId];
 
+/** Stable selectors for non-modal feature-level theme overrides. */
+export const ThemeComponent = {
+  AnalyticsView: 'AnalyticsView',
+  ListView: 'ListView',
+  KanbanView: 'KanbanView',
+  EisenhowerView: 'EisenhowerView',
+  DescriptionEditor: 'DescriptionEditor',
+  Header: 'Header',
+  MobileBottomNav: 'MobileBottomNav',
+  NotesView: 'NotesView',
+  PomodoroWidget: 'PomodoroWidget',
+  ReminderToast: 'ReminderToast',
+  Sidebar: 'Sidebar',
+  TaskInput: 'TaskInput',
+  TaskItem: 'TaskItem',
+  NoteCard: 'NoteCard'
+} as const;
+export type ThemeComponent = (typeof ThemeComponent)[keyof typeof ThemeComponent];
+
 export const ModalSize = {
   Sm: 'sm',
   Md: 'md',
