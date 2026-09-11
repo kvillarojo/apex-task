@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, CalendarDays } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ChevronLeft, ChevronRight, CalendarDays, Plus } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { getCalendarGrid, getTodayString } from '../../utils/dateUtils';
 import { TaskItem } from '../TaskItem';
@@ -50,9 +50,11 @@ const renderEventTitle = (title: string) => {
 };
 
 export const CalendarView: React.FC = () => {
-  const { tasks } = useTodo();
+  const { tasks, addTask, filter } = useTodo();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<string>(getTodayString());
+  const [draftTitle, setDraftTitle] = useState('');
+  const [draftTime, setDraftTime] = useState('');
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -62,6 +64,11 @@ export const CalendarView: React.FC = () => {
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
+
+  useEffect(() => {
+    setDraftTitle('');
+    setDraftTime('');
+  }, [selectedDate]);
 
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
@@ -75,6 +82,28 @@ export const CalendarView: React.FC = () => {
     const today = new Date();
     setCurrentDate(today);
     setSelectedDate(getTodayString());
+  };
+
+  const handleAddTask = (event: React.FormEvent) => {
+    event.preventDefault();
+    const title = draftTitle.trim();
+    if (!title) return;
+
+    addTask({
+      title,
+      completed: false,
+      status: 'todo',
+      priority: 'p4',
+      dueDate: selectedDate,
+      dueTime: draftTime || undefined,
+      recurring: 'none',
+      projectId: filter.projectId || 'inbox',
+      tags: [],
+      subtasks: []
+    });
+
+    setDraftTitle('');
+    setDraftTime('');
   };
 
   const tasksForSelectedDate = tasks.filter(task => task.dueDate === selectedDate);
@@ -166,9 +195,41 @@ export const CalendarView: React.FC = () => {
             </div>
           </div>
 
+          <form className={styles.quickAdd} onSubmit={handleAddTask}>
+            <label className={styles.quickAddLabel} htmlFor="calendar-quick-add-title">
+              Add task for {formatScheduleHeading(selectedDate)}
+            </label>
+            <div className={styles.quickAddRow}>
+              <input
+                id="calendar-quick-add-title"
+                className={styles.quickAddInput}
+                type="text"
+                value={draftTitle}
+                onChange={event => setDraftTitle(event.target.value)}
+                placeholder="Task title…"
+                autoComplete="off"
+              />
+              <input
+                className={styles.quickAddTime}
+                type="time"
+                value={draftTime}
+                onChange={event => setDraftTime(event.target.value)}
+                aria-label="Due time"
+              />
+              <button
+                type="submit"
+                className={`btn-primary ${styles.quickAddSubmit}`}
+                disabled={!draftTitle.trim()}
+                aria-label="Add task"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+          </form>
+
           <div className={styles.scheduleBody}>
             {tasksForSelectedDate.length === 0 ? (
-              <p className={styles.emptyState}>Select another day or add a due date to a task.</p>
+              <p className={styles.emptyState}>No tasks yet — add one above for this day.</p>
             ) : (
               <div className={styles.detailsList}>
                 {tasksForSelectedDate.map(task => (

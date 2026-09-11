@@ -283,6 +283,67 @@
   font-weight: 600;
 }
 
+.quickAdd {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--bg-sidebar) 70%, transparent);
+}
+
+.quickAddLabel {
+  color: var(--text-muted);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.quickAddRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px 40px;
+  gap: 8px;
+  align-items: center;
+}
+
+.quickAddInput,
+.quickAddTime {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.quickAddInput:focus,
+.quickAddTime:focus {
+  border-color: var(--primary);
+}
+
+.quickAddInput::placeholder {
+  color: var(--text-muted);
+}
+
+.quickAddSubmit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+}
+
+.quickAddSubmit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .scheduleBody {
   flex: 1;
   min-height: 0;
@@ -311,6 +372,14 @@
 
   .dayCell {
     min-height: 96px;
+  }
+
+  .quickAddRow {
+    grid-template-columns: minmax(0, 1fr) 40px;
+  }
+
+  .quickAddTime {
+    grid-column: 1 / -1;
   }
 }
 
