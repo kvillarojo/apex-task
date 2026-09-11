@@ -30,7 +30,6 @@
 
 .sizeTicket {
   /* Relies on global .ticket-modal-card sizing */
-  width: auto;
   max-width: none;
   animation-name: modalTicketIn;
 }
