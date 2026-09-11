@@ -3,6 +3,7 @@ import { Bell, X, ExternalLink, Clock } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
 import { getThemeComponentProps } from '../../theme';
+import styles from './ReminderToast.module.css';
 
 export const ReminderToast: React.FC = () => {
   const {
@@ -35,30 +36,35 @@ export const ReminderToast: React.FC = () => {
   };
 
   return (
-    <div {...getThemeComponentProps(ThemeComponent.ReminderToast)} className="reminder-toast-container">
-      <div className="reminder-toast-card">
-        <div className="reminder-toast-left">
-          <div className="reminder-bell-badge">
+    <div
+      {...getThemeComponentProps(ThemeComponent.ReminderToast)}
+      className={styles.container}
+      role="status"
+      aria-live="polite"
+    >
+      <div className={styles.card}>
+        <div className={styles.left}>
+          <div className={styles.bellBadge}>
             <Bell size={18} />
           </div>
-          <div className="reminder-toast-content">
-            <div className="reminder-toast-header">
-              <span className="reminder-toast-tag">
+          <div className={styles.content}>
+            <div className={styles.header}>
+              <span className={styles.tag}>
                 {activeAlert.type === 'note' ? 'Note Reminder' : 'Task Reminder'}
               </span>
-              <span className="reminder-toast-time">{activeAlert.dueText}</span>
+              <span className={styles.time}>{activeAlert.dueText}</span>
             </div>
-            <h4 className="reminder-toast-title">{activeAlert.title}</h4>
-            <span className="reminder-toast-project">
+            <h4 className={styles.title}>{activeAlert.title}</h4>
+            <span className={styles.project}>
               Project: {activeAlert.projectName}
             </span>
           </div>
         </div>
 
-        <div className="reminder-toast-actions">
+        <div className={styles.actions}>
           <button
             type="button"
-            className="btn-primary reminder-open-btn"
+            className={`btn-primary ${styles.openBtn}`}
             onClick={handleOpenItem}
           >
             <ExternalLink size={13} />
@@ -66,22 +72,23 @@ export const ReminderToast: React.FC = () => {
           </button>
           <button
             type="button"
-            className="btn-secondary reminder-snooze-btn"
+            className={`btn-secondary ${styles.snoozeBtn}`}
             onClick={() => snoozeActiveAlert(15)}
             title="Snooze for 15 minutes"
           >
             <Clock size={13} />
             <span>Snooze 15m</span>
           </button>
-          <button
-            type="button"
-            className="reminder-dismiss-btn"
-            onClick={dismissActiveAlert}
-            aria-label="Dismiss alert"
-          >
-            <X size={16} />
-          </button>
         </div>
+
+        <button
+          type="button"
+          className={styles.dismissBtn}
+          onClick={dismissActiveAlert}
+          aria-label="Dismiss alert"
+        >
+          <X size={16} />
+        </button>
       </div>
     </div>
   );

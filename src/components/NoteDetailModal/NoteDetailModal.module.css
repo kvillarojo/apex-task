@@ -263,6 +263,54 @@
   animation: notePopoverIn 160ms ease-out;
 }
 
+.floatingReminder {
+  position: fixed;
+  top: var(--reminder-float-top);
+  left: var(--reminder-float-left);
+  width: var(--reminder-float-width);
+  z-index: 140;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--border-color) 75%, transparent);
+  border-radius: 18px;
+  background:
+    linear-gradient(
+      160deg,
+      color-mix(in srgb, var(--bg-modal) 90%, #fff 10%) 0%,
+      var(--bg-modal) 55%
+    );
+  box-shadow:
+    0 22px 48px -20px rgba(0, 0, 0, 0.58),
+    0 0 0 1px color-mix(in srgb, var(--note-accent, var(--primary)) 16%, transparent);
+  backdrop-filter: blur(14px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: min(72dvh, 520px);
+  overflow-y: auto;
+  animation: floatingReminderIn 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.floatingReminderAbove {
+  transform: translateY(-100%);
+  transform-origin: bottom left;
+}
+
+.floatingReminderBelow {
+  transform: none;
+  transform-origin: top left;
+}
+
+@keyframes floatingReminderIn {
+  from {
+    opacity: 0;
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
 .tagsPopover {
   width: min(360px, 82vw);
 }
@@ -580,7 +628,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .popover {
+  .popover,
+  .floatingReminder {
     animation: none;
   }
 }

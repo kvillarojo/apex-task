@@ -75,10 +75,11 @@ export const NoteMetaRail: React.FC<NoteMetaRailProps> = ({
 }) => {
   const [openPanel, setOpenPanel] = useState<OpenPanel>(null);
   const railRef = useRef<HTMLDivElement>(null);
+  const reminderChipRef = useRef<HTMLButtonElement>(null);
   const selectedAccent = NOTE_COLORS.find(option => option.value === color) || NOTE_COLORS[0];
 
   useEffect(() => {
-    if (!openPanel) return;
+    if (!openPanel || openPanel === 'reminder') return;
     const onPointerDown = (event: MouseEvent) => {
       if (!railRef.current?.contains(event.target as Node)) {
         setOpenPanel(null);
@@ -223,10 +224,14 @@ export const NoteMetaRail: React.FC<NoteMetaRailProps> = ({
         {/* Reminder */}
         <div className={styles.chipWrap}>
           <button
+            ref={reminderChipRef}
             type="button"
-            className={`${styles.chip} ${reminderDate ? styles.chipActive : ''}`}
+            className={`${styles.chip} ${reminderDate ? styles.chipActive : ''} ${
+              openPanel === 'reminder' ? styles.chipActive : ''
+            }`}
             onClick={() => togglePanel('reminder')}
             aria-expanded={openPanel === 'reminder'}
+            aria-haspopup="dialog"
           >
             <Clock size={14} />
             <span>{reminderDate ? reminderSummary : 'Reminder'}</span>
@@ -234,6 +239,7 @@ export const NoteMetaRail: React.FC<NoteMetaRailProps> = ({
           </button>
           {openPanel === 'reminder' && (
             <ReminderPopover
+              anchorEl={reminderChipRef.current}
               reminderDate={reminderDate}
               reminderTime={reminderTime}
               reminderSummary={reminderSummary}
@@ -242,6 +248,7 @@ export const NoteMetaRail: React.FC<NoteMetaRailProps> = ({
               setReminderTime={setReminderTime}
               onApplyPreset={onApplyPreset}
               onEnableNotifications={onEnableNotifications}
+              onRequestClose={() => setOpenPanel(null)}
             />
           )}
         </div>
