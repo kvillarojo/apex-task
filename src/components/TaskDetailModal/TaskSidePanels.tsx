@@ -5,7 +5,7 @@ import {
   RECURRENCE_OPTIONS
 } from '../../constants/enums';
 import type { Priority, RecurrenceRule, TaskStatus, Project, Assignee } from '../../types/todo';
-import { TagChipInput } from '../common';
+import { TagChipInput, DatePicker } from '../common';
 
 interface TaskDetailsPanelProps {
   priority: Priority;
@@ -139,21 +139,11 @@ export const TaskPlanningPanel: React.FC<TaskPlanningPanelProps> = ({
     <div className="panel-content">
       <div className="form-group">
         <label>DUE DATE</label>
-        <input
-          type="date"
+        <DatePicker
           value={dueDate}
-          onChange={event => setDueDate(event.target.value)}
-          className="form-input"
-        />
-      </div>
-
-      <div className="form-group">
-        <label>DUE TIME</label>
-        <input
-          type="time"
-          value={dueTime}
-          onChange={event => setDueTime(event.target.value)}
-          className="form-input"
+          onChange={setDueDate}
+          timeValue={dueTime}
+          onTimeChange={setDueTime}
         />
       </div>
 

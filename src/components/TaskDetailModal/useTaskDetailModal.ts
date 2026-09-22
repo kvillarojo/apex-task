@@ -1,6 +1,86 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTodo } from '../../context/TodoContext';
-import type { Priority, RecurrenceRule, TaskStatus } from '../../types/todo';
+import type { Priority, RecurrenceRule, Task, TaskStatus } from '../../types/todo';
+
+const AUTOSAVE_DELAY_MS = 650;
+
+type SaveStatus = 'idle' | 'pending' | 'saving' | 'saved';
+
+interface TaskFormState {
+  title: string;
+  description: string;
+  priority: Priority;
+  status: TaskStatus;
+  projectId: string;
+  assigneeId: string;
+  dueDate: string;
+  dueTime: string;
+  recurring: RecurrenceRule;
+  tags: string[];
+}
+
+function formFromTask(task: Task): TaskFormState {
+  return {
+    title: task.title,
+    description: task.description || '',
+    priority: task.priority,
+    status: task.status,
+    projectId: task.projectId,
+    assigneeId: task.assigneeId || '',
+    dueDate: task.dueDate || '',
+    dueTime: task.dueTime || '',
+    recurring: task.recurring,
+    tags: [...task.tags]
+  };
+}
+
+function emptyForm(): TaskFormState {
+  return {
+    title: '',
+    description: '',
+    priority: 'p4',
+    status: 'todo',
+    projectId: '',
+    assigneeId: '',
+    dueDate: '',
+    dueTime: '',
+    recurring: 'none',
+    tags: []
+  };
+}
+
+function buildUpdates(form: TaskFormState, existingCompletedAt?: string): Partial<Task> | null {
+  if (!form.title.trim()) return null;
+  return {
+    title: form.title.trim(),
+    description: form.description.trim() || undefined,
+    priority: form.priority,
+    status: form.status,
+    completed: form.status === 'done',
+    completedAt: form.status === 'done' ? existingCompletedAt || new Date().toISOString() : undefined,
+    projectId: form.projectId,
+    assigneeId: form.assigneeId || undefined,
+    dueDate: form.dueDate || undefined,
+    dueTime: form.dueTime || undefined,
+    recurring: form.recurring,
+    tags: form.tags
+  };
+}
+
+function serializeForm(form: TaskFormState): string {
+  return JSON.stringify({
+    title: form.title.trim(),
+    description: form.description.trim(),
+    priority: form.priority,
+    status: form.status,
+    projectId: form.projectId,
+    assigneeId: form.assigneeId,
+    dueDate: form.dueDate,
+    dueTime: form.dueTime,
+    recurring: form.recurring,
+    tags: form.tags
+  });
+}
 
 export function useTaskDetailModal() {
   const {
@@ -32,39 +112,164 @@ export function useTaskDetailModal() {
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(editingTask?.tags || []);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
 
+  const taskId = editingTask?.id ?? null;
+  const formRef = useRef<TaskFormState>(emptyForm());
+  const lastSavedRef = useRef('');
+  const skipAutosaveRef = useRef(true);
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const completedAtRef = useRef<string | undefined>(editingTask?.completedAt);
+  const taskIdRef = useRef<string | null>(taskId);
+  const updateTaskRef = useRef(updateTask);
+
+  formRef.current = {
+    title,
+    description,
+    priority,
+    status,
+    projectId,
+    assigneeId,
+    dueDate,
+    dueTime,
+    recurring,
+    tags
+  };
+  taskIdRef.current = taskId;
+  completedAtRef.current = editingTask?.completedAt;
+  updateTaskRef.current = updateTask;
+
+  // Hydrate local form only when switching tickets — not after each autosave write.
   useEffect(() => {
     if (!editingTask) {
-      setTitle('');
-      setDescription('');
-      setPriority('p4');
-      setStatus('todo');
-      setProjectId('');
-      setAssigneeId('');
-      setDueDate('');
-      setDueTime('');
-      setRecurring('none');
-      setTags([]);
+      const blank = emptyForm();
+      setTitle(blank.title);
+      setDescription(blank.description);
+      setPriority(blank.priority);
+      setStatus(blank.status);
+      setProjectId(blank.projectId);
+      setAssigneeId(blank.assigneeId);
+      setDueDate(blank.dueDate);
+      setDueTime(blank.dueTime);
+      setRecurring(blank.recurring);
+      setTags(blank.tags);
       setTagInput('');
       setNewSubtaskTitle('');
+      setSaveStatus('idle');
+      lastSavedRef.current = '';
+      skipAutosaveRef.current = true;
       return;
     }
 
-    setTitle(editingTask.title);
-    setDescription(editingTask.description || '');
-    setPriority(editingTask.priority);
-    setStatus(editingTask.status);
-    setProjectId(editingTask.projectId);
-    setAssigneeId(editingTask.assigneeId || '');
-    setDueDate(editingTask.dueDate || '');
-    setDueTime(editingTask.dueTime || '');
-    setRecurring(editingTask.recurring);
-    setTags([...editingTask.tags]);
+    const form = formFromTask(editingTask);
+    setTitle(form.title);
+    setDescription(form.description);
+    setPriority(form.priority);
+    setStatus(form.status);
+    setProjectId(form.projectId);
+    setAssigneeId(form.assigneeId);
+    setDueDate(form.dueDate);
+    setDueTime(form.dueTime);
+    setRecurring(form.recurring);
+    setTags(form.tags);
     setTagInput('');
     setNewSubtaskTitle('');
-  }, [editingTask]);
+    setSaveStatus('idle');
+    lastSavedRef.current = serializeForm(form);
+    skipAutosaveRef.current = true;
+    // Intentionally depend on id only so context updates from autosave don't reset the form.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [taskId]);
 
-  const close = () => setEditingTask(null);
+  const persistForm = (form: TaskFormState): boolean => {
+    const id = taskIdRef.current;
+    if (!id) return false;
+    const updates = buildUpdates(form, completedAtRef.current);
+    if (!updates) return false;
+    const snapshot = serializeForm(form);
+    if (snapshot === lastSavedRef.current) return false;
+    updateTaskRef.current(id, updates);
+    lastSavedRef.current = snapshot;
+    return true;
+  };
+
+  const flushSave = () => {
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
+    if (persistForm(formRef.current)) {
+      setSaveStatus('saved');
+    }
+  };
+
+  // Debounced autosave while the ticket is open.
+  useEffect(() => {
+    if (!taskId) return;
+
+    if (skipAutosaveRef.current) {
+      skipAutosaveRef.current = false;
+      return;
+    }
+
+    const snapshot = serializeForm(formRef.current);
+    if (snapshot === lastSavedRef.current) {
+      setSaveStatus(prev => (prev === 'pending' ? 'saved' : prev));
+      return;
+    }
+
+    if (!formRef.current.title.trim()) {
+      setSaveStatus('idle');
+      return;
+    }
+
+    setSaveStatus('pending');
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      saveTimerRef.current = null;
+      setSaveStatus('saving');
+      if (persistForm(formRef.current)) {
+        setSaveStatus('saved');
+      } else {
+        setSaveStatus('idle');
+      }
+    }, AUTOSAVE_DELAY_MS);
+
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+      }
+    };
+  }, [
+    taskId,
+    title,
+    description,
+    priority,
+    status,
+    projectId,
+    assigneeId,
+    dueDate,
+    dueTime,
+    recurring,
+    tags
+  ]);
+
+  // Flush any pending debounce if the modal unmounts unexpectedly.
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current);
+        saveTimerRef.current = null;
+        persistForm(formRef.current);
+      }
+    };
+  }, []);
+
+  const close = () => {
+    flushSave();
+    setEditingTask(null);
+  };
 
   const completedSubtasksCount = editingTask?.subtasks.filter(subtask => subtask.completed).length ?? 0;
   const totalSubtasksCount = editingTask?.subtasks.length ?? 0;
@@ -72,28 +277,17 @@ export function useTaskDetailModal() {
     totalSubtasksCount > 0 ? Math.round((completedSubtasksCount / totalSubtasksCount) * 100) : 0;
 
   const handleSave = () => {
-    if (!editingTask || !title.trim()) return;
-    updateTask(editingTask.id, {
-      title: title.trim(),
-      description: description.trim() || undefined,
-      priority,
-      status,
-      completed: status === 'done',
-      completedAt: status === 'done' ? editingTask.completedAt || new Date().toISOString() : undefined,
-      projectId,
-      assigneeId: assigneeId || undefined,
-      dueDate: dueDate || undefined,
-      dueTime: dueTime || undefined,
-      recurring,
-      tags
-    });
     close();
   };
 
   const handleDelete = () => {
     if (!editingTask) return;
+    if (saveTimerRef.current) {
+      clearTimeout(saveTimerRef.current);
+      saveTimerRef.current = null;
+    }
     deleteTask(editingTask.id);
-    close();
+    setEditingTask(null);
   };
 
   const handleAddSubtask = (event: React.FormEvent) => {
@@ -145,6 +339,7 @@ export function useTaskDetailModal() {
     deleteComment,
     handleSave,
     handleDelete,
-    handleAddSubtask
+    handleAddSubtask,
+    saveStatus
   };
 }

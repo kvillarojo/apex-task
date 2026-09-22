@@ -1437,6 +1437,23 @@ input[type="time"].form-input::-webkit-calendar-picker-indicator:hover {
   white-space: nowrap;
 }
 
+.ticket-save-status {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: color 0.2s;
+}
+
+.ticket-save-status.is-saving {
+  color: var(--text-secondary);
+}
+
+.ticket-save-status.is-saved {
+  color: var(--primary);
+}
+
 .btn-danger {
   color: var(--priority-p1);
 }

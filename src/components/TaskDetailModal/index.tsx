@@ -49,10 +49,18 @@ export const TaskDetailModal: React.FC = () => {
     deleteComment,
     handleSave,
     handleDelete,
-    handleAddSubtask
+    handleAddSubtask,
+    saveStatus
   } = useTaskDetailModal();
 
   if (!editingTask) return null;
+
+  const saveStatusLabel =
+    saveStatus === 'pending' || saveStatus === 'saving'
+      ? 'Saving…'
+      : saveStatus === 'saved'
+        ? 'Saved'
+        : 'Autosave on';
 
   return (
     <Modal
@@ -147,11 +155,16 @@ export const TaskDetailModal: React.FC = () => {
           )}
         </div>
         <div className="footer-actions">
-          <button type="button" className="btn-secondary" onClick={close}>
-            Cancel
-          </button>
+          <span
+            className={`ticket-save-status${
+              saveStatus === 'pending' || saveStatus === 'saving' ? ' is-saving' : ''
+            }${saveStatus === 'saved' ? ' is-saved' : ''}`}
+            aria-live="polite"
+          >
+            {saveStatusLabel}
+          </span>
           <button type="button" className="btn-primary" onClick={handleSave}>
-            Save Changes
+            Done
           </button>
         </div>
       </ModalFooter>
