@@ -5,6 +5,7 @@ import {
   RECURRENCE_OPTIONS
 } from '../../constants/enums';
 import type { Priority, RecurrenceRule, TaskStatus, Project, Assignee } from '../../types/todo';
+import { TagChipInput } from '../common';
 
 interface TaskDetailsPanelProps {
   priority: Priority;
@@ -110,6 +111,13 @@ interface TaskPlanningPanelProps {
   setDueTime: (value: string) => void;
   recurring: RecurrenceRule;
   setRecurring: (value: RecurrenceRule) => void;
+  // Tags
+  tags: string[];
+  tagInput: string;
+  setTagInput: (value: string) => void;
+  setTags: (tags: string[]) => void;
+  allTags: string[];
+  getTagColor: (tag: string) => string;
 }
 
 export const TaskPlanningPanel: React.FC<TaskPlanningPanelProps> = ({
@@ -118,7 +126,13 @@ export const TaskPlanningPanel: React.FC<TaskPlanningPanelProps> = ({
   dueTime,
   setDueTime,
   recurring,
-  setRecurring
+  setRecurring,
+  tags,
+  tagInput,
+  setTagInput,
+  setTags,
+  allTags,
+  getTagColor
 }) => (
   <section className="planning-panel">
     <h3 className="panel-title">Planning</h3>
@@ -157,6 +171,20 @@ export const TaskPlanningPanel: React.FC<TaskPlanningPanelProps> = ({
           ))}
         </select>
       </div>
+
+      <div className="form-group">
+        <label>TAGS</label>
+        <TagChipInput
+          tags={tags}
+          tagInput={tagInput}
+          onTagInputChange={setTagInput}
+          onTagsChange={setTags}
+          availableTags={allTags}
+          getTagColor={getTagColor}
+        />
+      </div>
     </div>
   </section>
 );
+
+

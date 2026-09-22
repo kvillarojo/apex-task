@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Tag as TagIcon } from 'lucide-react';
 import { normalizeTagName, filterTagSuggestions } from '../../utils/tagUtils';
 
@@ -23,8 +23,16 @@ export const TagChipInput: React.FC<TagChipInputProps> = ({
   placeholder = 'Type tag and press Enter...',
   inputClassName = 'form-input form-input-tag'
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const suggestions = filterTagSuggestions(availableTags, tagInput, tags);
   const cleanInput = normalizeTagName(tagInput);
+
+  // Position the fixed dropdown flush below the input regardless of overflow context
+  const getDropdownStyle = (): React.CSSProperties => {
+    if (!inputRef.current) return {};
+    const rect = inputRef.current.getBoundingClientRect();
+    return { top: rect.bottom + 4, left: rect.left, width: rect.width };
+  };
 
   const selectSuggestion = (tagToSelect: string) => {
     if (!tags.includes(tagToSelect)) {
@@ -79,8 +87,9 @@ export const TagChipInput: React.FC<TagChipInputProps> = ({
         })}
       </div>
 
-      <div style={{ position: 'relative' }}>
+      <div>
         <input
+          ref={inputRef}
           type="text"
           placeholder={placeholder}
           value={tagInput}
@@ -89,12 +98,17 @@ export const TagChipInput: React.FC<TagChipInputProps> = ({
           className={inputClassName}
         />
         {suggestions.length > 0 && (
-          <div className="tag-suggestions">
+          <div className="tag-suggestions" style={getDropdownStyle()}>
             {suggestions.map(suggestion => (
               <button
                 key={suggestion}
                 type="button"
-                onClick={() => selectSuggestion(suggestion)}
+                onMouseDown={event => {
+                  // Prevent the input from losing focus before the click registers,
+                  // which would collapse the dropdown before selectSuggestion fires.
+                  event.preventDefault();
+                  selectSuggestion(suggestion);
+                }}
                 className="suggestion-item"
               >
                 <TagIcon size={12} />

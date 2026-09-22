@@ -1,8 +1,10 @@
 import React from 'react';
-import { Modal, ModalHeader, ModalFooter, ModalId, ModalSize, TagChipInput } from '../common';
+import { Modal, ModalHeader, ModalFooter, ModalId, ModalSize } from '../common';
+import { formatISODateTime } from '../../utils/dateUtils';
 import { DescriptionEditor } from '../DescriptionEditor';
 import { useTaskDetailModal } from './useTaskDetailModal';
 import { SubtasksSection } from './SubtasksSection';
+import { CommentsSection } from './CommentsSection';
 import { TaskDetailsPanel, TaskPlanningPanel } from './TaskSidePanels';
 
 export const TaskDetailModal: React.FC = () => {
@@ -42,6 +44,9 @@ export const TaskDetailModal: React.FC = () => {
     subtasksPercent,
     toggleSubtask,
     deleteSubtask,
+    addComment,
+    updateComment,
+    deleteComment,
     handleSave,
     handleDelete,
     handleAddSubtask
@@ -91,17 +96,13 @@ export const TaskDetailModal: React.FC = () => {
             onAdd={handleAddSubtask}
           />
 
-          <div className="form-group form-group-tags">
-            <label>TAGS</label>
-            <TagChipInput
-              tags={tags}
-              tagInput={tagInput}
-              onTagInputChange={setTagInput}
-              onTagsChange={setTags}
-              availableTags={allTags}
-              getTagColor={getTagColor}
-            />
-          </div>
+          <CommentsSection
+            taskId={editingTask.id}
+            comments={editingTask.comments}
+            onAdd={addComment}
+            onUpdate={updateComment}
+            onDelete={deleteComment}
+          />
         </div>
 
         <aside className="ticket-modal-column-right">
@@ -124,14 +125,27 @@ export const TaskDetailModal: React.FC = () => {
             setDueTime={setDueTime}
             recurring={recurring}
             setRecurring={setRecurring}
+            tags={tags}
+            tagInput={tagInput}
+            setTagInput={setTagInput}
+            setTags={setTags}
+            allTags={allTags}
+            getTagColor={getTagColor}
           />
         </aside>
       </div>
 
       <ModalFooter variant="ticket">
-        <button type="button" className="btn-secondary btn-danger" onClick={handleDelete}>
-          Delete Task
-        </button>
+        <div className="footer-left">
+          <button type="button" className="btn-secondary btn-danger" onClick={handleDelete}>
+            Delete Task
+          </button>
+          {editingTask.createdAt && (
+            <span className="ticket-created-at">
+              Created {formatISODateTime(editingTask.createdAt)}
+            </span>
+          )}
+        </div>
         <div className="footer-actions">
           <button type="button" className="btn-secondary" onClick={close}>
             Cancel

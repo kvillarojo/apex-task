@@ -12,6 +12,7 @@ import type {
   PomodoroState,
   TagDefinition,
   Note,
+  Comment,
   ActiveReminderAlert
 } from '../types/todo';
 import {
@@ -77,6 +78,11 @@ interface TodoContextType {
   addSubtask: (taskId: string, title: string) => void;
   toggleSubtask: (taskId: string, subtaskId: string) => void;
   deleteSubtask: (taskId: string, subtaskId: string) => void;
+
+  // Comment Actions
+  addComment: (taskId: string, content: string, parentId?: string) => void;
+  updateComment: (taskId: string, commentId: string, content: string) => void;
+  deleteComment: (taskId: string, commentId: string) => void;
 
   // Project Actions
   addProject: (project: Omit<Project, 'id'>) => void;
@@ -185,7 +191,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [pomodoro, setPomodoro] = useState<PomodoroState>(initialPomodoro);
   const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>(loadTagDefinitionsFromStorage);
   const [tagModalOpen, setTagModalOpen] = useState<boolean>(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
+  const editingTask = editingTaskId ? (tasks.find(t => t.id === editingTaskId) ?? null) : null;
+  const setEditingTask = (task: Task | null) => setEditingTaskId(task?.id ?? null);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [noteModalOpen, setNoteModalOpen] = useState<boolean>(false);
   const [activeAlert, setActiveAlert] = useState<ActiveReminderAlert | null>(null);
@@ -256,6 +264,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newTask: Task = {
       ...taskData,
+      comments: taskData.comments ?? [],
       id: 'task-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
@@ -546,6 +555,58 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
         }
         return t;
+      })
+    );
+  };
+
+  // Comment Actions
+  const addComment = (taskId: string, content: string, parentId?: string) => {
+    const trimmed = content.trim();
+    if (!trimmed) return;
+    const newComment: Comment = {
+      id: 'cmt-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+      parentId,
+      content: trimmed,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setTasks(prev =>
+      prev.map(t =>
+        t.id === taskId
+          ? { ...t, comments: [...t.comments, newComment], updatedAt: new Date().toISOString() }
+          : t
+      )
+    );
+  };
+
+  const updateComment = (taskId: string, commentId: string, content: string) => {
+    const trimmed = content.trim();
+    if (!trimmed) return;
+    setTasks(prev =>
+      prev.map(t => {
+        if (t.id !== taskId) return t;
+        return {
+          ...t,
+          comments: t.comments.map(c =>
+            c.id === commentId
+              ? { ...c, content: trimmed, updatedAt: new Date().toISOString() }
+              : c
+          ),
+          updatedAt: new Date().toISOString()
+        };
+      })
+    );
+  };
+
+  const deleteComment = (taskId: string, commentId: string) => {
+    setTasks(prev =>
+      prev.map(t => {
+        if (t.id !== taskId) return t;
+        // Also remove any replies to this comment
+        const filtered = t.comments.filter(
+          c => c.id !== commentId && c.parentId !== commentId
+        );
+        return { ...t, comments: filtered, updatedAt: new Date().toISOString() };
       })
     );
   };
@@ -1055,6 +1116,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         addSubtask,
         toggleSubtask,
         deleteSubtask,
+        addComment,
+        updateComment,
+        deleteComment,
         addProject,
         updateProject,
         deleteProject,

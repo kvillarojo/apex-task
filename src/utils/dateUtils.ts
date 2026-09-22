@@ -52,6 +52,22 @@ export function formatFriendlyDate(dateStr?: string, timeStr?: string): string {
   return label;
 }
 
+export function formatISODateTime(isoString?: string): string {
+  if (!isoString) return '';
+  const date = new Date(isoString);
+  const datePart = date.toLocaleDateString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+  const timePart = date.toLocaleTimeString(undefined, {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+  return `${datePart} at ${timePart}`;
+}
+
 export function formatTime12h(timeStr: string): string {
   const [hStr, mStr] = timeStr.split(':');
   let h = parseInt(hStr, 10);

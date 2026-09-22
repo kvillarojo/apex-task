@@ -65,7 +65,8 @@ export const TaskInput: React.FC = () => {
       projectId: targetProjectId,
       assigneeId: selectedAssigneeId || undefined,
       tags: parsed.tags,
-      subtasks: []
+      subtasks: [],
+      comments: []
     });
 
     // Reset input

@@ -17,7 +17,10 @@ export const DEFAULT_PROJECTS: Project[] = [
 export function loadTasksFromStorage(): Task[] {
   try {
     const raw = localStorage.getItem(TASKS_STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed: Task[] = JSON.parse(raw);
+    // Migration guard: ensure all tasks have a comments array (added in v2)
+    return parsed.map(t => ({ ...t, comments: t.comments ?? [] }));
   } catch (err) {
     console.error('Failed to load tasks from localStorage', err);
     return [];

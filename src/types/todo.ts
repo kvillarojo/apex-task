@@ -10,6 +10,14 @@ export interface Subtask {
   completed: boolean;
 }
 
+export interface Comment {
+  id: string;
+  parentId?: string; // undefined = top-level; set = reply to another comment
+  content: string;
+  createdAt: string; // ISO string
+  updatedAt: string; // ISO string
+}
+
 export interface Assignee {
   id: string;
   name: string;
@@ -33,6 +41,7 @@ export interface Task {
   assigneeId?: string;
   tags: string[];
   subtasks: Subtask[];
+  comments: Comment[];
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
 }

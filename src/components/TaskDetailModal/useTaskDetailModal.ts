@@ -13,6 +13,9 @@ export function useTaskDetailModal() {
     addSubtask,
     toggleSubtask,
     deleteSubtask,
+    addComment,
+    updateComment,
+    deleteComment,
     allTags,
     getTagColor
   } = useTodo();
@@ -137,6 +140,9 @@ export function useTaskDetailModal() {
     subtasksPercent,
     toggleSubtask,
     deleteSubtask,
+    addComment,
+    updateComment,
+    deleteComment,
     handleSave,
     handleDelete,
     handleAddSubtask

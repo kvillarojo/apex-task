@@ -99,7 +99,8 @@ export const CalendarView: React.FC = () => {
       recurring: 'none',
       projectId: filter.projectId || 'inbox',
       tags: [],
-      subtasks: []
+      subtasks: [],
+      comments: []
     });
 
     setDraftTitle('');
