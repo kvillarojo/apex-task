@@ -11,6 +11,8 @@ node_modules
 dist
 dist-ssr
 *.local
+FILE_STRUCTURE.md
+REFACTOR_PLAN.md
 
 # Environment variables
 .env
