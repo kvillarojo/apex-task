@@ -107,8 +107,26 @@ export const CalendarView: React.FC = () => {
     setDraftTime('');
   };
 
-  const tasksForSelectedDate = tasks.filter(task => task.dueDate === selectedDate);
-  const openCount = tasksForSelectedDate.filter(task => !task.completed).length;
+  const tasksForSelectedDate = [...tasks.filter(task => task.dueDate === selectedDate)].sort((a, b) => {
+    // 1. Timed tasks first (chronological by dueTime)
+    if (a.dueTime && !b.dueTime) return -1;
+    if (!a.dueTime && b.dueTime) return 1;
+    if (a.dueTime && b.dueTime) {
+      const timeCompare = a.dueTime.localeCompare(b.dueTime);
+      if (timeCompare !== 0) return timeCompare;
+    }
+    // 2. Priority order
+    const priorityRank = { p1: 1, p2: 2, p3: 3, p4: 4 };
+    const priorityDiff = (priorityRank[a.priority] || 4) - (priorityRank[b.priority] || 4);
+    if (priorityDiff !== 0) return priorityDiff;
+    // 3. Fallback to title
+    return a.title.localeCompare(b.title);
+  });
+
+  const totalCount = tasksForSelectedDate.length;
+  const completedCount = tasksForSelectedDate.filter(task => task.completed).length;
+  const openCount = totalCount - completedCount;
+  const completionPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   return (
     <div className={styles.calendarView}>
@@ -183,16 +201,31 @@ export const CalendarView: React.FC = () => {
         <aside className={styles.scheduleSidebar} aria-label="Task schedule">
           <div className={styles.scheduleHeader}>
             <div className={styles.scheduleHeadingBlock}>
-              <span className={styles.scheduleEyebrow}>
-                <CalendarDays size={14} />
-                Schedule
-              </span>
+              <div className={styles.scheduleEyebrowRow}>
+                <span className={styles.scheduleEyebrow}>
+                  <CalendarDays size={14} />
+                  Schedule
+                </span>
+                {totalCount > 0 && (
+                  <span className={styles.progressPill}>
+                    {completedCount}/{totalCount} completed
+                  </span>
+                )}
+              </div>
               <h3 className={styles.scheduleTitle}>{formatScheduleHeading(selectedDate)}</h3>
               <p className={styles.scheduleMeta}>
-                {tasksForSelectedDate.length === 0
+                {totalCount === 0
                   ? 'No tasks on this day'
-                  : `${openCount} open · ${tasksForSelectedDate.length} total`}
+                  : `${openCount} open · ${totalCount} total`}
               </p>
+              {totalCount > 0 && (
+                <div className={styles.progressBarTrack} title={`${completionPercentage}% completed`}>
+                  <div
+                    className={styles.progressBarFill}
+                    style={{ width: `${completionPercentage}%` }}
+                  />
+                </div>
+              )}
             </div>
           </div>
 
@@ -229,12 +262,18 @@ export const CalendarView: React.FC = () => {
           </form>
 
           <div className={styles.scheduleBody}>
-            {tasksForSelectedDate.length === 0 ? (
-              <p className={styles.emptyState}>No tasks yet — add one above for this day.</p>
+            {totalCount === 0 ? (
+              <div className={styles.emptyState}>
+                <div className={styles.emptyStateIcon}>
+                  <CalendarDays size={26} />
+                </div>
+                <p className={styles.emptyStateTitle}>No tasks scheduled</p>
+                <p className={styles.emptyStateText}>Plan your day by adding a task with an optional time above.</p>
+              </div>
             ) : (
               <div className={styles.detailsList}>
                 {tasksForSelectedDate.map(task => (
-                  <TaskItem key={task.id} task={task} />
+                  <TaskItem key={task.id} task={task} variant="calendar" />
                 ))}
               </div>
             )}

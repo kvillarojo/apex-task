@@ -9,13 +9,14 @@ import {
   ChevronDown,
   Repeat,
   Plus,
-  User
+  User,
+  Clock
 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
 import { getThemeComponentProps } from '../../theme';
 import type { Task } from '../../types/todo';
-import { formatFriendlyDate, isOverdue } from '../../utils/dateUtils';
+import { formatFriendlyDate, formatTime12h, isOverdue } from '../../utils/dateUtils';
 import styles from './TaskItem.module.css';
 
 const ProjectBadge = styled.span<{ $color: string }>`
@@ -41,7 +42,7 @@ const getDescriptionPreview = (description: string) => {
 
 interface TaskItemProps {
   task: Task;
-  variant?: 'default' | 'kanban';
+  variant?: 'default' | 'kanban' | 'calendar';
 }
 
 export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' }) => {
@@ -91,20 +92,29 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
     setNewSubtaskTitle('');
   };
 
+  const cardClass = [
+    'task-card',
+    task.completed ? 'completed' : '',
+    variant === 'kanban' ? 'kanban-card' : '',
+    variant === 'calendar' ? 'calendar-card' : ''
+  ].filter(Boolean).join(' ');
+
   return (
-    <div {...getThemeComponentProps(ThemeComponent.TaskItem)} className={`task-card ${task.completed ? 'completed' : ''} ${variant === 'kanban' ? 'kanban-card' : ''}`}
+    <div
+      {...getThemeComponentProps(ThemeComponent.TaskItem)}
+      className={cardClass}
       onClick={(e) => {
-          e.stopPropagation();
-          setEditingTask(task);
-        }}
+        e.stopPropagation();
+        setEditingTask(task);
+      }}
     >
       {/* Checkbox */}
       <div
         className={`task-checkbox ${task.completed ? 'checked' : ''}`}
         onClick={(e) => {
           e.stopPropagation();
-          toggleTaskComplete(task.id)}
-        }
+          toggleTaskComplete(task.id);
+        }}
       >
         {task.completed && <Check size={14} />}
       </div>
@@ -114,8 +124,10 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
         <div className="task-header-row">
           <span className="task-title" title={task.title}>{task.title}</span>
 
-          {/* Quick Action Buttons */}
-          {variant === 'default' && <div className="task-action-buttons">{actionButtons}</div>}
+          {/* Quick Action Buttons for default and calendar variants */}
+          {(variant === 'default' || variant === 'calendar') && (
+            <div className="task-action-buttons">{actionButtons}</div>
+          )}
         </div>
 
         {variant === 'kanban' && <div className="task-action-row task-action-buttons">{actionButtons}</div>}
@@ -125,6 +137,21 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
 
         {/* Metadata Badges */}
         <div className="task-meta">
+          {/* Time badge for calendar variant */}
+          {variant === 'calendar' && (
+            task.dueTime ? (
+              <span className={`badge ${styles.timeBadge}`}>
+                <Clock size={11} />
+                {formatTime12h(task.dueTime)}
+              </span>
+            ) : (
+              <span className={`badge ${styles.allDayBadge}`}>
+                <Clock size={11} />
+                All day
+              </span>
+            )
+          )}
+
           {/* Priority */}
           <span className={`badge badge-priority ${task.priority}`}>
             <Flag size={11} />
@@ -137,11 +164,18 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task, variant = 'default' })
             {project.name}
           </ProjectBadge>
 
-          {/* Due Date */}
-          {dateFormatted && (
+          {/* Due Date (for non-calendar variants) */}
+          {variant !== 'calendar' && dateFormatted && (
             <span className={`badge ${overdue ? styles.overdueBadge : styles.dueBadge}`}>
               <Calendar size={11} />
               {dateFormatted}
+            </span>
+          )}
+
+          {/* Overdue badge for calendar variant */}
+          {variant === 'calendar' && overdue && (
+            <span className={`badge ${styles.overdueBadge}`}>
+              Overdue
             </span>
           )}
 
