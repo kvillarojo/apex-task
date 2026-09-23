@@ -50,6 +50,8 @@ export const TaskDetailModal: React.FC = () => {
     handleSave,
     handleDelete,
     handleAddSubtask,
+    notificationsEnabled,
+    handleEnableNotifications,
     saveStatus
   } = useTaskDetailModal();
 
@@ -133,6 +135,8 @@ export const TaskDetailModal: React.FC = () => {
             setDueTime={setDueTime}
             recurring={recurring}
             setRecurring={setRecurring}
+            notificationsEnabled={notificationsEnabled}
+            onEnableNotifications={handleEnableNotifications}
             tags={tags}
             tagInput={tagInput}
             setTagInput={setTagInput}

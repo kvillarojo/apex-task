@@ -97,7 +97,8 @@ export function useTaskDetailModal() {
     updateComment,
     deleteComment,
     allTags,
-    getTagColor
+    getTagColor,
+    requestNotificationPermission
   } = useTodo();
 
   const [title, setTitle] = useState(editingTask?.title || '');
@@ -113,6 +114,9 @@ export function useTaskDetailModal() {
   const [tags, setTags] = useState<string[]>(editingTask?.tags || []);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    () => typeof Notification !== 'undefined' && Notification.permission === 'granted'
+  );
 
   const taskId = editingTask?.id ?? null;
   const formRef = useRef<TaskFormState>(emptyForm());
@@ -290,6 +294,11 @@ export function useTaskDetailModal() {
     setEditingTask(null);
   };
 
+  const handleEnableNotifications = async () => {
+    const granted = await requestNotificationPermission();
+    setNotificationsEnabled(granted);
+  };
+
   const handleAddSubtask = (event: React.FormEvent) => {
     event.preventDefault();
     if (!editingTask || !newSubtaskTitle.trim()) return;
@@ -340,6 +349,8 @@ export function useTaskDetailModal() {
     handleSave,
     handleDelete,
     handleAddSubtask,
+    notificationsEnabled,
+    handleEnableNotifications,
     saveStatus
   };
 }

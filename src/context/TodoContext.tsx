@@ -275,7 +275,27 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateTask = (id: string, updates: Partial<Task>) => {
     setTasks(prev =>
-      prev.map(t => (t.id === id ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t))
+      prev.map(t => {
+        if (t.id !== id) return t;
+
+        const next: Task = { ...t, ...updates, updatedAt: new Date().toISOString() };
+
+        // Reschedule reminder whenever due date/time changes (unless caller sets the flag).
+        if (('dueDate' in updates || 'dueTime' in updates) && !('reminderNotified' in updates)) {
+          const dueDateChanged = 'dueDate' in updates && updates.dueDate !== t.dueDate;
+          const dueTimeChanged = 'dueTime' in updates && updates.dueTime !== t.dueTime;
+          if (dueDateChanged || dueTimeChanged) {
+            next.reminderNotified = false;
+          }
+        }
+
+        if (!next.dueDate) {
+          next.dueTime = undefined;
+          next.reminderNotified = false;
+        }
+
+        return next;
+      })
     );
   };
 
@@ -408,23 +428,66 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setActiveAlert(null);
   };
 
+  const formatSnoozeParts = (minutes: number) => {
+    const snoozeDate = new Date(Date.now() + minutes * 60 * 1000);
+    const yyyy = snoozeDate.getFullYear();
+    const mm = String(snoozeDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(snoozeDate.getDate()).padStart(2, '0');
+    const hh = String(snoozeDate.getHours()).padStart(2, '0');
+    const min = String(snoozeDate.getMinutes()).padStart(2, '0');
+    return {
+      date: `${yyyy}-${mm}-${dd}`,
+      time: `${hh}:${min}`
+    };
+  };
+
+  const fireReminderAlert = (
+    alert: Omit<ActiveReminderAlert, 'id'>,
+    notificationTitle: string,
+    notificationBody: string
+  ) => {
+    setActiveAlert({
+      ...alert,
+      id: `${alert.type}-${alert.itemId}-${Date.now()}`
+    });
+    soundEffects.playTimerFinishSound();
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      navigator.vibrate?.([150, 80, 150]);
+    }
+    if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+      try {
+        new Notification(notificationTitle, {
+          body: notificationBody,
+          icon: '/favicon.ico'
+        });
+      } catch {
+        // Ignore Notification constructor failures (e.g. insecure context)
+      }
+    }
+  };
+
   const snoozeActiveAlert = (minutes: number = 15) => {
     if (!activeAlert) return;
+    const { date, time } = formatSnoozeParts(minutes);
+
     if (activeAlert.type === 'note') {
       const targetNote = notes.find(n => n.id === activeAlert.itemId);
       if (targetNote) {
-        const snoozeDate = new Date(Date.now() + minutes * 60 * 1000);
-        const yyyy = snoozeDate.getFullYear();
-        const mm = String(snoozeDate.getMonth() + 1).padStart(2, '0');
-        const dd = String(snoozeDate.getDate()).padStart(2, '0');
-        const hh = String(snoozeDate.getHours()).padStart(2, '0');
-        const min = String(snoozeDate.getMinutes()).padStart(2, '0');
         updateNote(targetNote.id, {
           reminder: {
-            date: `${yyyy}-${mm}-${dd}`,
-            time: `${hh}:${min}`,
+            date,
+            time,
             notified: false
           }
+        });
+      }
+    } else if (activeAlert.type === 'task') {
+      const targetTask = tasks.find(t => t.id === activeAlert.itemId);
+      if (targetTask) {
+        updateTask(targetTask.id, {
+          dueDate: date,
+          dueTime: time,
+          reminderNotified: false
         });
       }
     }
@@ -443,8 +506,11 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
-  // Reminder Background Checker Loop
+  // Reminder Background Checker Loop (notes + tasks)
   useEffect(() => {
+    const isReminderDue = (date: string, time: string, currentDate: string, currentTime: string) =>
+      date < currentDate || (date === currentDate && time <= currentTime);
+
     const checkReminders = () => {
       const now = new Date();
       const currentDate = getTodayString();
@@ -457,31 +523,22 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!note.reminder || note.reminder.notified) return note;
         const remDate = note.reminder.date;
         const remTime = note.reminder.time || '09:00';
-        const isDue = remDate < currentDate || (remDate === currentDate && remTime <= currentTime);
 
-        if (isDue) {
+        if (isReminderDue(remDate, remTime, currentDate, currentTime)) {
           notesModified = true;
           const project = projects.find(p => p.id === note.projectId);
-          setActiveAlert({
-            id: `note-${note.id}-${Date.now()}`,
-            type: 'note',
-            title: note.title || 'Untitled Note',
-            projectName: project ? project.name : 'Inbox',
-            dueText: `${remDate} ${remTime}`,
-            itemId: note.id
-          });
-          soundEffects.playTimerFinishSound();
-          if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
-            navigator.vibrate?.([150, 80, 150]);
-          }
-          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-            try {
-              new Notification(`Apex Note Reminder: ${note.title || 'Untitled Note'}`, {
-                body: `Project: ${project ? project.name : 'Inbox'} • ${remTime}`,
-                icon: '/favicon.ico'
-              });
-            } catch {}
-          }
+          const projectName = project ? project.name : 'Inbox';
+          fireReminderAlert(
+            {
+              type: 'note',
+              title: note.title || 'Untitled Note',
+              projectName,
+              dueText: `${remDate} ${remTime}`,
+              itemId: note.id
+            },
+            `Apex Note Reminder: ${note.title || 'Untitled Note'}`,
+            `Project: ${projectName} • ${remTime}`
+          );
           return {
             ...note,
             reminder: {
@@ -496,12 +553,46 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (notesModified) {
         setNotes(updatedNotes);
       }
+
+      let tasksModified = false;
+      const updatedTasks = tasks.map(task => {
+        // Tasks only alert when both due date and due time are set.
+        if (!task.dueDate || !task.dueTime || task.reminderNotified || task.completed) return task;
+        const remDate = task.dueDate;
+        const remTime = task.dueTime;
+
+        if (isReminderDue(remDate, remTime, currentDate, currentTime)) {
+          tasksModified = true;
+          const project = projects.find(p => p.id === task.projectId);
+          const projectName = project ? project.name : 'Inbox';
+          fireReminderAlert(
+            {
+              type: 'task',
+              title: task.title || 'Untitled Task',
+              projectName,
+              dueText: `${remDate} ${remTime}`,
+              itemId: task.id
+            },
+            `Apex Task Reminder: ${task.title || 'Untitled Task'}`,
+            `Project: ${projectName} • ${remTime}`
+          );
+          return {
+            ...task,
+            reminderNotified: true
+          };
+        }
+        return task;
+      });
+
+      if (tasksModified) {
+        setTasks(updatedTasks);
+      }
     };
 
     const intervalId = setInterval(checkReminders, 10000);
     checkReminders();
     return () => clearInterval(intervalId);
-  }, [notes, projects]);
+  }, [notes, tasks, projects]);
 
   // Subtask Actions
   const addSubtask = (taskId: string, title: string) => {

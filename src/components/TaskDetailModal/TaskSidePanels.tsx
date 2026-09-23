@@ -1,4 +1,5 @@
 import React from 'react';
+import { Bell } from 'lucide-react';
 import {
   PRIORITY_OPTIONS,
   TASK_STATUS_OPTIONS,
@@ -111,6 +112,8 @@ interface TaskPlanningPanelProps {
   setDueTime: (value: string) => void;
   recurring: RecurrenceRule;
   setRecurring: (value: RecurrenceRule) => void;
+  notificationsEnabled: boolean;
+  onEnableNotifications: () => void;
   // Tags
   tags: string[];
   tagInput: string;
@@ -127,6 +130,8 @@ export const TaskPlanningPanel: React.FC<TaskPlanningPanelProps> = ({
   setDueTime,
   recurring,
   setRecurring,
+  notificationsEnabled,
+  onEnableNotifications,
   tags,
   tagInput,
   setTagInput,
@@ -145,6 +150,16 @@ export const TaskPlanningPanel: React.FC<TaskPlanningPanelProps> = ({
           timeValue={dueTime}
           onTimeChange={setDueTime}
         />
+        {dueDate && !notificationsEnabled && typeof Notification !== 'undefined' && (
+          <button
+            type="button"
+            className="task-notify-btn"
+            onClick={onEnableNotifications}
+          >
+            <Bell size={14} />
+            Enable device alerts
+          </button>
+        )}
       </div>
 
       <div className="form-group">
@@ -176,5 +191,3 @@ export const TaskPlanningPanel: React.FC<TaskPlanningPanelProps> = ({
     </div>
   </section>
 );
-
-

@@ -36,6 +36,7 @@ export interface Task {
   priority: Priority;
   dueDate?: string; // YYYY-MM-DD
   dueTime?: string; // HH:mm
+  reminderNotified?: boolean; // whether due-date notification has already fired
   recurring: RecurrenceRule;
   projectId: string;
   assigneeId?: string;
