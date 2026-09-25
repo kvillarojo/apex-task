@@ -35,6 +35,7 @@ export const MobileBottomNav: React.FC = () => {
   };
 
   const activeTasksCount = tasks.filter(t => !t.completed).length;
+  const isTaskView = viewMode === 'list' || viewMode === 'kanban' || viewMode === 'eisenhower';
 
   return (
     <>
@@ -53,7 +54,7 @@ export const MobileBottomNav: React.FC = () => {
       <nav {...getThemeComponentProps(ThemeComponent.MobileBottomNav)} className="mobile-bottom-nav">
         <button
           type="button"
-          className={`mobile-tab-btn ${viewMode !== 'notes' && viewMode !== 'calendar' ? 'active' : ''}`}
+          className={`mobile-tab-btn ${isTaskView ? 'active' : ''}`}
           onClick={() => setViewMode('list')}
         >
           <div className="mobile-tab-icon-wrapper">

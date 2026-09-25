@@ -6,6 +6,7 @@ import { ListView } from './components/ListView';
 import { KanbanView } from './components/KanbanView';
 import { EisenhowerView } from './components/EisenhowerView';
 import { CalendarView } from './components/CalendarView';
+import { TimelineView } from './components/TimelineView';
 import { AnalyticsView } from './components/AnalyticsView';
 import { TaskDetailModal } from './components/TaskDetailModal';
 import { PeopleModal } from './components/PeopleModal';
@@ -31,6 +32,8 @@ const MainContent: React.FC = () => {
         return <EisenhowerView />;
       case 'calendar':
         return <CalendarView />;
+      case 'timeline':
+        return <TimelineView />;
       case 'analytics':
         return <AnalyticsView />;
       case 'notes':

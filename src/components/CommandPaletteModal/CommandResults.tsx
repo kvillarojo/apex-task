@@ -5,6 +5,7 @@ import {
   Kanban,
   Grid,
   Calendar,
+  CalendarRange,
   BarChart3,
   Sun,
   Moon,
@@ -78,6 +79,9 @@ export const CommandResults: React.FC<CommandResultsProps> = ({
       </button>
       <button type="button" className="nav-item" onClick={() => onSelectView('calendar')}>
         <div className="nav-item-left"><Calendar size={16} /> Switch to Calendar View</div>
+      </button>
+      <button type="button" className="nav-item" onClick={() => onSelectView('timeline')}>
+        <div className="nav-item-left"><CalendarRange size={16} /> Switch to Timeline / Gantt</div>
       </button>
       <button type="button" className="nav-item" onClick={() => onSelectView('analytics')}>
         <div className="nav-item-left"><BarChart3 size={16} /> Switch to Analytics</div>

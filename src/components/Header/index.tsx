@@ -5,6 +5,7 @@ import {
   Kanban,
   Grid,
   Calendar as CalendarIcon,
+  CalendarRange,
   BarChart3,
   StickyNote,
   Menu,
@@ -139,6 +140,15 @@ export const Header: React.FC = () => {
           >
             <CalendarIcon size={16} />
             <span>Calendar</span>
+          </button>
+
+          <button
+            className={`view-btn ${viewMode === 'timeline' ? 'active' : ''}`}
+            onClick={() => setViewMode('timeline')}
+            title="Timeline / Gantt View"
+          >
+            <CalendarRange size={16} />
+            <span>Timeline</span>
           </button>
 
           <button

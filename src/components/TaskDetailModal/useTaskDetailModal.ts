@@ -13,6 +13,8 @@ interface TaskFormState {
   status: TaskStatus;
   projectId: string;
   assigneeId: string;
+  startDate: string;
+  startTime: string;
   dueDate: string;
   dueTime: string;
   recurring: RecurrenceRule;
@@ -27,6 +29,8 @@ function formFromTask(task: Task): TaskFormState {
     status: task.status,
     projectId: task.projectId,
     assigneeId: task.assigneeId || '',
+    startDate: task.startDate || '',
+    startTime: task.startTime || '',
     dueDate: task.dueDate || '',
     dueTime: task.dueTime || '',
     recurring: task.recurring,
@@ -42,6 +46,8 @@ function emptyForm(): TaskFormState {
     status: 'todo',
     projectId: '',
     assigneeId: '',
+    startDate: '',
+    startTime: '',
     dueDate: '',
     dueTime: '',
     recurring: 'none',
@@ -60,6 +66,8 @@ function buildUpdates(form: TaskFormState, existingCompletedAt?: string): Partia
     completedAt: form.status === 'done' ? existingCompletedAt || new Date().toISOString() : undefined,
     projectId: form.projectId,
     assigneeId: form.assigneeId || undefined,
+    startDate: form.startDate || undefined,
+    startTime: form.startTime || undefined,
     dueDate: form.dueDate || undefined,
     dueTime: form.dueTime || undefined,
     recurring: form.recurring,
@@ -75,6 +83,8 @@ function serializeForm(form: TaskFormState): string {
     status: form.status,
     projectId: form.projectId,
     assigneeId: form.assigneeId,
+    startDate: form.startDate,
+    startTime: form.startTime,
     dueDate: form.dueDate,
     dueTime: form.dueTime,
     recurring: form.recurring,
@@ -107,6 +117,8 @@ export function useTaskDetailModal() {
   const [status, setStatus] = useState<TaskStatus>(editingTask?.status || 'todo');
   const [projectId, setProjectId] = useState(editingTask?.projectId || '');
   const [assigneeId, setAssigneeId] = useState(editingTask?.assigneeId || '');
+  const [startDate, setStartDate] = useState(editingTask?.startDate || '');
+  const [startTime, setStartTime] = useState(editingTask?.startTime || '');
   const [dueDate, setDueDate] = useState(editingTask?.dueDate || '');
   const [dueTime, setDueTime] = useState(editingTask?.dueTime || '');
   const [recurring, setRecurring] = useState<RecurrenceRule>(editingTask?.recurring || 'none');
@@ -134,6 +146,8 @@ export function useTaskDetailModal() {
     status,
     projectId,
     assigneeId,
+    startDate,
+    startTime,
     dueDate,
     dueTime,
     recurring,
@@ -153,6 +167,8 @@ export function useTaskDetailModal() {
       setStatus(blank.status);
       setProjectId(blank.projectId);
       setAssigneeId(blank.assigneeId);
+      setStartDate(blank.startDate);
+      setStartTime(blank.startTime);
       setDueDate(blank.dueDate);
       setDueTime(blank.dueTime);
       setRecurring(blank.recurring);
@@ -172,6 +188,8 @@ export function useTaskDetailModal() {
     setStatus(form.status);
     setProjectId(form.projectId);
     setAssigneeId(form.assigneeId);
+    setStartDate(form.startDate);
+    setStartTime(form.startTime);
     setDueDate(form.dueDate);
     setDueTime(form.dueTime);
     setRecurring(form.recurring);
@@ -322,6 +340,10 @@ export function useTaskDetailModal() {
     setProjectId,
     assigneeId,
     setAssigneeId,
+    startDate,
+    setStartDate,
+    startTime,
+    setStartTime,
     dueDate,
     setDueDate,
     dueTime,

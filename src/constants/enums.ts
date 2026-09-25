@@ -11,6 +11,7 @@ export const ViewMode = {
   Kanban: 'kanban',
   Eisenhower: 'eisenhower',
   Calendar: 'calendar',
+  Timeline: 'timeline',
   Analytics: 'analytics',
   Notes: 'notes'
 } as const;
@@ -66,6 +67,8 @@ export const ThemeComponent = {
   ListView: 'ListView',
   KanbanView: 'KanbanView',
   EisenhowerView: 'EisenhowerView',
+  CalendarView: 'CalendarView',
+  TimelineView: 'TimelineView',
   DescriptionEditor: 'DescriptionEditor',
   Header: 'Header',
   MobileBottomNav: 'MobileBottomNav',
@@ -130,6 +133,7 @@ export const RECURRENCE_OPTIONS = [
 export const VIEW_MODE_OPTIONS = [
   { value: ViewMode.List, label: 'List View' },
   { value: ViewMode.Kanban, label: 'Kanban Board' },
+  { value: ViewMode.Timeline, label: 'Timeline / Gantt' },
   { value: ViewMode.Eisenhower, label: 'Eisenhower Matrix' },
   { value: ViewMode.Calendar, label: 'Calendar Grid' },
   { value: ViewMode.Analytics, label: 'Analytics Dashboard' }

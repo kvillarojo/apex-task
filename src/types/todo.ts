@@ -34,6 +34,8 @@ export interface Task {
   completedAt?: string; // ISO string
   status: TaskStatus;
   priority: Priority;
+  startDate?: string; // YYYY-MM-DD
+  startTime?: string; // HH:mm
   dueDate?: string; // YYYY-MM-DD
   dueTime?: string; // HH:mm
   reminderNotified?: boolean; // whether due-date notification has already fired
@@ -66,7 +68,7 @@ export interface CustomTags {
   tag: string;
 }
 
-export type ViewMode = 'list' | 'kanban' | 'eisenhower' | 'calendar' | 'analytics' | 'notes';
+export type ViewMode = 'list' | 'kanban' | 'eisenhower' | 'calendar' | 'timeline' | 'analytics' | 'notes';
 
 export interface NoteReminder {
   date: string; // YYYY-MM-DD

@@ -9,6 +9,7 @@ export function useCommandPalette() {
     tasks,
     projects,
     setEditingTask,
+    viewMode,
     setViewMode,
     setFilter,
     theme,
@@ -61,8 +62,10 @@ export function useCommandPalette() {
     const targetProj = projects.find(project => project.id === projectId);
     if (targetProj?.defaultView) {
       setViewMode(targetProj.defaultView);
+    } else if (viewMode === 'timeline' || viewMode === 'notes' || viewMode === 'analytics') {
+      setViewMode('list');
     }
-    setFilter({ projectId, smartFilter: 'all' });
+    setFilter({ projectId, smartFilter: 'all', tag: null });
     close();
   };
 

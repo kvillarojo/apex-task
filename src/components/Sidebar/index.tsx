@@ -12,6 +12,7 @@ import {
   Trash2,
   Edit2,
   StickyNote,
+  CalendarRange,
   X
 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
@@ -56,8 +57,10 @@ export const Sidebar: React.FC = () => {
   const visibleTags = viewMode === 'notes' ? noteTags : allTags;
   const visibleProjects = viewMode === 'notes' ? noteProjects : taskProjects;
 
+  const isTaskView = viewMode === 'list' || viewMode === 'kanban' || viewMode === 'eisenhower';
+
   const handleSmartClick = (smart: SmartFilter) => {
-    if (viewMode === 'notes') {
+    if (!isTaskView) {
       setViewMode('list');
     }
     setSmartFilter(smart);
@@ -72,14 +75,19 @@ export const Sidebar: React.FC = () => {
 
   const handleProjectClick = (projectId: string) => {
     const targetProj = projects.find(p => p.id === projectId);
-    if (targetProj?.defaultView && viewMode !== 'notes') {
+    if (targetProj?.defaultView) {
       setViewMode(targetProj.defaultView);
+    } else if (viewMode === 'timeline' || viewMode === 'notes' || viewMode === 'analytics') {
+      setViewMode('list');
     }
     setFilter({ projectId, smartFilter: 'all', tag: null });
     setMobileDrawerOpen(false);
   };
 
   const handleTagClick = (tag: string) => {
+    if (viewMode === 'timeline' || viewMode === 'analytics') {
+      setViewMode('list');
+    }
     if (filter.tag === tag) {
       setFilter({ tag: null, projectId: null, smartFilter: 'all' });
     } else {
@@ -140,7 +148,21 @@ export const Sidebar: React.FC = () => {
             </button>
 
             <button
-              className={`nav-item ${viewMode !== 'notes' && filter.smartFilter === 'inbox' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              className={`nav-item ${viewMode === 'timeline' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => {
+                setViewMode('timeline');
+                setFilter({ projectId: null, tag: null });
+                setMobileDrawerOpen(false);
+              }}
+            >
+              <div className="nav-item-left">
+                <CalendarRange size={18} color="#8b5cf6" />
+                <span>Timeline</span>
+              </div>
+            </button>
+
+            <button
+              className={`nav-item ${isTaskView && filter.smartFilter === 'inbox' && !filter.projectId && !filter.tag ? 'active' : ''}`}
               onClick={() => handleSmartClick('inbox')}
             >
               <div className="nav-item-left">
@@ -151,7 +173,7 @@ export const Sidebar: React.FC = () => {
             </button>
 
           <button
-            className={`nav-item ${filter.smartFilter === 'today' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+            className={`nav-item ${isTaskView && filter.smartFilter === 'today' && !filter.projectId && !filter.tag ? 'active' : ''}`}
             onClick={() => handleSmartClick('today')}
           >
             <div className="nav-item-left">
@@ -166,7 +188,7 @@ export const Sidebar: React.FC = () => {
           </button>
 
           <button
-            className={`nav-item ${filter.smartFilter === 'upcoming' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+            className={`nav-item ${isTaskView && filter.smartFilter === 'upcoming' && !filter.projectId && !filter.tag ? 'active' : ''}`}
             onClick={() => handleSmartClick('upcoming')}
           >
             <div className="nav-item-left">
@@ -177,7 +199,7 @@ export const Sidebar: React.FC = () => {
           </button>
 
           <button
-            className={`nav-item ${filter.smartFilter === 'important' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+            className={`nav-item ${isTaskView && filter.smartFilter === 'important' && !filter.projectId && !filter.tag ? 'active' : ''}`}
             onClick={() => handleSmartClick('important')}
           >
             <div className="nav-item-left">
@@ -192,7 +214,7 @@ export const Sidebar: React.FC = () => {
           </button>
 
           <button
-            className={`nav-item ${filter.smartFilter === 'completed' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+            className={`nav-item ${isTaskView && filter.smartFilter === 'completed' && !filter.projectId && !filter.tag ? 'active' : ''}`}
             onClick={() => handleSmartClick('completed')}
           >
             <div className="nav-item-left">
@@ -203,7 +225,7 @@ export const Sidebar: React.FC = () => {
           </button>
 
           <button
-            className={`nav-item ${filter.smartFilter === 'all' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+            className={`nav-item ${isTaskView && filter.smartFilter === 'all' && !filter.projectId && !filter.tag ? 'active' : ''}`}
             onClick={() => handleSmartClick('all')}
           >
             <div className="nav-item-left">

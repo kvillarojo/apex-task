@@ -10,6 +10,13 @@ export interface ProjectTemplate {
 
 export const PROJECT_TEMPLATES: ProjectTemplate[] = [
   {
+    name: 'Release Roadmap',
+    color: '#8b5cf6',
+    icon: 'Layers',
+    description: 'Multi-phase milestones: Dev, QA, CAB & Go-Live timelines',
+    defaultView: 'timeline'
+  },
+  {
     name: 'Work Sprint',
     color: '#3b82f6',
     icon: 'Briefcase',

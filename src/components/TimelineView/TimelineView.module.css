@@ -1,0 +1,618 @@
+.timelineContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* Toolbar Header */
+.timelineToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+}
+
+.toolbarLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.titleArea {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.navControls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rangeLabel {
+  font-size: 0.88rem;
+  font-weight: 750;
+  color: var(--text-secondary);
+  padding: 0 4px;
+}
+
+.todayBtn {
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  font-weight: 700;
+}
+
+.toolbarRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.scaleSwitcher {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+}
+
+.scaleBtn {
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.scaleBtn:hover {
+  color: var(--text-primary);
+}
+
+.scaleBtn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.projectFilterSelect {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.projectFilterSelect:focus {
+  border-color: var(--primary);
+}
+
+.addTaskBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  padding: 6px 14px;
+}
+
+/* Quick Add Drawer / Bar */
+.quickAddBar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--bg-card) 90%, var(--primary) 10%);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  flex-wrap: wrap;
+}
+
+.quickAddInput {
+  flex: 1;
+  min-width: 180px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.quickAddInput:focus {
+  border-color: var(--primary);
+}
+
+.quickAddSelect,
+.quickAddDate {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.quickAddDate {
+  width: 135px;
+}
+
+/* Main Timeline Board Area */
+.timelineBoard {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Left Sidebar (Projects & Task List) */
+.leftSidebar {
+  width: 280px;
+  min-width: 280px;
+  max-width: 280px;
+  border-right: 1px solid var(--border-color);
+  background: var(--bg-sidebar);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.sidebarHeader {
+  height: 52px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.sidebarContent {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.projectSidebarSection {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.projectSidebarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: color-mix(in srgb, var(--bg-card) 60%, transparent);
+  font-weight: 750;
+  font-size: 0.84rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  user-select: none;
+}
+
+.projectSidebarHeader:hover {
+  background: var(--bg-card-hover);
+}
+
+.projectTitleGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.projectDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.projectName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.projectTaskCount {
+  font-size: 0.7rem;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--bg-input);
+  color: var(--text-muted);
+}
+
+.taskSidebarList {
+  display: flex;
+  flex-direction: column;
+}
+
+.taskSidebarItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px 8px 24px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s ease;
+  min-height: 40px;
+}
+
+.taskSidebarItem:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+}
+
+.taskSidebarTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+  padding-right: 6px;
+}
+
+.taskDurationBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Right Timeline Canvas (Scrollable Grid) */
+.timelineCanvasWrapper {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: auto;
+  position: relative;
+}
+
+.timelineCanvas {
+  position: relative;
+  min-height: 100%;
+}
+
+/* Timeline Header (Days/Weeks/Months) */
+.timeHeaderRow {
+  display: flex;
+  height: 52px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-sidebar);
+  position: sticky;
+  top: 0;
+  z-index: 4;
+}
+
+.timeColumnHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.timeColumnHeader.isWeekend {
+  background: color-mix(in srgb, var(--bg-app) 50%, var(--bg-sidebar));
+}
+
+.timeColumnHeader.isToday {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-weight: 850;
+}
+
+.colDayName {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.colDayNumber {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.isToday .colDayNumber {
+  color: var(--primary);
+}
+
+/* Vertical Grid Lines */
+.gridLinesContainer {
+  position: absolute;
+  top: 52px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gridLineColumn {
+  border-right: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+  height: 100%;
+  flex-shrink: 0;
+}
+
+.gridLineColumn.isWeekend {
+  background: color-mix(in srgb, var(--bg-app) 25%, transparent);
+}
+
+/* Today Indicator Line */
+.todayMarkerLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #38bdf8;
+  z-index: 3;
+  pointer-events: none;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+.todayMarkerBadge {
+  position: absolute;
+  top: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0284c7;
+  color: #ffffff;
+  font-size: 0.6rem;
+  font-weight: 850;
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+
+/* Swimlane Rows */
+.swimlaneGroup {
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+  z-index: 2;
+}
+
+.swimlaneProjectHeader {
+  height: 38px;
+  position: relative;
+  background: color-mix(in srgb, var(--bg-card) 65%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+}
+
+.projectSpanBar {
+  position: absolute;
+  top: 9px;
+  height: 20px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--project-color, var(--primary)) 20%, var(--bg-input));
+  border: 1px dashed var(--project-color, var(--primary));
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 0.68rem;
+  font-weight: 750;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0.85;
+}
+
+.swimlaneLanesArea {
+  position: relative;
+  padding: 6px 0;
+}
+
+.laneRow {
+  position: relative;
+  height: 40px;
+  width: 100%;
+}
+
+/* Gantt Task Bar */
+.taskBar {
+  position: absolute;
+  top: 4px;
+  height: 32px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--project-color, var(--primary)) 80%, #000000);
+  border: 1px solid color-mix(in srgb, var(--project-color, var(--primary)) 90%, #ffffff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 8px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+  user-select: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.taskBar:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  filter: brightness(1.1);
+  z-index: 10;
+}
+
+.taskBar.completed {
+  opacity: 0.6;
+  filter: grayscale(0.4);
+}
+
+.taskBarCheckbox {
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.taskBarCheckbox.checked {
+  background: #10b981;
+  border-color: #10b981;
+}
+
+.taskBarTitle {
+  font-size: 0.78rem;
+  font-weight: 750;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+
+.taskBar.completed .taskBarTitle {
+  text-decoration: line-through;
+}
+
+.taskBarPriorityBadge {
+  font-size: 0.62rem;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.35);
+  color: #ffffff;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* Tooltip */
+.taskTooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  min-width: 210px;
+  max-width: 280px;
+  pointer-events: none;
+  z-index: 50;
+  font-size: 0.78rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltipTitle {
+  font-weight: 800;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-secondary);
+}
+
+.tooltipValue {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* Empty State */
+.emptyTimeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  color: var(--text-muted);
+  gap: 12px;
+  width: 100%;
+}
+
+.emptyIcon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emptyTitle {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.emptyText {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  max-width: 360px;
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .leftSidebar {
+    width: 180px;
+    min-width: 180px;
+  }
+}
+

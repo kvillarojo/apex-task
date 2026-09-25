@@ -8,22 +8,178 @@ const THEME_STORAGE_KEY = 'mytodo_theme_v1';
 const TAG_DEFINITIONS_STORAGE_KEY = 'mytodo_tag_definitions_v1';
 const CUSTOM_TAGS_STORAGE_KEY = 'mytodo_custom_tags_v1';
 
+import { getTodayString, addDays } from './dateUtils';
+
 export const DEFAULT_ASSIGNEES: Assignee[] = [];
 
 export const DEFAULT_PROJECTS: Project[] = [
-  { id: 'inbox', name: 'Inbox', color: '#3b82f6', icon: 'Inbox', scope: 'shared' }
+  { id: 'inbox', name: 'Inbox', color: '#3b82f6', icon: 'Inbox', scope: 'shared' },
+  { id: 'proj_alpha', name: 'Project Alpha', color: '#8b5cf6', icon: 'Layers', defaultView: 'timeline', scope: 'tasks' },
+  { id: 'proj_beta', name: 'Project Beta', color: '#06b6d4', icon: 'Briefcase', defaultView: 'timeline', scope: 'tasks' }
 ];
+
+export function getDefaultTasks(): Task[] {
+  const today = getTodayString();
+  return [
+    {
+      id: 'demo-task-1',
+      title: 'Dev and QA',
+      description: '<p>Core feature development, unit tests, and QA test execution.</p>',
+      completed: false,
+      status: 'in_progress',
+      priority: 'p1',
+      startDate: today,
+      dueDate: addDays(today, 6),
+      recurring: 'none',
+      projectId: 'proj_alpha',
+      tags: ['release', 'dev', 'qa'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'demo-task-2',
+      title: 'Regression testing',
+      description: '<p>Full end-to-end regression test suite.</p>',
+      completed: false,
+      status: 'todo',
+      priority: 'p2',
+      startDate: addDays(today, 5),
+      dueDate: addDays(today, 10),
+      recurring: 'none',
+      projectId: 'proj_alpha',
+      tags: ['release', 'qa'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'demo-task-3',
+      title: 'CAB Approval',
+      description: '<p>Change Advisory Board submission and review.</p>',
+      completed: false,
+      status: 'todo',
+      priority: 'p2',
+      startDate: addDays(today, 11),
+      dueDate: addDays(today, 12),
+      recurring: 'none',
+      projectId: 'proj_alpha',
+      tags: ['release', 'cab'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'demo-task-4',
+      title: 'Go Live & Rollout',
+      description: '<p>Production deployment and post-release verification.</p>',
+      completed: false,
+      status: 'todo',
+      priority: 'p1',
+      startDate: addDays(today, 13),
+      dueDate: addDays(today, 15),
+      recurring: 'none',
+      projectId: 'proj_alpha',
+      tags: ['release', 'prod'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    // Project Beta timeline tasks (overlapping with Project Alpha)
+    {
+      id: 'demo-task-5',
+      title: 'Dev and QA',
+      description: '<p>Backend API refactoring and integration testing.</p>',
+      completed: false,
+      status: 'in_progress',
+      priority: 'p2',
+      startDate: addDays(today, 3),
+      dueDate: addDays(today, 9),
+      recurring: 'none',
+      projectId: 'proj_beta',
+      tags: ['backend', 'qa'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'demo-task-6',
+      title: 'Regression testing',
+      description: '<p>Regression verification on staging environment.</p>',
+      completed: false,
+      status: 'todo',
+      priority: 'p2',
+      startDate: addDays(today, 8),
+      dueDate: addDays(today, 13),
+      recurring: 'none',
+      projectId: 'proj_beta',
+      tags: ['testing'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'demo-task-7',
+      title: 'CAB',
+      description: '<p>Submit change request to CAB.</p>',
+      completed: false,
+      status: 'todo',
+      priority: 'p3',
+      startDate: addDays(today, 14),
+      dueDate: addDays(today, 15),
+      recurring: 'none',
+      projectId: 'proj_beta',
+      tags: ['cab'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    },
+    {
+      id: 'demo-task-8',
+      title: 'Go Live',
+      description: '<p>Global launch and monitoring.</p>',
+      completed: false,
+      status: 'todo',
+      priority: 'p1',
+      startDate: addDays(today, 16),
+      dueDate: addDays(today, 18),
+      recurring: 'none',
+      projectId: 'proj_beta',
+      tags: ['launch'],
+      subtasks: [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  ];
+}
 
 export function loadTasksFromStorage(): Task[] {
   try {
     const raw = localStorage.getItem(TASKS_STORAGE_KEY);
-    if (!raw) return [];
+    if (!raw) {
+      const defaults = getDefaultTasks();
+      saveTasksToStorage(defaults);
+      return defaults;
+    }
     const parsed: Task[] = JSON.parse(raw);
+    if (parsed.length === 0) {
+      const defaults = getDefaultTasks();
+      saveTasksToStorage(defaults);
+      return defaults;
+    }
     // Migration guard: ensure all tasks have a comments array (added in v2)
     return parsed.map(t => ({ ...t, comments: t.comments ?? [] }));
   } catch (err) {
     console.error('Failed to load tasks from localStorage', err);
-    return [];
+    return getDefaultTasks();
   }
 }
 

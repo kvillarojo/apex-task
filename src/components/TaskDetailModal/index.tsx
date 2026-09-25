@@ -23,6 +23,10 @@ export const TaskDetailModal: React.FC = () => {
     setProjectId,
     assigneeId,
     setAssigneeId,
+    startDate,
+    setStartDate,
+    startTime,
+    setStartTime,
     dueDate,
     setDueDate,
     dueTime,
@@ -63,6 +67,8 @@ export const TaskDetailModal: React.FC = () => {
       : saveStatus === 'saved'
         ? 'Saved'
         : 'Autosave on';
+
+  const isTimelineProject = projects.find(p => p.id === projectId)?.defaultView === 'timeline';
 
   return (
     <Modal
@@ -129,6 +135,11 @@ export const TaskDetailModal: React.FC = () => {
             assignees={assignees}
           />
           <TaskPlanningPanel
+            isTimelineProject={isTimelineProject}
+            startDate={startDate}
+            setStartDate={setStartDate}
+            startTime={startTime}
+            setStartTime={setStartTime}
             dueDate={dueDate}
             setDueDate={setDueDate}
             dueTime={dueTime}

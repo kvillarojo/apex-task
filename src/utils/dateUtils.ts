@@ -78,11 +78,28 @@ export function formatTime12h(timeStr: string): string {
   return `${h}:${String(m).padStart(2, '0')} ${ampm}`;
 }
 
-function formatDateISO(d: Date): string {
+export function formatDateISO(d: Date): string {
   const year = d.getFullYear();
   const month = String(d.getMonth() + 1).padStart(2, '0');
   const day = String(d.getDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
+}
+
+export function parseISODate(dateStr: string): Date {
+  const [y, m, d] = dateStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+export function addDays(dateStr: string, days: number): string {
+  const d = parseISODate(dateStr);
+  d.setDate(d.getDate() + days);
+  return formatDateISO(d);
+}
+
+export function diffInDays(startStr: string, endStr: string): number {
+  const d1 = parseISODate(startStr);
+  const d2 = parseISODate(endStr);
+  return Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 export interface CalendarDay {
