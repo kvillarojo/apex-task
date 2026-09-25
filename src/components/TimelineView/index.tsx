@@ -235,34 +235,20 @@ export const TimelineView: React.FC = () => {
         if (pt.task.completed) completedCount++;
       });
 
-      // Compute sub-lanes for overlapping tasks
-      const sorted = [...projectTasks].sort(
-        (a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end)
+      // Sort tasks chronologically
+      const sortedTasks = [...projectTasks].sort(
+        (a, b) =>
+          a.start.localeCompare(b.start) ||
+          a.end.localeCompare(b.end) ||
+          a.task.title.localeCompare(b.task.title)
       );
-      const lanes: ProcessedTimelineTask[][] = [];
-
-      sorted.forEach(pt => {
-        let placed = false;
-        for (const lane of lanes) {
-          const lastInLane = lane[lane.length - 1];
-          if (lastInLane.end < pt.start) {
-            lane.push(pt);
-            placed = true;
-            break;
-          }
-        }
-        if (!placed) {
-          lanes.push([pt]);
-        }
-      });
 
       const totalCount = projectTasks.length;
       const progressPercent = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
       return {
         project,
-        tasks: projectTasks,
-        lanes,
+        tasks: sortedTasks,
         minStart,
         maxEnd,
         spanDuration: minStart && maxEnd ? diffInDays(minStart, maxEnd) + 1 : 0,
@@ -653,126 +639,124 @@ export const TimelineView: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Lanes Area */}
+                  {/* Task Rows Area */}
                   {!isCollapsed && (
-                    <div className={styles.swimlaneLanesArea}>
-                      {group.lanes.length === 0 ? (
-                        <div style={{ height: '36px' }} />
+                    <div className={styles.swimlaneTasksArea}>
+                      {group.tasks.length === 0 ? (
+                        <div style={{ height: '38px' }} />
                       ) : (
-                        group.lanes.map((lane, laneIdx) => (
-                          <div key={`lane-${laneIdx}`} className={styles.laneRow}>
-                            {lane.map(pt => {
-                              const taskStartDiff = diffInDays(windowStart, pt.start);
-                              const taskLeftPx = taskStartDiff * colWidth;
-                              const taskWidthPx = Math.max(pt.durationDays * colWidth - 4, 38);
-                              const assignee = assignees.find(a => a.id === pt.task.assigneeId);
+                        group.tasks.map(pt => {
+                          const taskStartDiff = diffInDays(windowStart, pt.start);
+                          const taskLeftPx = taskStartDiff * colWidth;
+                          const minBarWidth = Math.max(colWidth - 4, 12);
+                          const taskWidthPx = Math.max(pt.durationDays * colWidth - 4, minBarWidth);
+                          const assignee = assignees.find(a => a.id === pt.task.assigneeId);
 
-                              return (
-                                <div
-                                  key={pt.task.id}
-                                  className={`${styles.taskBar} ${
-                                    pt.task.completed ? styles.completed : ''
-                                  } ${pt.isOverdue ? styles.overdue : ''}`}
-                                  style={{
-                                    left: `${taskLeftPx}px`,
-                                    width: `${taskWidthPx}px`
+                          return (
+                            <div key={`row-${pt.task.id}`} className={styles.taskCanvasRow}>
+                              <div
+                                className={`${styles.taskBar} ${
+                                  pt.task.completed ? styles.completed : ''
+                                } ${pt.isOverdue ? styles.overdue : ''}`}
+                                style={{
+                                  left: `${taskLeftPx}px`,
+                                  width: `${taskWidthPx}px`
+                                }}
+                                onClick={() => setEditingTask(pt.task)}
+                                onMouseEnter={() => setHoveredTask(pt)}
+                                onMouseLeave={() => setHoveredTask(null)}
+                              >
+                                <span
+                                  className={`${styles.taskBarCheckbox} ${
+                                    pt.task.completed ? styles.checked : ''
+                                  }`}
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    toggleTaskComplete(pt.task.id);
                                   }}
-                                  onClick={() => setEditingTask(pt.task)}
-                                  onMouseEnter={() => setHoveredTask(pt)}
-                                  onMouseLeave={() => setHoveredTask(null)}
+                                  title={pt.task.completed ? 'Mark incomplete' : 'Mark complete'}
                                 >
+                                  {pt.task.completed && <Check size={10} />}
+                                </span>
+
+                                <span className={styles.taskBarTitle}>{pt.task.title}</span>
+
+                                {assignee && (
                                   <span
-                                    className={`${styles.taskBarCheckbox} ${
-                                      pt.task.completed ? styles.checked : ''
-                                    }`}
-                                    onClick={e => {
-                                      e.stopPropagation();
-                                      toggleTaskComplete(pt.task.id);
-                                    }}
-                                    title={pt.task.completed ? 'Mark incomplete' : 'Mark complete'}
+                                    className={styles.taskBarAvatar}
+                                    style={{ backgroundColor: assignee.avatarColor }}
+                                    title={`Assignee: ${assignee.name}`}
                                   >
-                                    {pt.task.completed && <Check size={10} />}
+                                    {assignee.initials}
                                   </span>
+                                )}
 
-                                  <span className={styles.taskBarTitle}>{pt.task.title}</span>
+                                <span className={styles.taskBarPriorityBadge}>
+                                  {pt.task.priority.toUpperCase()}
+                                </span>
 
-                                  {assignee && (
-                                    <span
-                                      className={styles.taskBarAvatar}
-                                      style={{ backgroundColor: assignee.avatarColor }}
-                                      title={`Assignee: ${assignee.name}`}
-                                    >
-                                      {assignee.initials}
-                                    </span>
-                                  )}
+                                {/* Progress bar line */}
+                                {pt.progress > 0 && !pt.task.completed && (
+                                  <div className={styles.taskBarProgress}>
+                                    <div
+                                      className={styles.taskBarProgressFill}
+                                      style={{ width: `${pt.progress}%` }}
+                                    />
+                                  </div>
+                                )}
 
-                                  <span className={styles.taskBarPriorityBadge}>
-                                    {pt.task.priority.toUpperCase()}
-                                  </span>
-
-                                  {/* Progress bar line */}
-                                  {pt.progress > 0 && !pt.task.completed && (
-                                    <div className={styles.taskBarProgress}>
-                                      <div
-                                        className={styles.taskBarProgressFill}
-                                        style={{ width: `${pt.progress}%` }}
-                                      />
+                                {/* Tooltip on hover */}
+                                {hoveredTask?.task.id === pt.task.id && (
+                                  <div className={styles.taskTooltip}>
+                                    <div className={styles.tooltipTitle}>{pt.task.title}</div>
+                                    <div className={styles.tooltipRow}>
+                                      <span>Project:</span>
+                                      <span className={styles.tooltipValue} style={{ color: group.project.color }}>
+                                        {group.project.name}
+                                      </span>
                                     </div>
-                                  )}
-
-                                  {/* Tooltip on hover */}
-                                  {hoveredTask?.task.id === pt.task.id && (
-                                    <div className={styles.taskTooltip}>
-                                      <div className={styles.tooltipTitle}>{pt.task.title}</div>
+                                    <div className={styles.tooltipRow}>
+                                      <span>Timeline:</span>
+                                      <span className={styles.tooltipValue}>
+                                        {pt.start} &rarr; {pt.end}
+                                      </span>
+                                    </div>
+                                    <div className={styles.tooltipRow}>
+                                      <span>Duration:</span>
+                                      <span className={styles.tooltipValue}>{pt.durationDays} days</span>
+                                    </div>
+                                    <div className={styles.tooltipRow}>
+                                      <span>Priority:</span>
+                                      <span className={styles.tooltipValue}>{pt.task.priority.toUpperCase()}</span>
+                                    </div>
+                                    {assignee && (
                                       <div className={styles.tooltipRow}>
-                                        <span>Project:</span>
-                                        <span className={styles.tooltipValue} style={{ color: group.project.color }}>
-                                          {group.project.name}
-                                        </span>
+                                        <span>Assignee:</span>
+                                        <span className={styles.tooltipValue}>{assignee.name}</span>
                                       </div>
-                                      <div className={styles.tooltipRow}>
-                                        <span>Timeline:</span>
-                                        <span className={styles.tooltipValue}>
-                                          {pt.start} &rarr; {pt.end}
-                                        </span>
-                                      </div>
-                                      <div className={styles.tooltipRow}>
-                                        <span>Duration:</span>
-                                        <span className={styles.tooltipValue}>{pt.durationDays} days</span>
-                                      </div>
-                                      <div className={styles.tooltipRow}>
-                                        <span>Priority:</span>
-                                        <span className={styles.tooltipValue}>{pt.task.priority.toUpperCase()}</span>
-                                      </div>
-                                      {assignee && (
+                                    )}
+                                    {pt.task.subtasks && pt.task.subtasks.length > 0 && (
+                                      <div>
                                         <div className={styles.tooltipRow}>
-                                          <span>Assignee:</span>
-                                          <span className={styles.tooltipValue}>{assignee.name}</span>
+                                          <span>Subtasks:</span>
+                                          <span className={styles.tooltipValue}>
+                                            {pt.task.subtasks.filter(s => s.completed).length} / {pt.task.subtasks.length} ({pt.progress}%)
+                                          </span>
                                         </div>
-                                      )}
-                                      {pt.task.subtasks && pt.task.subtasks.length > 0 && (
-                                        <div>
-                                          <div className={styles.tooltipRow}>
-                                            <span>Subtasks:</span>
-                                            <span className={styles.tooltipValue}>
-                                              {pt.task.subtasks.filter(s => s.completed).length} / {pt.task.subtasks.length} ({pt.progress}%)
-                                            </span>
-                                          </div>
-                                          <div className={styles.tooltipProgress}>
-                                            <div
-                                              className={styles.tooltipProgressFill}
-                                              style={{ width: `${pt.progress}%` }}
-                                            />
-                                          </div>
+                                        <div className={styles.tooltipProgress}>
+                                          <div
+                                            className={styles.tooltipProgressFill}
+                                            style={{ width: `${pt.progress}%` }}
+                                          />
                                         </div>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        ))
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })
                       )}
                     </div>
                   )}

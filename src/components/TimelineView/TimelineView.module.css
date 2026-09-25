@@ -239,7 +239,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
+  padding: 0 12px;
+  height: 38px;
+  box-sizing: border-box;
   background: color-mix(in srgb, var(--bg-card) 60%, transparent);
   cursor: pointer;
   user-select: none;
@@ -328,13 +330,14 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px 6px 20px;
+  padding: 0 12px 0 20px;
   border-top: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent);
   font-size: 0.8rem;
   color: var(--text-secondary);
   cursor: pointer;
   transition: background 0.15s ease;
-  min-height: 36px;
+  height: 38px;
+  box-sizing: border-box;
 }
 
 .taskSidebarItem:hover {
@@ -567,7 +570,8 @@
 }
 
 .swimlaneProjectHeader {
-  height: 36px;
+  height: 38px;
+  box-sizing: border-box;
   position: relative;
   background: color-mix(in srgb, var(--bg-card) 70%, transparent);
   border-bottom: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
@@ -591,23 +595,31 @@
   text-overflow: ellipsis;
 }
 
-.swimlaneLanesArea {
+.swimlaneTasksArea {
   position: relative;
-  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.laneRow {
+.taskCanvasRow {
   position: relative;
-  height: 42px;
+  height: 38px;
   width: 100%;
+  box-sizing: border-box;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent);
+  transition: background 0.15s ease;
+}
+
+.taskCanvasRow:hover {
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
 }
 
 /* ===== Task Bars ===== */
 .taskBar {
   position: absolute;
   top: 4px;
-  height: 34px;
-  border-radius: 8px;
+  height: 30px;
+  border-radius: 6px;
   background: var(--project-color, var(--primary));
   border: 1px solid color-mix(in srgb, var(--project-color, var(--primary)) 85%, #ffffff 15%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
@@ -620,6 +632,7 @@
   user-select: none;
   overflow: hidden;
   z-index: 2;
+  box-sizing: border-box;
 }
 
 .taskBar:hover {
