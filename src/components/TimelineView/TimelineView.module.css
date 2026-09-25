@@ -1,20 +1,20 @@
+/* ===== Container & Toolbar ===== */
 .timelineContainer {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  gap: 14px;
+  gap: 12px;
   min-width: 0;
 }
 
-/* Toolbar Header */
 .timelineToolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 10px 14px;
+  padding: 10px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: 14px;
@@ -41,17 +41,19 @@
   margin: 0;
 }
 
+.taskCountBadge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
 .navControls {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.rangeLabel {
-  font-size: 0.88rem;
-  font-weight: 750;
-  color: var(--text-secondary);
-  padding: 0 4px;
 }
 
 .todayBtn {
@@ -122,7 +124,7 @@
   padding: 6px 14px;
 }
 
-/* Quick Add Drawer / Bar */
+/* ===== Quick Add Bar ===== */
 .quickAddBar {
   display: flex;
   align-items: center;
@@ -165,7 +167,7 @@
   width: 135px;
 }
 
-/* Main Timeline Board Area */
+/* ===== Timeline Board Layout ===== */
 .timelineBoard {
   display: flex;
   flex: 1;
@@ -177,11 +179,11 @@
   position: relative;
 }
 
-/* Left Sidebar (Projects & Task List) */
+/* ===== Left Sidebar ===== */
 .leftSidebar {
-  width: 280px;
-  min-width: 280px;
-  max-width: 280px;
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
   border-right: 1px solid var(--border-color);
   background: var(--bg-sidebar);
   display: flex;
@@ -191,7 +193,7 @@
 }
 
 .sidebarHeader {
-  height: 52px;
+  height: 72px;
   padding: 0 16px;
   display: flex;
   align-items: center;
@@ -202,6 +204,7 @@
   color: var(--text-muted);
   letter-spacing: 0.06em;
   text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 .sidebarContent {
@@ -210,6 +213,24 @@
   min-height: 0;
 }
 
+.sidebarContent::-webkit-scrollbar {
+  width: 5px;
+}
+
+.sidebarContent::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebarContent::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 25%, transparent);
+  border-radius: 3px;
+}
+
+.sidebarContent::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-muted) 45%, transparent);
+}
+
+/* Project sections in sidebar */
 .projectSidebarSection {
   border-bottom: 1px solid var(--border-color);
 }
@@ -218,13 +239,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 14px;
+  padding: 8px 12px;
   background: color-mix(in srgb, var(--bg-card) 60%, transparent);
-  font-weight: 750;
-  font-size: 0.84rem;
-  color: var(--text-primary);
   cursor: pointer;
   user-select: none;
+  transition: background 0.15s ease;
 }
 
 .projectSidebarHeader:hover {
@@ -234,31 +253,72 @@
 .projectTitleGroup {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
+  flex: 1;
 }
 
-.projectDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+.collapseIcon {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
   flex-shrink: 0;
 }
 
+.collapseIcon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.projectDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--bg-sidebar) 100%, transparent);
+}
+
 .projectName {
+  font-weight: 750;
+  font-size: 0.82rem;
+  color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
+.projectStats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
 .projectTaskCount {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 700;
   padding: 1px 6px;
   border-radius: 999px;
   background: var(--bg-input);
   color: var(--text-muted);
 }
 
+.projectProgressMini {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+
+.projectProgressMiniFill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+}
+
+/* Task sidebar items */
 .taskSidebarList {
   display: flex;
   flex-direction: column;
@@ -267,14 +327,14 @@
 .taskSidebarItem {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px 8px 24px;
-  border-top: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+  gap: 8px;
+  padding: 6px 12px 6px 20px;
+  border-top: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent);
   font-size: 0.8rem;
   color: var(--text-secondary);
   cursor: pointer;
   transition: background 0.15s ease;
-  min-height: 40px;
+  min-height: 36px;
 }
 
 .taskSidebarItem:hover {
@@ -282,29 +342,86 @@
   color: var(--text-primary);
 }
 
+.taskSidebarCheckbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1.5px solid var(--border-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: transparent;
+}
+
+.taskSidebarCheckbox:hover {
+  border-color: var(--primary);
+}
+
+.taskSidebarCheckbox.checked {
+  background: #10b981;
+  border-color: #10b981;
+  color: #ffffff;
+}
+
 .taskSidebarTitle {
+  flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
-  padding-right: 6px;
+}
+
+.taskSidebarTitle.completed {
+  text-decoration: line-through;
+  opacity: 0.5;
 }
 
 .taskDurationBadge {
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 700;
   color: var(--text-muted);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-/* Right Timeline Canvas (Scrollable Grid) */
+.taskOverdueBadge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #ef4444;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: color-mix(in srgb, #ef4444 10%, transparent);
+}
+
+/* ===== Timeline Canvas ===== */
 .timelineCanvasWrapper {
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
-  overflow-y: auto;
+  overflow: auto;
   position: relative;
+}
+
+.timelineCanvasWrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.timelineCanvasWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.timelineCanvasWrapper::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--text-muted) 25%, transparent);
+  border-radius: 3px;
+}
+
+.timelineCanvasWrapper::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--text-muted) 45%, transparent);
 }
 
 .timelineCanvas {
@@ -312,14 +429,41 @@
   min-height: 100%;
 }
 
-/* Timeline Header (Days/Weeks/Months) */
+/* ===== Month Header Row ===== */
+.monthHeaderRow {
+  display: flex;
+  height: 28px;
+  border-bottom: 1px solid var(--border-color);
+  background: color-mix(in srgb, var(--bg-sidebar) 92%, var(--primary) 8%);
+  position: sticky;
+  top: 0;
+  z-index: 5;
+}
+
+.monthHeaderCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-right: 1px solid var(--border-color);
+  user-select: none;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ===== Day Header Row ===== */
 .timeHeaderRow {
   display: flex;
-  height: 52px;
+  height: 44px;
   border-bottom: 1px solid var(--border-color);
   background: var(--bg-sidebar);
   position: sticky;
-  top: 0;
+  top: 28px;
   z-index: 4;
 }
 
@@ -328,12 +472,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid var(--border-color);
+  border-right: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--text-secondary);
   flex-shrink: 0;
   user-select: none;
+  gap: 1px;
 }
 
 .timeColumnHeader.isWeekend {
@@ -341,31 +486,32 @@
 }
 
 .timeColumnHeader.isToday {
-  background: var(--primary-light);
+  background: color-mix(in srgb, var(--primary) 15%, var(--bg-sidebar));
   color: var(--primary);
-  font-weight: 850;
 }
 
 .colDayName {
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   text-transform: uppercase;
   color: var(--text-muted);
+  line-height: 1;
 }
 
 .colDayNumber {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .isToday .colDayNumber {
   color: var(--primary);
 }
 
-/* Vertical Grid Lines */
+/* ===== Grid Lines ===== */
 .gridLinesContainer {
   position: absolute;
-  top: 52px;
+  top: 72px;
   bottom: 0;
   left: 0;
   right: 0;
@@ -375,44 +521,45 @@
 }
 
 .gridLineColumn {
-  border-right: 1px solid color-mix(in srgb, var(--border-color) 45%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--border-color) 30%, transparent);
   height: 100%;
   flex-shrink: 0;
 }
 
 .gridLineColumn.isWeekend {
-  background: color-mix(in srgb, var(--bg-app) 25%, transparent);
+  background: color-mix(in srgb, var(--bg-app) 12%, transparent);
 }
 
-/* Today Indicator Line */
+/* ===== Today Marker ===== */
 .todayMarkerLine {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: #38bdf8;
+  background: linear-gradient(180deg, #38bdf8, #0ea5e9);
   z-index: 3;
   pointer-events: none;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
 }
 
 .todayMarkerBadge {
   position: absolute;
-  top: 2px;
+  top: 4px;
   left: 50%;
   transform: translateX(-50%);
-  background: #0284c7;
+  background: linear-gradient(135deg, #0284c7, #0ea5e9);
   color: #ffffff;
-  font-size: 0.6rem;
+  font-size: 0.56rem;
   font-weight: 850;
-  padding: 1px 6px;
+  padding: 2px 8px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.4);
 }
 
-/* Swimlane Rows */
+/* ===== Swimlane Groups ===== */
 .swimlaneGroup {
   position: relative;
   border-bottom: 1px solid var(--border-color);
@@ -420,55 +567,54 @@
 }
 
 .swimlaneProjectHeader {
-  height: 38px;
+  height: 36px;
   position: relative;
-  background: color-mix(in srgb, var(--bg-card) 65%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 40%, transparent);
+  background: color-mix(in srgb, var(--bg-card) 70%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 35%, transparent);
 }
 
 .projectSpanBar {
   position: absolute;
-  top: 9px;
+  top: 8px;
   height: 20px;
   border-radius: 6px;
-  background: color-mix(in srgb, var(--project-color, var(--primary)) 20%, var(--bg-input));
-  border: 1px dashed var(--project-color, var(--primary));
+  background: color-mix(in srgb, var(--project-color, var(--primary)) 15%, var(--bg-input));
+  border: 1.5px dashed color-mix(in srgb, var(--project-color, var(--primary)) 50%, transparent);
   display: flex;
   align-items: center;
-  padding: 0 8px;
-  font-size: 0.68rem;
+  padding: 0 10px;
+  font-size: 0.66rem;
   font-weight: 750;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.85;
 }
 
 .swimlaneLanesArea {
   position: relative;
-  padding: 6px 0;
+  padding: 4px 0;
 }
 
 .laneRow {
   position: relative;
-  height: 40px;
+  height: 42px;
   width: 100%;
 }
 
-/* Gantt Task Bar */
+/* ===== Task Bars ===== */
 .taskBar {
   position: absolute;
   top: 4px;
-  height: 32px;
+  height: 34px;
   border-radius: 8px;
-  background: color-mix(in srgb, var(--project-color, var(--primary)) 80%, #000000);
-  border: 1px solid color-mix(in srgb, var(--project-color, var(--primary)) 90%, #ffffff);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  background: var(--project-color, var(--primary));
+  border: 1px solid color-mix(in srgb, var(--project-color, var(--primary)) 85%, #ffffff 15%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
   display: flex;
   align-items: center;
-  padding: 0 10px;
-  gap: 8px;
+  padding: 0 8px;
+  gap: 6px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
   user-select: none;
@@ -478,21 +624,30 @@
 
 .taskBar:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
   filter: brightness(1.1);
   z-index: 10;
 }
 
 .taskBar.completed {
-  opacity: 0.6;
-  filter: grayscale(0.4);
+  opacity: 0.5;
+  filter: grayscale(0.4) brightness(0.9);
+}
+
+.taskBar.overdue {
+  border-color: #ef4444;
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.25), inset 0 0 0 1px rgba(239, 68, 68, 0.15);
+}
+
+.taskBar.overdue:hover {
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
 }
 
 .taskBarCheckbox {
-  width: 15px;
-  height: 15px;
+  width: 16px;
+  height: 16px;
   border-radius: 4px;
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -502,61 +657,103 @@
   transition: background 0.15s ease;
 }
 
+.taskBarCheckbox:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .taskBarCheckbox.checked {
-  background: #10b981;
-  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.9);
+  border-color: rgba(16, 185, 129, 0.9);
 }
 
 .taskBarTitle {
-  font-size: 0.78rem;
-  font-weight: 750;
+  font-size: 0.76rem;
+  font-weight: 700;
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .taskBar.completed .taskBarTitle {
   text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.taskBarAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #ffffff;
+  flex-shrink: 0;
+  text-transform: uppercase;
 }
 
 .taskBarPriorityBadge {
-  font-size: 0.62rem;
+  font-size: 0.58rem;
   font-weight: 800;
   padding: 1px 5px;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.28);
   color: #ffffff;
   text-transform: uppercase;
   flex-shrink: 0;
 }
 
-/* Tooltip */
+/* Subtask progress bar at bottom of task bar */
+.taskBarProgress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(0, 0, 0, 0.18);
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+.taskBarProgressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+}
+
+/* ===== Tooltip ===== */
 .taskTooltip {
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 10px);
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-sidebar);
   border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 10px 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  min-width: 210px;
-  max-width: 280px;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  min-width: 220px;
+  max-width: 300px;
   pointer-events: none;
   z-index: 50;
   font-size: 0.78rem;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .tooltipTitle {
   font-weight: 800;
   color: var(--text-primary);
-  font-size: 0.85rem;
+  font-size: 0.88rem;
+  padding-bottom: 2px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
 }
 
 .tooltipRow {
@@ -564,6 +761,7 @@
   align-items: center;
   justify-content: space-between;
   color: var(--text-secondary);
+  gap: 12px;
 }
 
 .tooltipValue {
@@ -571,22 +769,37 @@
   color: var(--text-primary);
 }
 
-/* Empty State */
+.tooltipProgress {
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--bg-input);
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.tooltipProgressFill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+/* ===== Empty State ===== */
 .emptyTimeline {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   text-align: center;
   color: var(--text-muted);
-  gap: 12px;
+  gap: 16px;
   width: 100%;
 }
 
 .emptyIcon {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: var(--primary-light);
   color: var(--primary);
@@ -596,23 +809,39 @@
 }
 
 .emptyTitle {
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--text-primary);
   margin: 0;
 }
 
 .emptyText {
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--text-secondary);
-  max-width: 360px;
+  max-width: 400px;
   margin: 0;
+  line-height: 1.5;
 }
 
+/* ===== Responsive ===== */
 @media (max-width: 768px) {
   .leftSidebar {
-    width: 180px;
-    min-width: 180px;
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+  }
+
+  .timelineToolbar {
+    padding: 8px 10px;
+  }
+
+  .addTaskBtn span {
+    display: none;
   }
 }
 
+@media (max-width: 640px) {
+  .leftSidebar {
+    display: none;
+  }
+}
