@@ -13,8 +13,7 @@ export function useProjectModal() {
     closeProjectModal,
     addProject,
     updateProject,
-    deleteProject,
-    viewMode
+    deleteProject
   } = useTodo();
 
   const [name, setName] = useState('');
@@ -72,7 +71,7 @@ export function useProjectModal() {
         color,
         icon,
         defaultView,
-        scope: viewMode === 'notes' ? 'notes' : 'tasks'
+        scope: 'shared'
       });
     }
     closeProjectModal();

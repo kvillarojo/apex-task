@@ -44,6 +44,8 @@ export const TimelineView: React.FC = () => {
     tasks,
     projects,
     assignees,
+    filter,
+    setFilter,
     setEditingTask,
     toggleTaskComplete,
     addTask
@@ -55,7 +57,20 @@ export const TimelineView: React.FC = () => {
   }, [projects]);
 
   const [scale, setScale] = useState<TimelineScale>('day');
-  const [selectedProjectId, setSelectedProjectId] = useState<string>('all');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(
+    filter.projectId && timelineProjects.some(p => p.id === filter.projectId)
+      ? filter.projectId
+      : 'all'
+  );
+
+  // Sync selectedProjectId when filter.projectId changes from sidebar
+  useEffect(() => {
+    if (filter.projectId && timelineProjects.some(p => p.id === filter.projectId)) {
+      setSelectedProjectId(filter.projectId);
+    } else if (!filter.projectId) {
+      setSelectedProjectId('all');
+    }
+  }, [filter.projectId, timelineProjects]);
   const [hoveredTask, setHoveredTask] = useState<ProcessedTimelineTask | null>(null);
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [collapsedProjects, setCollapsedProjects] = useState<Record<string, boolean>>({});
@@ -357,7 +372,11 @@ export const TimelineView: React.FC = () => {
             <Filter size={14} color="var(--text-muted)" />
             <select
               value={selectedProjectId}
-              onChange={e => setSelectedProjectId(e.target.value)}
+              onChange={e => {
+                const val = e.target.value;
+                setSelectedProjectId(val);
+                setFilter({ projectId: val === 'all' ? null : val });
+              }}
               className={styles.projectFilterSelect}
             >
               <option value="all">All Timeline Projects ({timelineProjects.length})</option>

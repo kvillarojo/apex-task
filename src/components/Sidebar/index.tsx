@@ -74,13 +74,25 @@ export const Sidebar: React.FC = () => {
   };
 
   const handleProjectClick = (projectId: string) => {
-    const targetProj = projects.find(p => p.id === projectId);
-    if (targetProj?.defaultView) {
-      setViewMode(targetProj.defaultView);
-    } else if (viewMode === 'timeline' || viewMode === 'notes' || viewMode === 'analytics') {
-      setViewMode('list');
+    if (viewMode === 'notes') {
+      setFilter({
+        projectId: filter.projectId === projectId ? null : projectId,
+        smartFilter: 'all',
+        tag: null
+      });
+    } else {
+      const targetProj = projects.find(p => p.id === projectId);
+      if (targetProj?.defaultView) {
+        setViewMode(targetProj.defaultView);
+      } else if (viewMode === 'timeline' || viewMode === 'analytics') {
+        setViewMode('list');
+      }
+      setFilter({
+        projectId: filter.projectId === projectId ? null : projectId,
+        smartFilter: 'all',
+        tag: null
+      });
     }
-    setFilter({ projectId, smartFilter: 'all', tag: null });
     setMobileDrawerOpen(false);
   };
 

@@ -14,8 +14,8 @@ export const DEFAULT_ASSIGNEES: Assignee[] = [];
 
 export const DEFAULT_PROJECTS: Project[] = [
   { id: 'inbox', name: 'Inbox', color: '#3b82f6', icon: 'Inbox', scope: 'shared' },
-  { id: 'proj_alpha', name: 'Project Alpha', color: '#8b5cf6', icon: 'Layers', defaultView: 'timeline', scope: 'tasks' },
-  { id: 'proj_beta', name: 'Project Beta', color: '#06b6d4', icon: 'Briefcase', defaultView: 'timeline', scope: 'tasks' }
+  { id: 'proj_alpha', name: 'Project Alpha', color: '#8b5cf6', icon: 'Layers', defaultView: 'timeline', scope: 'shared' },
+  { id: 'proj_beta', name: 'Project Beta', color: '#06b6d4', icon: 'Briefcase', defaultView: 'timeline', scope: 'shared' }
 ];
 
 export function getDefaultTasks(): Task[] {
@@ -198,7 +198,16 @@ export function loadProjectsFromStorage(): Project[] {
       saveProjectsToStorage(DEFAULT_PROJECTS);
       return DEFAULT_PROJECTS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) {
+      return parsed.map((p: Project) => {
+        if ((p.id === 'proj_alpha' || p.id === 'proj_beta') && p.scope === 'tasks') {
+          return { ...p, scope: 'shared' };
+        }
+        return p;
+      });
+    }
+    return DEFAULT_PROJECTS;
   } catch (err) {
     console.error('Failed to load projects from localStorage', err);
     return DEFAULT_PROJECTS;

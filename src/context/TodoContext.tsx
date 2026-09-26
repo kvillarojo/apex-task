@@ -1056,11 +1056,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getProjectScope = (project: Project): 'tasks' | 'notes' | 'shared' => {
     if (project.scope) return project.scope;
-    const hasTasks = tasks.some(task => task.projectId === project.id);
-    const hasNotes = notes.some(note => note.projectId === project.id);
-    if (hasTasks && hasNotes) return 'shared';
-    if (hasNotes) return 'notes';
-    return 'tasks';
+    return 'shared';
   };
 
   const taskProjects = projects.filter(project => getProjectScope(project) !== 'notes');
