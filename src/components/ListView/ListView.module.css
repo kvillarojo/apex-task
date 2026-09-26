@@ -1,8 +1,14 @@
 .view { display: flex; flex-direction: column; gap: 16px; }
-.toolbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; gap: 12px; flex-wrap: wrap; }
+.toolbarLeft { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .taskCount, .sortLabel, .emptyDescription { color: var(--text-muted); }
 .taskCount { font-size: .85rem; }
 .taskCountValue { color: var(--text-primary); font-weight: 600; }
+.statusFilter { display: inline-flex; align-items: center; background-color: var(--bg-input, rgba(255, 255, 255, 0.05)); border: 1px solid var(--border-color); border-radius: 8px; padding: 2px; gap: 2px; }
+.filterButton { display: inline-flex; align-items: center; gap: 5px; background: none; border: none; color: var(--text-secondary); font-size: .75rem; font-weight: 500; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: all .15s ease; }
+.filterButton:hover { color: var(--text-primary); background-color: rgba(255, 255, 255, 0.04); }
+.filterActive { background-color: var(--primary) !important; color: #ffffff !important; font-weight: 600; }
+.btnIcon { flex-shrink: 0; }
 .sortControls { display: flex; align-items: center; gap: 8px; font-size: .8rem; }
 .sortButton { padding: 4px 8px; font-size: .75rem; }
 .sortIcon { margin-left: 4px; }
@@ -10,4 +16,8 @@
 .emptyIcon { opacity: .5; }
 .emptyTitle { font-size: 1.1rem; font-weight: 600; }
 .emptyDescription { font-size: .85rem; }
-@media (max-width: 640px) { .toolbar { align-items: flex-start; flex-direction: column; gap: 10px; } .sortControls { flex-wrap: wrap; } }
+@media (max-width: 640px) {
+  .toolbar { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .toolbarLeft { width: 100%; justify-content: space-between; }
+  .sortControls { flex-wrap: wrap; }
+}

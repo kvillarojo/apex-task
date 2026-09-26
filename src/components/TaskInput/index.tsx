@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Plus,
   Calendar,
@@ -30,6 +30,11 @@ export const TaskInput: React.FC = () => {
   const [selectedDueTime, setSelectedDueTime] = useState<string>('');
   const [selectedRecurring, setSelectedRecurring] = useState<RecurrenceRule>('none');
   const [showDetails, setShowDetails] = useState(false);
+
+  // Keep selectedProjectId in sync when active filter project changes
+  useEffect(() => {
+    setSelectedProjectId(filter.projectId || 'inbox');
+  }, [filter.projectId]);
 
   // Live Natural Language Parsing
   const parsed = useMemo(() => {
@@ -73,6 +78,7 @@ export const TaskInput: React.FC = () => {
     setRawText('');
     setDescription('');
     setSelectedPriority('p4');
+    setSelectedProjectId(filter.projectId || 'inbox');
     setSelectedAssigneeId('');
     setSelectedDueDate('');
     setSelectedDueTime('');

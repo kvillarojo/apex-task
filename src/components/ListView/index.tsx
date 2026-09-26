@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUpDown, CheckCircle } from 'lucide-react';
+import { ArrowUpDown, CheckCircle, CheckCircle2, Circle } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { TaskItem } from '../TaskItem';
 import { TaskInput } from '../TaskInput';
@@ -18,6 +18,8 @@ export const ListView: React.FC = () => {
     }
   };
 
+  const currentStatusFilter = filter.statusFilter || 'all';
+
   return (
     <div {...getThemeComponentProps(ThemeComponent.ListView)} className={styles.view}>
       {/* Quick Add Bar */}
@@ -25,8 +27,39 @@ export const ListView: React.FC = () => {
 
       {/* Sort & Controls Header */}
       <div className={styles.toolbar}>
-        <div className={styles.taskCount}>
-          Showing <span className={styles.taskCountValue}>{filteredTasks.length}</span> tasks
+        <div className={styles.toolbarLeft}>
+          <div className={styles.taskCount}>
+            Showing <span className={styles.taskCountValue}>{filteredTasks.length}</span> tasks
+          </div>
+
+          {/* Status Filter (All / Not Done / Done) */}
+          <div className={styles.statusFilter} role="group" aria-label="Task completion filter">
+            <button
+              type="button"
+              onClick={() => setFilter({ statusFilter: 'all' })}
+              className={`${styles.filterButton} ${currentStatusFilter === 'all' ? styles.filterActive : ''}`}
+            >
+              All
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter({ statusFilter: 'active' })}
+              className={`${styles.filterButton} ${currentStatusFilter === 'active' ? styles.filterActive : ''}`}
+              title="Show active tasks only"
+            >
+              <Circle size={12} className={styles.btnIcon} />
+              <span>Active</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setFilter({ statusFilter: 'completed' })}
+              className={`${styles.filterButton} ${currentStatusFilter === 'completed' ? styles.filterActive : ''}`}
+              title="Show Done tasks only"
+            >
+              <CheckCircle2 size={12} className={styles.btnIcon} />
+              <span>Done</span>
+            </button>
+          </div>
         </div>
 
         <div className={styles.sortControls}>

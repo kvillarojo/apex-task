@@ -105,6 +105,7 @@ export interface FilterState {
   projectId: string | null;
   tag: string | null;
   priority: Priority | null;
+  statusFilter?: 'all' | 'active' | 'completed';
   searchQuery: string;
   sortBy: 'dueDate' | 'priority' | 'title' | 'createdAt';
   sortOrder: 'asc' | 'desc';

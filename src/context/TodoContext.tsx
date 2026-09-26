@@ -159,6 +159,7 @@ const initialFilter: FilterState = {
   projectId: null,
   tag: null,
   priority: null,
+  statusFilter: 'all',
   searchQuery: '',
   sortBy: 'dueDate',
   sortOrder: 'asc'
@@ -871,6 +872,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setFilterState(prev => ({
       ...prev,
       smartFilter: smart,
+      statusFilter: 'all',
       projectId: null,
       tag: null
     }));
@@ -1109,6 +1111,14 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Priority Filter
     if (filter.priority && task.priority !== filter.priority) {
+      return false;
+    }
+
+    // Status Filter (All / Active (Not Done) / Completed (Done))
+    if (filter.statusFilter === 'active' && task.completed) {
+      return false;
+    }
+    if (filter.statusFilter === 'completed' && !task.completed) {
       return false;
     }
 
