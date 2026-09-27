@@ -13,9 +13,6 @@ import {
   Edit2,
   StickyNote,
   CalendarRange,
-  Kanban,
-  Grid,
-  BarChart3,
   List,
   Sun,
   Moon,
@@ -195,16 +192,6 @@ export const Sidebar: React.FC = () => {
             </button>
 
             <button
-              className={`nav-item ${viewMode === 'kanban' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-              onClick={() => handleViewChange('kanban')}
-            >
-              <div className="nav-item-left">
-                <Kanban size={18} color="#3b82f6" />
-                <span>Kanban</span>
-              </div>
-            </button>
-
-            <button
               className={`nav-item ${viewMode === 'notes' && !filter.projectId && !filter.tag ? 'active' : ''}`}
               onClick={() => handleViewChange('notes')}
             >
@@ -220,26 +207,6 @@ export const Sidebar: React.FC = () => {
             </button>
 
             <button
-              className={`nav-item ${viewMode === 'eisenhower' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-              onClick={() => handleViewChange('eisenhower')}
-            >
-              <div className="nav-item-left">
-                <Grid size={18} color="#f59e0b" />
-                <span>Matrix</span>
-              </div>
-            </button>
-
-            <button
-              className={`nav-item ${viewMode === 'calendar' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-              onClick={() => handleViewChange('calendar')}
-            >
-              <div className="nav-item-left">
-                <Calendar size={18} color="#10b981" />
-                <span>Calendar</span>
-              </div>
-            </button>
-
-            <button
               className={`nav-item ${viewMode === 'timeline' && !filter.projectId && !filter.tag ? 'active' : ''}`}
               onClick={() => handleViewChange('timeline')}
             >
@@ -249,36 +216,7 @@ export const Sidebar: React.FC = () => {
               </div>
             </button>
 
-            <button
-              className={`nav-item ${viewMode === 'analytics' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-              onClick={() => handleViewChange('analytics')}
-            >
-              <div className="nav-item-left">
-                <BarChart3 size={18} color="#06b6d4" />
-                <span>Analytics</span>
-              </div>
-            </button>
-
-            <button
-              className={`nav-item ${pomodoro.isVisible ? 'active' : ''}`}
-              onClick={() => {
-                setPomodoroVisible(!pomodoro.isVisible);
-                if (!pomodoro.isVisible) {
-                  setPomodoroMaximized(false);
-                }
-                setMobileDrawerOpen(false);
-              }}
-            >
-              <div className="nav-item-left">
-                <Timer size={18} color={pomodoro.isRunning ? '#10b981' : '#f43f5e'} />
-                <span>Focus Timer</span>
-              </div>
-              {pomodoro.isRunning && (
-                <span className="nav-badge" style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
-                  {Math.floor(pomodoro.timeLeft / 60)}m
-                </span>
-              )}
-            </button>
+           
           </div>
 
           {/* Smart Filters Navigation */}
