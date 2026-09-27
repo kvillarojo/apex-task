@@ -16,7 +16,8 @@ import {
   Users,
   Download,
   Upload,
-  Command
+  Command,
+  Timer
 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
@@ -38,7 +39,10 @@ export const Header: React.FC = () => {
     exportData,
     importData,
     mobileDrawerOpen,
-    setMobileDrawerOpen
+    setMobileDrawerOpen,
+    pomodoro,
+    setPomodoroVisible,
+    setPomodoroMaximized
   } = useTodo();
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -162,6 +166,22 @@ export const Header: React.FC = () => {
         </div>
 
         <div className={styles.divider} />
+
+        {/* Focus Timer Toggle */}
+        <button
+          className={`icon-button ${pomodoro.isVisible ? 'active' : ''}`}
+          onClick={() => {
+            if (!pomodoro.isVisible) {
+              setPomodoroVisible(true);
+              setPomodoroMaximized(false);
+            } else {
+              setPomodoroVisible(false);
+            }
+          }}
+          title={pomodoro.isRunning ? `Focus Timer (${Math.floor(pomodoro.timeLeft / 60)}m remaining)` : 'Focus Timer'}
+        >
+          <Timer size={18} color={pomodoro.isRunning ? '#10b981' : undefined} />
+        </button>
 
         {/* Sound Toggle */}
         <button

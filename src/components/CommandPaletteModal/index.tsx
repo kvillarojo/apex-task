@@ -19,7 +19,8 @@ export const CommandPaletteModal: React.FC = () => {
     handleSelectProject,
     handleCreateProject,
     handleManageTags,
-    handleToggleTheme
+    handleToggleTheme,
+    handleToggleFocusTimer
   } = useCommandPalette();
 
   return (
@@ -42,6 +43,7 @@ export const CommandPaletteModal: React.FC = () => {
         onCreateProject={handleCreateProject}
         onManageTags={handleManageTags}
         onToggleTheme={handleToggleTheme}
+        onToggleFocusTimer={handleToggleFocusTimer}
       />
     </Modal>
   );

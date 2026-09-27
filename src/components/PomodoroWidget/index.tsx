@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Timer, Settings, Plus, Minus, Check, Edit3, Maximize2, Minimize2, X } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
@@ -44,6 +44,16 @@ export const PomodoroWidget: React.FC = () => {
     ? Math.min(100, Math.max(0, ((currentMaxDuration - pomodoro.timeLeft) / currentMaxDuration) * 100))
     : 0;
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isVisible && isMaximized) {
+        setPomodoroMaximized(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isVisible, isMaximized, setPomodoroMaximized]);
+
   const handleStartEditingTime = () => {
     setEditMinutesInput(String(minutes));
     setIsEditingTime(true);
@@ -64,14 +74,14 @@ export const PomodoroWidget: React.FC = () => {
         type="button"
         onClick={() => {
           setPomodoroVisible(true);
-          setPomodoroMaximized(true);
+          setPomodoroMaximized(false);
         }}
         data-theme-component={ThemeComponent.PomodoroWidget}
         className={styles.floatingBtn}
         style={mergeThemeStyles(ThemeComponent.PomodoroWidget, {})}
-        title="Open Focus Timer"
+        title={pomodoro.isRunning ? `Focus Timer (${timeFormatted})` : 'Open Focus Timer'}
       >
-        <Timer size={26} />
+        <Timer size={24} />
       </button>
     );
   }
@@ -79,89 +89,65 @@ export const PomodoroWidget: React.FC = () => {
   const widgetBody = (
     <>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)' }}>
-          <Timer size={16} />
+      <div className={styles.widgetHeader}>
+        <div className={styles.headerTitle}>
+          <Timer size={isMaximized ? 20 : 16} />
           <span>Focus Timer</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
+        <div className={styles.headerRight}>
+          <span className={styles.sessionBadge}>
             #{pomodoro.totalCompletedSessions + 1}
           </span>
           <button
+            type="button"
+            className={styles.iconBtn}
             onClick={() => setShowSettings(!showSettings)}
-            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
             title="Configure Timer Durations"
           >
-            <Settings size={15} />
+            <Settings size={isMaximized ? 17 : 15} />
           </button>
           <button
+            type="button"
+            className={styles.iconBtn}
             onClick={() => setPomodoroMaximized(!isMaximized)}
-            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
             title={isMaximized ? 'Minimize Focus Timer' : 'Maximize Focus Timer'}
           >
-            {isMaximized ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
+            {isMaximized ? <Minimize2 size={isMaximized ? 17 : 15} /> : <Maximize2 size={15} />}
           </button>
           <button
+            type="button"
+            className={styles.iconBtn}
             onClick={() => {
               setPomodoroVisible(false);
               setPomodoroMaximized(false);
             }}
-            style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
             title="Close Focus Timer"
           >
-            <X size={15} />
+            <X size={isMaximized ? 17 : 15} />
           </button>
         </div>
       </div>
 
       {/* Mode Selector */}
-      <div style={{ display: 'flex', backgroundColor: 'var(--bg-input)', padding: '2px', borderRadius: '8px' }}>
+      <div className={styles.modeSelector}>
         <button
+          type="button"
           onClick={() => setPomodoroMode('work')}
-          style={{
-            flex: 1,
-            padding: '4px',
-            borderRadius: '6px',
-            border: 'none',
-            fontSize: '0.725rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: pomodoro.mode === 'work' ? 'var(--primary)' : 'transparent',
-            color: pomodoro.mode === 'work' ? 'white' : 'var(--text-secondary)'
-          }}
+          className={`${styles.modeBtn} ${pomodoro.mode === 'work' ? styles.activeWork : ''}`}
         >
           Work ({Math.round(pomodoro.workDuration / 60)}m)
         </button>
         <button
+          type="button"
           onClick={() => setPomodoroMode('shortBreak')}
-          style={{
-            flex: 1,
-            padding: '4px',
-            borderRadius: '6px',
-            border: 'none',
-            fontSize: '0.725rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: pomodoro.mode === 'shortBreak' ? '#10b981' : 'transparent',
-            color: pomodoro.mode === 'shortBreak' ? 'white' : 'var(--text-secondary)'
-          }}
+          className={`${styles.modeBtn} ${pomodoro.mode === 'shortBreak' ? styles.activeShortBreak : ''}`}
         >
           Break ({Math.round(pomodoro.shortBreakDuration / 60)}m)
         </button>
         <button
+          type="button"
           onClick={() => setPomodoroMode('longBreak')}
-          style={{
-            flex: 1,
-            padding: '4px',
-            borderRadius: '6px',
-            border: 'none',
-            fontSize: '0.725rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            backgroundColor: pomodoro.mode === 'longBreak' ? '#8b5cf6' : 'transparent',
-            color: pomodoro.mode === 'longBreak' ? 'white' : 'var(--text-secondary)'
-          }}
+          className={`${styles.modeBtn} ${pomodoro.mode === 'longBreak' ? styles.activeLongBreak : ''}`}
         >
           Long ({Math.round(pomodoro.longBreakDuration / 60)}m)
         </button>
@@ -169,39 +155,39 @@ export const PomodoroWidget: React.FC = () => {
 
       {/* Mode Duration Settings Drawer */}
       {showSettings && (
-        <div style={{ padding: '10px', backgroundColor: 'var(--bg-input)', borderRadius: '10px', display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '0.75rem' }}>
-          <div style={{ fontWeight: 700, color: 'var(--text-muted)' }}>CUSTOM DURATION SETTINGS</div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className={styles.settingsDrawer}>
+          <div className={styles.settingsHeading}>CUSTOM DURATION SETTINGS</div>
+          <div className={styles.settingsRow}>
             <span>Work Session (mins):</span>
             <input
               type="number"
               min={1}
               max={180}
+              className={styles.settingsInput}
               value={Math.round(pomodoro.workDuration / 60)}
               onChange={e => setModeDuration('work', parseInt(e.target.value, 10) || 25)}
-              style={{ width: '50px', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}
             />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className={styles.settingsRow}>
             <span>Short Break (mins):</span>
             <input
               type="number"
               min={1}
               max={60}
+              className={styles.settingsInput}
               value={Math.round(pomodoro.shortBreakDuration / 60)}
               onChange={e => setModeDuration('shortBreak', parseInt(e.target.value, 10) || 5)}
-              style={{ width: '50px', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}
             />
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div className={styles.settingsRow}>
             <span>Long Break (mins):</span>
             <input
               type="number"
               min={1}
               max={120}
+              className={styles.settingsInput}
               value={Math.round(pomodoro.longBreakDuration / 60)}
               onChange={e => setModeDuration('longBreak', parseInt(e.target.value, 10) || 15)}
-              style={{ width: '50px', padding: '2px 6px', borderRadius: '4px', border: '1px solid var(--border-color)', backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)' }}
             />
           </div>
         </div>
@@ -209,15 +195,16 @@ export const PomodoroWidget: React.FC = () => {
 
       {/* Active Task Attachment */}
       {activeTask && (
-        <div style={{ fontSize: '0.775rem', color: 'var(--text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          Target: <strong>{activeTask.title}</strong>
+        <div className={styles.taskTarget}>
+          <span style={{ color: 'var(--text-muted)' }}>Focus:</span>
+          <strong>{activeTask.title}</strong>
         </div>
       )}
 
       {/* Countdown Timer Display with Manual Edit Mode */}
-      <div style={{ textAlign: 'center', margin: '4px 0', position: 'relative' }}>
+      <div className={styles.timerWrapper}>
         {isEditingTime ? (
-          <form onSubmit={handleSaveManualTime} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+          <form onSubmit={handleSaveManualTime} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
             <input
               type="number"
               min={0}
@@ -225,113 +212,116 @@ export const PomodoroWidget: React.FC = () => {
               value={editMinutesInput}
               onChange={e => setEditMinutesInput(e.target.value)}
               style={{
-                width: '90px',
-                fontSize: '1.8rem',
+                width: isMaximized ? '130px' : '90px',
+                fontSize: isMaximized ? '2.8rem' : '1.8rem',
                 fontWeight: 800,
                 textAlign: 'center',
                 backgroundColor: 'var(--bg-input)',
                 color: 'var(--text-primary)',
                 border: '1px solid var(--primary)',
-                borderRadius: '8px',
+                borderRadius: '10px',
                 fontFamily: 'monospace'
               }}
               autoFocus
             />
-            <span style={{ fontSize: '1rem', fontWeight: 600 }}>mins</span>
-            <button type="submit" className="btn-primary" style={{ padding: '6px 8px' }}>
-              <Check size={16} />
+            <span style={{ fontSize: isMaximized ? '1.2rem' : '1rem', fontWeight: 700 }}>mins</span>
+            <button type="submit" className="btn-primary" style={{ padding: '8px 12px' }}>
+              <Check size={18} />
             </button>
           </form>
         ) : (
           <div
             onClick={handleStartEditingTime}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-              cursor: 'pointer',
-              padding: '2px 8px',
-              borderRadius: '8px',
-              transition: 'background-color 0.2s'
-            }}
-            className="timer-display-hover"
+            className={styles.timerDisplayHover}
             title="Click to manually edit minutes"
           >
-            <span style={{
-              fontSize: isMaximized ? '4.4rem' : '2.2rem',
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              fontFamily: 'monospace'
-            }}>
+            <span className={styles.timerDigit}>
               {timeFormatted}
             </span>
-            <Edit3 size={isMaximized ? 18 : 14} color="var(--text-muted)" style={{ opacity: 0.6 }} />
+            <Edit3 size={isMaximized ? 20 : 14} color="var(--text-muted)" style={{ opacity: 0.6 }} />
           </div>
         )}
       </div>
 
       {/* Quick Time Adjustment Pills (+5m, +1m, -1m, -5m) */}
-      <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
+      <div className={styles.adjustPills}>
         <button
-          className="btn-secondary"
+          type="button"
+          className={styles.pillBtn}
           onClick={() => adjustTimeLeft(-300)}
           title="Subtract 5 minutes"
-          style={{ padding: '3px 8px', fontSize: '0.7rem' }}
         >
           <Minus size={10} /> 5m
         </button>
         <button
-          className="btn-secondary"
+          type="button"
+          className={styles.pillBtn}
           onClick={() => adjustTimeLeft(-60)}
           title="Subtract 1 minute"
-          style={{ padding: '3px 8px', fontSize: '0.7rem' }}
         >
           <Minus size={10} /> 1m
         </button>
         <button
-          className="btn-secondary"
+          type="button"
+          className={styles.pillBtn}
           onClick={() => adjustTimeLeft(60)}
           title="Add 1 minute"
-          style={{ padding: '3px 8px', fontSize: '0.7rem' }}
         >
           <Plus size={10} /> 1m
         </button>
         <button
-          className="btn-secondary"
+          type="button"
+          className={styles.pillBtn}
           onClick={() => adjustTimeLeft(300)}
           title="Add 5 minutes"
-          style={{ padding: '3px 8px', fontSize: '0.7rem' }}
         >
           <Plus size={10} /> 5m
         </button>
       </div>
 
       {/* Progress Bar */}
-      <div style={{ height: '4px', borderRadius: '2px', backgroundColor: 'var(--bg-input)', overflow: 'hidden' }}>
+      <div className={styles.progressBar}>
         <div
+          className={styles.progressFill}
           style={{
-            height: '100%',
             width: `${progressPct}%`,
-            backgroundColor: pomodoro.mode === 'work' ? 'var(--primary)' : '#10b981',
-            transition: 'width 1s linear'
+            backgroundColor:
+              pomodoro.mode === 'work'
+                ? 'var(--primary)'
+                : pomodoro.mode === 'shortBreak'
+                ? '#10b981'
+                : '#8b5cf6'
           }}
         />
       </div>
 
       {/* Control Buttons */}
-      <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+      <div className={styles.controlsRow}>
         {pomodoro.isRunning ? (
-          <button className="btn-primary" onClick={pausePomodoro} style={{ flex: 1, justifyContent: 'center' }}>
-            <Pause size={16} /> Pause
+          <button
+            type="button"
+            className={`${styles.mainActionBtn} ${styles.isPause}`}
+            onClick={pausePomodoro}
+          >
+            <Pause size={isMaximized ? 20 : 16} /> Pause
           </button>
         ) : (
-          <button className="btn-primary" onClick={() => startPomodoro()} style={{ flex: 1, justifyContent: 'center' }}>
-            <Play size={16} /> Start
+          <button
+            type="button"
+            className={styles.mainActionBtn}
+            onClick={() => startPomodoro()}
+          >
+            <Play size={isMaximized ? 20 : 16} /> Start
           </button>
         )}
 
-        <button className="btn-secondary" onClick={resetPomodoro} title="Reset Timer" style={{ padding: '8px' }}>
-          <RotateCcw size={16} />
+        <button
+          type="button"
+          className={styles.resetBtn}
+          onClick={resetPomodoro}
+          title="Reset Timer"
+        >
+          <RotateCcw size={isMaximized ? 20 : 16} />
         </button>
       </div>
     </>
@@ -341,6 +331,11 @@ export const PomodoroWidget: React.FC = () => {
     <div
       data-theme-component={ThemeComponent.PomodoroWidget}
       className={styles.maxOverlay}
+      onClick={e => {
+        if (e.target === e.currentTarget) {
+          setPomodoroMaximized(false);
+        }
+      }}
       style={mergeThemeStyles(ThemeComponent.PomodoroWidget, {})}
     >
       <div className={styles.maxPanel}>{widgetBody}</div>

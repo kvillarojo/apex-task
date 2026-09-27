@@ -7,6 +7,8 @@ import {
   Calendar,
   CalendarRange,
   BarChart3,
+  StickyNote,
+  Timer,
   Sun,
   Moon,
   Plus,
@@ -38,6 +40,7 @@ interface CommandResultsProps {
   onCreateProject: () => void;
   onManageTags: () => void;
   onToggleTheme: () => void;
+  onToggleFocusTimer: () => void;
 }
 
 export const CommandResults: React.FC<CommandResultsProps> = ({
@@ -49,10 +52,17 @@ export const CommandResults: React.FC<CommandResultsProps> = ({
   onSelectProject,
   onCreateProject,
   onManageTags,
-  onToggleTheme
+  onToggleTheme,
+  onToggleFocusTimer
 }) => (
   <div className={styles.results}>
     <Section title="ACTIONS">
+      <button type="button" className="nav-item" onClick={onToggleFocusTimer}>
+        <div className="nav-item-left">
+          <Timer size={16} color="var(--primary)" />
+          <span>Open Focus Timer (Pomodoro)</span>
+        </div>
+      </button>
       <button type="button" className="nav-item" onClick={onCreateProject}>
         <div className="nav-item-left">
           <Plus size={16} color="var(--primary)" />
@@ -73,6 +83,9 @@ export const CommandResults: React.FC<CommandResultsProps> = ({
       </button>
       <button type="button" className="nav-item" onClick={() => onSelectView('kanban')}>
         <div className="nav-item-left"><Kanban size={16} /> Switch to Kanban Board</div>
+      </button>
+      <button type="button" className="nav-item" onClick={() => onSelectView('notes')}>
+        <div className="nav-item-left"><StickyNote size={16} /> Switch to Notes Workspace</div>
       </button>
       <button type="button" className="nav-item" onClick={() => onSelectView('eisenhower')}>
         <div className="nav-item-left"><Grid size={16} /> Switch to Eisenhower Matrix</div>

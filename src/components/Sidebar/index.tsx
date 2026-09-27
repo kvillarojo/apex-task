@@ -24,6 +24,7 @@ import {
   Users,
   Download,
   Upload,
+  Timer,
   X
 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
@@ -61,7 +62,10 @@ export const Sidebar: React.FC = () => {
     toggleSound,
     openPeopleModal,
     exportData,
-    importData
+    importData,
+    pomodoro,
+    setPomodoroVisible,
+    setPomodoroMaximized
   } = useTodo();
 
   // Smart count calculations
@@ -253,6 +257,27 @@ export const Sidebar: React.FC = () => {
                 <BarChart3 size={18} color="#06b6d4" />
                 <span>Analytics</span>
               </div>
+            </button>
+
+            <button
+              className={`nav-item ${pomodoro.isVisible ? 'active' : ''}`}
+              onClick={() => {
+                setPomodoroVisible(!pomodoro.isVisible);
+                if (!pomodoro.isVisible) {
+                  setPomodoroMaximized(false);
+                }
+                setMobileDrawerOpen(false);
+              }}
+            >
+              <div className="nav-item-left">
+                <Timer size={18} color={pomodoro.isRunning ? '#10b981' : '#f43f5e'} />
+                <span>Focus Timer</span>
+              </div>
+              {pomodoro.isRunning && (
+                <span className="nav-badge" style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
+                  {Math.floor(pomodoro.timeLeft / 60)}m
+                </span>
+              )}
             </button>
           </div>
 
@@ -504,6 +529,22 @@ export const Sidebar: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => {
+                setPomodoroVisible(!pomodoro.isVisible);
+                if (!pomodoro.isVisible) {
+                  setPomodoroMaximized(false);
+                }
+                setMobileDrawerOpen(false);
+              }}
+              title="Focus Timer"
+              style={{ width: '32px', height: '32px' }}
+            >
+              <Timer size={16} color={pomodoro.isRunning ? '#10b981' : undefined} />
+            </button>
+
             <button
               type="button"
               className="icon-button"

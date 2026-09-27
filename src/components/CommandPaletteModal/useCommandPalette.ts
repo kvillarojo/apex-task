@@ -15,7 +15,9 @@ export function useCommandPalette() {
     theme,
     setTheme,
     openCreateProjectModal,
-    openTagModal
+    openTagModal,
+    setPomodoroVisible,
+    setPomodoroMaximized
   } = useTodo();
 
   const [query, setQuery] = useState('');
@@ -84,6 +86,12 @@ export function useCommandPalette() {
     close();
   };
 
+  const handleToggleFocusTimer = () => {
+    setPomodoroVisible(true);
+    setPomodoroMaximized(false);
+    close();
+  };
+
   return {
     open: commandPaletteOpen,
     close,
@@ -97,6 +105,7 @@ export function useCommandPalette() {
     handleSelectProject,
     handleCreateProject,
     handleManageTags,
-    handleToggleTheme
+    handleToggleTheme,
+    handleToggleFocusTimer
   };
 }
