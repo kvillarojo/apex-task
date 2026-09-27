@@ -1,0 +1,92 @@
+.floatingBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 999px;
+  box-shadow: var(--shadow-lg);
+  width: 56px;
+  height: 56px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.floatingBtn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 8px 24px var(--accent-glow);
+}
+
+.widgetContainer {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--bg-modal);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 300px;
+  animation: focusTimerWidgetIn 260ms ease-out forwards;
+}
+
+.maxOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.68);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  animation: focusTimerOverlayIn 280ms ease-out forwards;
+}
+
+.maxPanel {
+  width: min(560px, calc(100vw - 32px));
+  max-height: 90vh;
+  overflow-y: auto;
+  background-color: var(--bg-modal);
+  border: 1px solid var(--border-color);
+  border-radius: 22px;
+  padding: 24px 28px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transform: scale(0.96);
+  opacity: 0;
+  animation: focusTimerCardIn 320ms cubic-bezier(.2, .8, .2, 1) forwards;
+}
+
+@media (max-width: 900px) {
+  .floatingBtn {
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    left: 18px;
+    right: auto;
+    width: 50px;
+    height: 50px;
+  }
+
+  .widgetContainer {
+    bottom: calc(76px + env(safe-area-inset-bottom));
+    left: 14px;
+    right: 14px;
+    width: auto;
+    max-width: calc(100vw - 28px);
+    padding: 14px 16px;
+  }
+
+  .maxPanel {
+    padding: 18px 20px;
+  }
+}

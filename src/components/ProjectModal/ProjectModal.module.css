@@ -78,3 +78,10 @@
   color: var(--text-muted);
   display: flex;
 }
+
+@media (max-width: 600px) {
+  .twoCol {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}

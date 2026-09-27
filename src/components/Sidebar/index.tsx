@@ -13,12 +13,23 @@ import {
   Edit2,
   StickyNote,
   CalendarRange,
+  Kanban,
+  Grid,
+  BarChart3,
+  List,
+  Sun,
+  Moon,
+  Volume2,
+  VolumeX,
+  Users,
+  Download,
+  Upload,
   X
 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
 import { getThemeComponentProps } from '../../theme';
-import type { SmartFilter } from '../../types/todo';
+import type { SmartFilter, ViewMode } from '../../types/todo';
 import { isToday, isUpcoming } from '../../utils/dateUtils';
 import { PROJECT_ICONS } from '../../constants/projectIcons';
 
@@ -43,7 +54,14 @@ export const Sidebar: React.FC = () => {
     taskProjects,
     noteProjects,
     getTagColor,
-    stats
+    stats,
+    theme,
+    setTheme,
+    soundEnabled,
+    toggleSound,
+    openPeopleModal,
+    exportData,
+    importData
   } = useTodo();
 
   // Smart count calculations
@@ -67,8 +85,8 @@ export const Sidebar: React.FC = () => {
     setMobileDrawerOpen(false);
   };
 
-  const handleNotesClick = () => {
-    setViewMode('notes');
+  const handleViewChange = (mode: ViewMode) => {
+    setViewMode(mode);
     setFilter({ projectId: null, tag: null });
     setMobileDrawerOpen(false);
   };
@@ -108,6 +126,24 @@ export const Sidebar: React.FC = () => {
     setMobileDrawerOpen(false);
   };
 
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = event => {
+      const content = event.target?.result as string;
+      if (content) {
+        const success = importData(content);
+        if (success) {
+          alert('Backup restored successfully!');
+        } else {
+          alert('Invalid backup file format.');
+        }
+      }
+    };
+    reader.readAsText(file);
+  };
+
   return (
     <>
       {mobileDrawerOpen && (
@@ -140,13 +176,33 @@ export const Sidebar: React.FC = () => {
         </div>
 
         <div className="sidebar-content">
-          {/* Smart Filters Navigation */}
+          {/* Workspace Views */}
           <div className="nav-section">
             <span className="nav-section-title">Views</span>
 
             <button
+              className={`nav-item ${viewMode === 'list' && !filter.projectId && !filter.tag && filter.smartFilter === 'all' ? 'active' : ''}`}
+              onClick={() => handleViewChange('list')}
+            >
+              <div className="nav-item-left">
+                <List size={18} color="#6366f1" />
+                <span>List</span>
+              </div>
+            </button>
+
+            <button
+              className={`nav-item ${viewMode === 'kanban' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleViewChange('kanban')}
+            >
+              <div className="nav-item-left">
+                <Kanban size={18} color="#3b82f6" />
+                <span>Kanban</span>
+              </div>
+            </button>
+
+            <button
               className={`nav-item ${viewMode === 'notes' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-              onClick={handleNotesClick}
+              onClick={() => handleViewChange('notes')}
             >
               <div className="nav-item-left">
                 <StickyNote size={18} color="#ec4899" />
@@ -160,12 +216,28 @@ export const Sidebar: React.FC = () => {
             </button>
 
             <button
+              className={`nav-item ${viewMode === 'eisenhower' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleViewChange('eisenhower')}
+            >
+              <div className="nav-item-left">
+                <Grid size={18} color="#f59e0b" />
+                <span>Matrix</span>
+              </div>
+            </button>
+
+            <button
+              className={`nav-item ${viewMode === 'calendar' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleViewChange('calendar')}
+            >
+              <div className="nav-item-left">
+                <Calendar size={18} color="#10b981" />
+                <span>Calendar</span>
+              </div>
+            </button>
+
+            <button
               className={`nav-item ${viewMode === 'timeline' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-              onClick={() => {
-                setViewMode('timeline');
-                setFilter({ projectId: null, tag: null });
-                setMobileDrawerOpen(false);
-              }}
+              onClick={() => handleViewChange('timeline')}
             >
               <div className="nav-item-left">
                 <CalendarRange size={18} color="#8b5cf6" />
@@ -174,249 +246,318 @@ export const Sidebar: React.FC = () => {
             </button>
 
             <button
+              className={`nav-item ${viewMode === 'analytics' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleViewChange('analytics')}
+            >
+              <div className="nav-item-left">
+                <BarChart3 size={18} color="#06b6d4" />
+                <span>Analytics</span>
+              </div>
+            </button>
+          </div>
+
+          {/* Smart Filters Navigation */}
+          <div className="nav-section">
+            <span className="nav-section-title">Filters</span>
+
+            <button
               className={`nav-item ${isTaskView && filter.smartFilter === 'inbox' && !filter.projectId && !filter.tag ? 'active' : ''}`}
               onClick={() => handleSmartClick('inbox')}
             >
               <div className="nav-item-left">
                 <Inbox size={18} color="#3b82f6" />
-                <span>Tasks</span>
+                <span>Inbox</span>
               </div>
               {inboxCount > 0 && <span className="nav-badge">{inboxCount}</span>}
             </button>
 
-          <button
-            className={`nav-item ${isTaskView && filter.smartFilter === 'today' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-            onClick={() => handleSmartClick('today')}
-          >
-            <div className="nav-item-left">
-              <Calendar size={18} color="#10b981" />
-              <span>Today</span>
-            </div>
-            {todayCount > 0 && (
-              <span className="nav-badge" style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
-                {todayCount}
-              </span>
-            )}
-          </button>
-
-          <button
-            className={`nav-item ${isTaskView && filter.smartFilter === 'upcoming' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-            onClick={() => handleSmartClick('upcoming')}
-          >
-            <div className="nav-item-left">
-              <Clock size={18} color="#8b5cf6" />
-              <span>Upcoming</span>
-            </div>
-            {upcomingCount > 0 && <span className="nav-badge">{upcomingCount}</span>}
-          </button>
-
-          <button
-            className={`nav-item ${isTaskView && filter.smartFilter === 'important' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-            onClick={() => handleSmartClick('important')}
-          >
-            <div className="nav-item-left">
-              <Star size={18} color="#f59e0b" />
-              <span>Important</span>
-            </div>
-            {importantCount > 0 && (
-              <span className="nav-badge" style={{ backgroundColor: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b' }}>
-                {importantCount}
-              </span>
-            )}
-          </button>
-
-          <button
-            className={`nav-item ${isTaskView && filter.smartFilter === 'completed' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-            onClick={() => handleSmartClick('completed')}
-          >
-            <div className="nav-item-left">
-              <CheckCircle2 size={18} color="#64748b" />
-              <span>Completed</span>
-            </div>
-            <span className="nav-badge">{completedCount}</span>
-          </button>
-
-          <button
-            className={`nav-item ${isTaskView && filter.smartFilter === 'all' && !filter.projectId && !filter.tag ? 'active' : ''}`}
-            onClick={() => handleSmartClick('all')}
-          >
-            <div className="nav-item-left">
-              <ListTodo size={18} color="#6366f1" />
-              <span>All Tasks</span>
-            </div>
-            <span className="nav-badge">{allCount}</span>
-          </button>
-        </div>
-
-        {/* Projects Section */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            <span>Projects</span>
             <button
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-              onClick={openCreateProjectModal}
-              title="Create New Project"
+              className={`nav-item ${isTaskView && filter.smartFilter === 'today' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleSmartClick('today')}
             >
-              <Plus size={16} />
+              <div className="nav-item-left">
+                <Calendar size={18} color="#10b981" />
+                <span>Today</span>
+              </div>
+              {todayCount > 0 && (
+                <span className="nav-badge" style={{ backgroundColor: 'rgba(16, 185, 129, 0.2)', color: '#10b981' }}>
+                  {todayCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              className={`nav-item ${isTaskView && filter.smartFilter === 'upcoming' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleSmartClick('upcoming')}
+            >
+              <div className="nav-item-left">
+                <Clock size={18} color="#8b5cf6" />
+                <span>Upcoming</span>
+              </div>
+              {upcomingCount > 0 && <span className="nav-badge">{upcomingCount}</span>}
+            </button>
+
+            <button
+              className={`nav-item ${isTaskView && filter.smartFilter === 'important' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleSmartClick('important')}
+            >
+              <div className="nav-item-left">
+                <Star size={18} color="#f59e0b" />
+                <span>Important</span>
+              </div>
+              {importantCount > 0 && (
+                <span className="nav-badge" style={{ backgroundColor: 'rgba(245, 158, 11, 0.2)', color: '#f59e0b' }}>
+                  {importantCount}
+                </span>
+              )}
+            </button>
+
+            <button
+              className={`nav-item ${isTaskView && filter.smartFilter === 'completed' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleSmartClick('completed')}
+            >
+              <div className="nav-item-left">
+                <CheckCircle2 size={18} color="#64748b" />
+                <span>Completed</span>
+              </div>
+              <span className="nav-badge">{completedCount}</span>
+            </button>
+
+            <button
+              className={`nav-item ${isTaskView && filter.smartFilter === 'all' && !filter.projectId && !filter.tag ? 'active' : ''}`}
+              onClick={() => handleSmartClick('all')}
+            >
+              <div className="nav-item-left">
+                <ListTodo size={18} color="#6366f1" />
+                <span>All Tasks</span>
+              </div>
+              <span className="nav-badge">{allCount}</span>
             </button>
           </div>
 
-          {visibleProjects.map(project => {
-            const count = viewMode === 'notes'
-              ? notes.filter(note => note.projectId === project.id).length
-              : tasks.filter(task => task.projectId === project.id && !task.completed).length;
-            const isActive = filter.projectId === project.id;
-            const IconComponent = PROJECT_ICONS[project.icon] || Folder;
-
-            return (
-              <div
-                key={project.id}
-                className={`nav-item project-nav-item ${isActive ? 'active' : ''}`}
-                onClick={() => handleProjectClick(project.id)}
-              >
-                <div className="nav-item-left" style={{ minWidth: 0 }}>
-                  <span style={{ color: project.color, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                    <IconComponent size={16} />
-                  </span>
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {project.name}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-                  {count > 0 && <span className="nav-badge">{count}</span>}
-                  
-                  {project.id !== 'inbox' && (
-                    <div className="project-item-actions">
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          openEditProjectModal(project);
-                        }}
-                        className="project-action-btn"
-                        title="Edit Project"
-                      >
-                        <Edit2 size={12} />
-                      </button>
-                      <button
-                        onClick={e => {
-                          e.stopPropagation();
-                          deleteProject(project.id);
-                        }}
-                        className="project-action-btn delete-proj-btn"
-                        title="Delete Project"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Tags Section */}
-        <div className="nav-section">
-          <div className="nav-section-title">
-            <span>{viewMode === 'notes' ? 'Note tags' : 'Tags'}</span>
-            <button
-              style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-              onClick={openTagModal}
-              title="Manage & Create Tags"
-            >
-              <Plus size={16} />
-            </button>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '4px 6px' }}>
-            {visibleTags.length > 0 ? (
-              <div className="sidebar-tags-cloud">
-                {visibleTags.map(tag => {
-                  const count = viewMode === 'notes'
-                    ? notes.filter(note => note.tags.includes(tag)).length
-                    : tasks.filter(task => task.tags.includes(tag) && !task.completed).length;
-                  const isSelected = filter.tag === tag;
-                  const color = getTagColor(tag);
-
-                  return (
-                    <button
-                      key={tag}
-                      type="button"
-                      onClick={() => handleTagClick(tag)}
-                      className={`sidebar-tag-pill ${isSelected ? 'active' : ''}`}
-                      style={{
-                        backgroundColor: isSelected ? color : `${color}18`,
-                        borderColor: isSelected ? color : `${color}40`,
-                        color: isSelected ? '#ffffff' : color
-                      }}
-                      title={`Filter by #${tag}`}
-                    >
-                      <span
-                        style={{
-                          width: '6px',
-                          height: '6px',
-                          borderRadius: '50%',
-                          backgroundColor: isSelected ? '#ffffff' : color,
-                          flexShrink: 0
-                        }}
-                      />
-                      <span>#{tag}</span>
-                      {count > 0 && (
-                        <span
-                          className="sidebar-tag-count"
-                          style={{
-                            backgroundColor: isSelected ? 'rgba(255,255,255,0.25)' : `${color}25`,
-                            color: isSelected ? '#ffffff' : color
-                          }}
-                        >
-                          {count}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            ) : (
+          {/* Projects Section */}
+          <div className="nav-section">
+            <div className="nav-section-title">
+              <span>Projects</span>
               <button
-                type="button"
-                onClick={openTagModal}
-                className="btn-secondary"
-                style={{
-                  fontSize: '0.75rem',
-                  padding: '6px 10px',
-                  width: '100%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  color: 'var(--text-muted)'
-                }}
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                onClick={openCreateProjectModal}
+                title="Create New Project"
               >
-                <Plus size={13} /> Add first tag
+                <Plus size={16} />
               </button>
-            )}
+            </div>
+
+            {visibleProjects.map(project => {
+              const count = viewMode === 'notes'
+                ? notes.filter(note => note.projectId === project.id).length
+                : tasks.filter(task => task.projectId === project.id && !task.completed).length;
+              const isActive = filter.projectId === project.id;
+              const IconComponent = PROJECT_ICONS[project.icon] || Folder;
+
+              return (
+                <div
+                  key={project.id}
+                  className={`nav-item project-nav-item ${isActive ? 'active' : ''}`}
+                  onClick={() => handleProjectClick(project.id)}
+                >
+                  <div className="nav-item-left" style={{ minWidth: 0 }}>
+                    <span style={{ color: project.color, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                      <IconComponent size={16} />
+                    </span>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {project.name}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                    {count > 0 && <span className="nav-badge">{count}</span>}
+
+                    {project.id !== 'inbox' && (
+                      <div className="project-item-actions">
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            openEditProjectModal(project);
+                          }}
+                          className="project-action-btn"
+                          title="Edit Project"
+                        >
+                          <Edit2 size={12} />
+                        </button>
+                        <button
+                          onClick={e => {
+                            e.stopPropagation();
+                            deleteProject(project.id);
+                          }}
+                          className="project-action-btn delete-proj-btn"
+                          title="Delete Project"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Tags Section */}
+          <div className="nav-section">
+            <div className="nav-section-title">
+              <span>{viewMode === 'notes' ? 'Note tags' : 'Tags'}</span>
+              <button
+                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                onClick={openTagModal}
+                title="Manage & Create Tags"
+              >
+                <Plus size={16} />
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '4px 6px' }}>
+              {visibleTags.length > 0 ? (
+                <div className="sidebar-tags-cloud">
+                  {visibleTags.map(tag => {
+                    const count = viewMode === 'notes'
+                      ? notes.filter(note => note.tags.includes(tag)).length
+                      : tasks.filter(task => task.tags.includes(tag) && !task.completed).length;
+                    const isSelected = filter.tag === tag;
+                    const color = getTagColor(tag);
+
+                    return (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => handleTagClick(tag)}
+                        className={`sidebar-tag-pill ${isSelected ? 'active' : ''}`}
+                        style={{
+                          backgroundColor: isSelected ? color : `${color}18`,
+                          borderColor: isSelected ? color : `${color}40`,
+                          color: isSelected ? '#ffffff' : color
+                        }}
+                        title={`Filter by #${tag}`}
+                      >
+                        <span
+                          style={{
+                            width: '6px',
+                            height: '6px',
+                            borderRadius: '50%',
+                            backgroundColor: isSelected ? '#ffffff' : color,
+                            flexShrink: 0
+                          }}
+                        />
+                        <span>#{tag}</span>
+                        {count > 0 && (
+                          <span
+                            className="sidebar-tag-count"
+                            style={{
+                              backgroundColor: isSelected ? 'rgba(255,255,255,0.25)' : `${color}25`,
+                              color: isSelected ? '#ffffff' : color
+                            }}
+                          >
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={openTagModal}
+                  className="btn-secondary"
+                  style={{
+                    fontSize: '0.75rem',
+                    padding: '6px 10px',
+                    width: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    color: 'var(--text-muted)'
+                  }}
+                >
+                  <Plus size={13} /> Add first tag
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Sidebar Footer Stats Preview */}
-      <div style={{ padding: '16px', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-          <span>Completion Rate</span>
-          <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{stats.completionRate}%</span>
+        {/* Sidebar Footer Stats & Mobile Quick Actions */}
+        <div style={{ padding: '14px 16px', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+            <span>Completion Rate</span>
+            <span style={{ fontWeight: 700, color: 'var(--primary)' }}>{stats.completionRate}%</span>
+          </div>
+          <div style={{ height: '6px', borderRadius: '3px', backgroundColor: 'var(--bg-input)', overflow: 'hidden' }}>
+            <div
+              style={{
+                height: '100%',
+                width: `${stats.completionRate}%`,
+                background: 'linear-gradient(90deg, #6366f1, #10b981)',
+                transition: 'width 0.3s ease'
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
+            <button
+              type="button"
+              className="icon-button"
+              onClick={toggleSound}
+              title={soundEnabled ? 'Mute Sounds' : 'Enable Sounds'}
+              style={{ width: '32px', height: '32px' }}
+            >
+              {soundEnabled ? <Volume2 size={16} color="#10b981" /> : <VolumeX size={16} color="var(--text-muted)" />}
+            </button>
+
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => {
+                openPeopleModal();
+                setMobileDrawerOpen(false);
+              }}
+              title="Manage Users"
+              style={{ width: '32px', height: '32px' }}
+            >
+              <Users size={16} />
+            </button>
+
+            <button
+              type="button"
+              className="icon-button"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
+              style={{ width: '32px', height: '32px' }}
+            >
+              {theme === 'dark' ? <Sun size={16} color="#f59e0b" /> : <Moon size={16} color="#6366f1" />}
+            </button>
+
+            <button
+              type="button"
+              className="icon-button"
+              onClick={exportData}
+              title="Export JSON Backup"
+              style={{ width: '32px', height: '32px' }}
+            >
+              <Download size={16} />
+            </button>
+
+            <label
+              className="icon-button"
+              title="Import JSON Backup"
+              style={{ width: '32px', height: '32px', cursor: 'pointer', margin: 0 }}
+            >
+              <Upload size={16} />
+              <input style={{ display: 'none' }} type="file" accept=".json" onChange={handleImportFile} />
+            </label>
+          </div>
         </div>
-        <div style={{ height: '6px', borderRadius: '3px', backgroundColor: 'var(--bg-input)', overflow: 'hidden' }}>
-          <div
-            style={{
-              height: '100%',
-              width: `${stats.completionRate}%`,
-              background: 'linear-gradient(90deg, #6366f1, #10b981)',
-              transition: 'width 0.3s ease'
-            }}
-          />
-        </div>
-      </div>
-    </aside>
-  </>
+      </aside>
+    </>
   );
 };

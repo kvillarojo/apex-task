@@ -3,6 +3,7 @@ import { Play, Pause, RotateCcw, Timer, Settings, Plus, Minus, Check, Edit3, Max
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
 import { mergeThemeStyles } from '../../theme';
+import styles from './PomodoroWidget.module.css';
 
 export const PomodoroWidget: React.FC = () => {
   const {
@@ -33,110 +34,50 @@ export const PomodoroWidget: React.FC = () => {
   const isVisible = pomodoro.isVisible;
 
   const currentMaxDuration =
-   pomodoro.mode === 'work'
-     ? pomodoro.workDuration
-     : pomodoro.mode === 'shortBreak'
-     ? pomodoro.shortBreakDuration
-     : pomodoro.longBreakDuration;
+    pomodoro.mode === 'work'
+      ? pomodoro.workDuration
+      : pomodoro.mode === 'shortBreak'
+      ? pomodoro.shortBreakDuration
+      : pomodoro.longBreakDuration;
 
   const progressPct = currentMaxDuration > 0
-   ? Math.min(100, Math.max(0, ((currentMaxDuration - pomodoro.timeLeft) / currentMaxDuration) * 100))
-   : 0;
+    ? Math.min(100, Math.max(0, ((currentMaxDuration - pomodoro.timeLeft) / currentMaxDuration) * 100))
+    : 0;
 
   const handleStartEditingTime = () => {
-   setEditMinutesInput(String(minutes));
-   setIsEditingTime(true);
+    setEditMinutesInput(String(minutes));
+    setIsEditingTime(true);
   };
 
   const handleSaveManualTime = (e: React.FormEvent) => {
-   e.preventDefault();
-   const parsedMins = parseInt(editMinutesInput, 10);
-   if (!isNaN(parsedMins) && parsedMins >= 0) {
-     setCustomTimeLeft(parsedMins * 60);
-   }
-   setIsEditingTime(false);
-  };
-
-  const normalWidgetStyle = {
-   position: 'fixed' as const,
-   bottom: '24px',
-   right: '24px',
-   backgroundColor: 'var(--bg-modal)',
-   border: '1px solid var(--border-color)',
-   borderRadius: '16px',
-   padding: '16px 20px',
-   boxShadow: 'var(--shadow-lg)',
-   zIndex: 50,
-   display: 'flex',
-   flexDirection: 'column' as const,
-   gap: '10px',
-   width: '300px'
-  };
-
-  const floatingIconStyle = {
-   position: 'fixed' as const,
-   bottom: '24px',
-   right: '24px',
-   backgroundColor: 'var(--primary)',
-   color: 'white',
-   border: 'none',
-   borderRadius: '999px',
-   boxShadow: 'var(--shadow-lg)',
-   width: '56px',
-   height: '56px',
-   zIndex: 50,
-   display: 'flex',
-   alignItems: 'center',
-   justifyContent: 'center',
-   cursor: 'pointer'
-  };
-
-  const maxOverlayStyle = {
-   position: 'fixed' as const,
-   inset: '0',
-   backgroundColor: 'rgba(0, 0, 0, 0.68)',
-   backdropFilter: 'blur(2px)',
-   display: 'flex',
-   alignItems: 'center',
-   justifyContent: 'center',
-   zIndex: 60,
-   animation: 'focusTimerOverlayIn 280ms ease-out forwards'
-  };
-
-  const maxPanelStyle = {
-   width: 'min(560px, calc(100vw - 48px))',
-   backgroundColor: 'var(--bg-modal)',
-   border: '1px solid var(--border-color)',
-   borderRadius: '22px',
-   padding: '24px 28px',
-   boxShadow: 'var(--shadow-lg)',
-   display: 'flex',
-   flexDirection: 'column' as const,
-   gap: '12px',
-   transform: 'scale(0.96)',
-   opacity: 0,
-   animation: 'focusTimerCardIn 320ms cubic-bezier(.2,.8,.2,1) forwards'
+    e.preventDefault();
+    const parsedMins = parseInt(editMinutesInput, 10);
+    if (!isNaN(parsedMins) && parsedMins >= 0) {
+      setCustomTimeLeft(parsedMins * 60);
+    }
+    setIsEditingTime(false);
   };
 
   if (!isVisible) {
-   return (
-     <button
-       type="button"
-       onClick={() => {
-         setPomodoroVisible(true);
-         setPomodoroMaximized(true);
-       }}
-       data-theme-component={ThemeComponent.PomodoroWidget}
-       style={mergeThemeStyles(ThemeComponent.PomodoroWidget, floatingIconStyle)}
-       title="Open Focus Timer"
-     >
-       <Timer size={26} />
-     </button>
-   );
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setPomodoroVisible(true);
+          setPomodoroMaximized(true);
+        }}
+        data-theme-component={ThemeComponent.PomodoroWidget}
+        className={styles.floatingBtn}
+        style={mergeThemeStyles(ThemeComponent.PomodoroWidget, {})}
+        title="Open Focus Timer"
+      >
+        <Timer size={26} />
+      </button>
+    );
   }
 
   const widgetBody = (
-   <>
+    <>
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.85rem', fontWeight: 700, color: 'var(--primary)' }}>
@@ -388,30 +329,29 @@ export const PomodoroWidget: React.FC = () => {
             <Play size={16} /> Start
           </button>
         )}
- 
+
         <button className="btn-secondary" onClick={resetPomodoro} title="Reset Timer" style={{ padding: '8px' }}>
           <RotateCcw size={16} />
         </button>
       </div>
     </>
- );
+  );
 
- return isMaximized ? (
-   <div
-     data-theme-component={ThemeComponent.PomodoroWidget}
-     style={mergeThemeStyles(ThemeComponent.PomodoroWidget, maxOverlayStyle)}
-   >
-     <div style={maxPanelStyle}>{widgetBody}</div>
-   </div>
- ) : (
-   <div
-     data-theme-component={ThemeComponent.PomodoroWidget}
-     style={mergeThemeStyles(ThemeComponent.PomodoroWidget, {
-       ...normalWidgetStyle,
-       animation: 'focusTimerWidgetIn 260ms ease-out forwards'
-     })}
-   >
-     {widgetBody}
-   </div>
- );
+  return isMaximized ? (
+    <div
+      data-theme-component={ThemeComponent.PomodoroWidget}
+      className={styles.maxOverlay}
+      style={mergeThemeStyles(ThemeComponent.PomodoroWidget, {})}
+    >
+      <div className={styles.maxPanel}>{widgetBody}</div>
+    </div>
+  ) : (
+    <div
+      data-theme-component={ThemeComponent.PomodoroWidget}
+      className={styles.widgetContainer}
+      style={mergeThemeStyles(ThemeComponent.PomodoroWidget, {})}
+    >
+      {widgetBody}
+    </div>
+  );
 };

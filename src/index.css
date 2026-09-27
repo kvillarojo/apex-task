@@ -402,6 +402,27 @@ body {
   background-color: var(--primary-light);
 }
 
+@media (max-width: 1280px) {
+  .view-btn {
+    padding: 6px 8px;
+  }
+  .view-btn span {
+    display: none;
+  }
+  .search-box {
+    width: 220px;
+  }
+}
+
+@media (max-width: 1060px) {
+  .search-box {
+    width: 160px;
+  }
+  .cmd-palette-btn span {
+    display: none;
+  }
+}
+
 /* Page Body Container */
 .page-container {
   flex: 1;
@@ -690,9 +711,13 @@ body {
 /* Kanban Board */
 .kanban-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(260px, 1fr));
   gap: 16px;
   height: 100%;
+  min-height: 0;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .kanban-column {
@@ -723,7 +748,18 @@ body {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   gap: 16px;
-  height: 600px;
+  height: 100%;
+  min-height: 520px;
+}
+
+@media (max-width: 768px) {
+  .matrix-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    height: auto;
+    min-height: 0;
+    gap: 14px;
+  }
 }
 
 .matrix-quadrant {

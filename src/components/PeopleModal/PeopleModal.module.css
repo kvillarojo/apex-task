@@ -91,3 +91,10 @@
   display: flex;
   gap: 4px;
 }
+
+@media (max-width: 600px) {
+  .form {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
