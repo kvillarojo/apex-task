@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Plus, X, Maximize2 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import type { TaskStatus, Task } from '../../types/todo';
 import { TaskItem } from '../TaskItem';
+import { TaskInput } from '../TaskInput';
 import { ThemeComponent } from '../../constants/enums';
-import { getThemeComponentProps } from '../../theme';
+import { getThemeComponentProps, mergeThemeStyles } from '../../theme';
 import styles from './KanbanView.module.css';
 
 const COLUMNS: { status: TaskStatus; label: string; color: string }[] = [
@@ -14,7 +16,9 @@ const COLUMNS: { status: TaskStatus; label: string; color: string }[] = [
 ];
 
 export const KanbanView: React.FC = () => {
-  const { filteredTasks, moveTaskStatus } = useTodo();
+  const { filteredTasks, moveTaskStatus, openCreateTaskModal, pomodoro, filter } = useTodo();
+  const [showQuickCreate, setShowQuickCreate] = useState(false);
+  const [quickCreateStatus, setQuickCreateStatus] = useState<TaskStatus>('todo');
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -27,6 +31,23 @@ export const KanbanView: React.FC = () => {
       moveTaskStatus(taskId, status);
     }
   };
+
+  const handleOpenQuickCreate = (status: TaskStatus = 'todo') => {
+    setQuickCreateStatus(status);
+    setShowQuickCreate(true);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showQuickCreate) {
+        setShowQuickCreate(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showQuickCreate]);
+
+  const isPomodoroOpen = pomodoro.isVisible && !pomodoro.isMaximized;
 
   return (
     <div {...getThemeComponentProps(ThemeComponent.KanbanView)} className="kanban-grid">
@@ -44,7 +65,18 @@ export const KanbanView: React.FC = () => {
                 <span className={styles.columnDot} style={{ backgroundColor: col.color }} />
                 <span>{col.label}</span>
               </div>
-              <span className="nav-badge">{columnTasks.length}</span>
+              <div className={styles.columnHeaderRight}>
+                <span className="nav-badge">{columnTasks.length}</span>
+                <button
+                  type="button"
+                  className={styles.columnAddBtn}
+                  onClick={() => handleOpenQuickCreate(col.status)}
+                  title={`Add task to ${col.label}`}
+                  aria-label={`Add task to ${col.label}`}
+                >
+                  <Plus size={14} />
+                </button>
+              </div>
             </div>
 
             <div className={`kanban-task-list ${styles.taskList}`}>
@@ -68,6 +100,79 @@ export const KanbanView: React.FC = () => {
           </div>
         );
       })}
+
+      {/* Quick Create Task Popover Card (Same TaskInput feature as ListView) */}
+      {showQuickCreate && (
+        <>
+          <div className={styles.quickCreateBackdrop} onClick={() => setShowQuickCreate(false)} />
+          <div
+            data-theme-component={ThemeComponent.KanbanView}
+            className={`${styles.quickCreateCard} ${isPomodoroOpen ? styles.pomodoroOpen : ''}`}
+            style={mergeThemeStyles(ThemeComponent.KanbanView, {})}
+          >
+            <div className={styles.quickCreateCardHeader}>
+              <div className={styles.quickCreateCardTitle}>
+                <Plus size={16} color="var(--primary)" />
+                <span>Quick Create Task</span>
+                <select
+                  value={quickCreateStatus}
+                  onChange={e => setQuickCreateStatus(e.target.value as TaskStatus)}
+                  className={styles.statusSelect}
+                >
+                  {COLUMNS.map(col => (
+                    <option key={col.status} value={col.status}>
+                      {col.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.quickCreateHeaderActions}>
+                <button
+                  type="button"
+                  className={styles.headerActionBtn}
+                  onClick={() => {
+                    setShowQuickCreate(false);
+                    openCreateTaskModal({ status: quickCreateStatus, projectId: filter.projectId || 'inbox' });
+                  }}
+                  title="Open full ticket details modal"
+                  aria-label="Open full ticket details modal"
+                >
+                  <Maximize2 size={14} />
+                </button>
+                <button
+                  type="button"
+                  className={styles.headerActionBtn}
+                  onClick={() => setShowQuickCreate(false)}
+                  title="Close quick create"
+                  aria-label="Close quick create"
+                >
+                  <X size={15} />
+                </button>
+              </div>
+            </div>
+
+            <TaskInput
+              autoFocus
+              defaultStatus={quickCreateStatus}
+              defaultProjectId={filter.projectId || 'inbox'}
+              onCreated={() => setShowQuickCreate(false)}
+            />
+          </div>
+        </>
+      )}
+
+      {/* Quick Create Task Ticket Button (Floating on top of Pomodoro) */}
+      <button
+        type="button"
+        onClick={() => handleOpenQuickCreate('todo')}
+        data-theme-component={ThemeComponent.KanbanView}
+        className={`${styles.quickCreateBtn} ${isPomodoroOpen ? styles.pomodoroOpen : ''}`}
+        style={mergeThemeStyles(ThemeComponent.KanbanView, {})}
+        title="Quick Create Task"
+        aria-label="Quick Create Task"
+      >
+        <Plus size={24} className={styles.quickCreateIcon} />
+      </button>
     </div>
   );
 };

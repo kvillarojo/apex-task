@@ -51,11 +51,15 @@ interface TodoContextType {
   mobileDrawerOpen: boolean;
 
   // Task Actions
-  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => void;
+  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => Task;
   updateTask: (id: string, updates: Partial<Task>) => void;
   deleteTask: (id: string) => void;
   toggleTaskComplete: (id: string) => void;
   moveTaskStatus: (id: string, newStatus: TaskStatus) => void;
+  openCreateTaskModal: (initialValues?: Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>>) => void;
+  openEditTaskModal: (task: Task) => void;
+  closeTaskModal: () => void;
+  taskModalOpen: boolean;
 
   // Note Actions
   addNote: (note: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => Note;
@@ -193,8 +197,70 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [tagDefinitions, setTagDefinitions] = useState<TagDefinition[]>(loadTagDefinitionsFromStorage);
   const [tagModalOpen, setTagModalOpen] = useState<boolean>(false);
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
-  const editingTask = editingTaskId ? (tasks.find(t => t.id === editingTaskId) ?? null) : null;
-  const setEditingTask = (task: Task | null) => setEditingTaskId(task?.id ?? null);
+  const [draftTask, setDraftTask] = useState<Task | null>(null);
+  const [taskModalOpen, setTaskModalOpen] = useState<boolean>(false);
+
+  const editingTask = draftTask
+    ? draftTask
+    : editingTaskId
+    ? (tasks.find(t => t.id === editingTaskId) ?? null)
+    : null;
+
+  const setEditingTask = (task: Task | null) => {
+    if (!task) {
+      setEditingTaskId(null);
+      setDraftTask(null);
+      setTaskModalOpen(false);
+    } else if (task.id) {
+      setEditingTaskId(task.id);
+      setDraftTask(null);
+      setTaskModalOpen(true);
+    } else {
+      setEditingTaskId(null);
+      setDraftTask(task);
+      setTaskModalOpen(true);
+    }
+  };
+
+  const openCreateTaskModal = (initialValues?: Partial<Omit<Task, 'id' | 'createdAt' | 'updatedAt'>>) => {
+    const activeProject = initialValues?.projectId ?? (filter.projectId || 'inbox');
+    const draft: Task = {
+      id: 'draft-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+      title: initialValues?.title || '',
+      description: initialValues?.description || '',
+      completed: initialValues?.status === 'done',
+      status: initialValues?.status || 'todo',
+      priority: initialValues?.priority || 'p4',
+      startDate: initialValues?.startDate,
+      startTime: initialValues?.startTime,
+      dueDate: initialValues?.dueDate,
+      dueTime: initialValues?.dueTime,
+      recurring: initialValues?.recurring || 'none',
+      projectId: activeProject,
+      assigneeId: initialValues?.assigneeId || '',
+      tags: initialValues?.tags ? [...initialValues.tags] : (filter.tag ? [filter.tag] : []),
+      subtasks: initialValues?.subtasks ? [...initialValues.subtasks] : [],
+      comments: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    setEditingTaskId(null);
+    setDraftTask(draft);
+    setTaskModalOpen(true);
+  };
+
+  const openEditTaskModal = (task: Task) => {
+    setEditingTaskId(task.id);
+    setDraftTask(null);
+    setTaskModalOpen(true);
+  };
+
+  const closeTaskModal = () => {
+    setEditingTaskId(null);
+    setDraftTask(null);
+    setTaskModalOpen(false);
+  };
+
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [noteModalOpen, setNoteModalOpen] = useState<boolean>(false);
   const [activeAlert, setActiveAlert] = useState<ActiveReminderAlert | null>(null);
@@ -262,7 +328,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [pomodoro.isRunning, pomodoro.timeLeft, pomodoro.mode, pomodoro.activeTaskId]);
 
   // Task Actions
-  const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Task => {
     const newTask: Task = {
       ...taskData,
       comments: taskData.comments ?? [],
@@ -272,6 +338,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     setTasks(prev => [newTask, ...prev]);
     soundEffects.playClickSound();
+    return newTask;
   };
 
   const updateTask = (id: string, updates: Partial<Task>) => {
@@ -1189,6 +1256,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         soundEnabled,
         pomodoro,
         editingTask,
+        taskModalOpen,
         editingNote,
         noteModalOpen,
         commandPaletteOpen,
@@ -1199,6 +1267,9 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         deleteTask,
         toggleTaskComplete,
         moveTaskStatus,
+        openCreateTaskModal,
+        openEditTaskModal,
+        closeTaskModal,
         addNote,
         updateNote,
         deleteNote,

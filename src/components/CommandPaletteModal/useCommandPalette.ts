@@ -14,6 +14,7 @@ export function useCommandPalette() {
     setFilter,
     theme,
     setTheme,
+    openCreateTaskModal,
     openCreateProjectModal,
     openTagModal,
     setPomodoroVisible,
@@ -71,6 +72,11 @@ export function useCommandPalette() {
     close();
   };
 
+  const handleCreateTask = () => {
+    close();
+    openCreateTaskModal();
+  };
+
   const handleCreateProject = () => {
     close();
     openCreateProjectModal();
@@ -103,6 +109,7 @@ export function useCommandPalette() {
     handleSelectTask,
     handleSelectView,
     handleSelectProject,
+    handleCreateTask,
     handleCreateProject,
     handleManageTags,
     handleToggleTheme,

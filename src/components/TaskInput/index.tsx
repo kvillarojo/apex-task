@@ -15,16 +15,34 @@ import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
 import { getThemeComponentProps } from '../../theme';
 import { parseNaturalLanguageTask } from '../../utils/naturalLanguageParser';
-import type { Priority, RecurrenceRule } from '../../types/todo';
+import type { Priority, RecurrenceRule, TaskStatus } from '../../types/todo';
 import styles from './TaskInput.module.css';
 
-export const TaskInput: React.FC = () => {
+interface TaskInputProps {
+  defaultStatus?: TaskStatus;
+  defaultProjectId?: string;
+  onCreated?: () => void;
+  autoFocus?: boolean;
+  className?: string;
+  placeholder?: string;
+}
+
+export const TaskInput: React.FC<TaskInputProps> = ({
+  defaultStatus = 'todo',
+  defaultProjectId,
+  onCreated,
+  autoFocus = false,
+  className = '',
+  placeholder = "Add task... try 'Buy groceries tomorrow at 5pm p1 #shopping @personal'"
+}) => {
   const { addTask, projects, assignees, filter } = useTodo();
 
   const [rawText, setRawText] = useState('');
   const [description, setDescription] = useState('');
   const [selectedPriority, setSelectedPriority] = useState<Priority>('p4');
-  const [selectedProjectId, setSelectedProjectId] = useState<string>(filter.projectId || 'inbox');
+  const [selectedProjectId, setSelectedProjectId] = useState<string>(
+    defaultProjectId || filter.projectId || 'inbox'
+  );
   const [selectedAssigneeId, setSelectedAssigneeId] = useState<string>('');
   const [selectedDueDate, setSelectedDueDate] = useState<string>('');
   const [selectedDueTime, setSelectedDueTime] = useState<string>('');
@@ -33,8 +51,8 @@ export const TaskInput: React.FC = () => {
 
   // Keep selectedProjectId in sync when active filter project changes
   useEffect(() => {
-    setSelectedProjectId(filter.projectId || 'inbox');
-  }, [filter.projectId]);
+    setSelectedProjectId(defaultProjectId || filter.projectId || 'inbox');
+  }, [defaultProjectId, filter.projectId]);
 
   // Live Natural Language Parsing
   const parsed = useMemo(() => {
@@ -61,8 +79,8 @@ export const TaskInput: React.FC = () => {
     addTask({
       title: titleToUse,
       description: description.trim() || undefined,
-      completed: false,
-      status: 'todo',
+      completed: defaultStatus === 'done',
+      status: defaultStatus,
       priority: finalPriority,
       dueDate: finalDueDate || undefined,
       dueTime: finalDueTime || undefined,
@@ -78,16 +96,21 @@ export const TaskInput: React.FC = () => {
     setRawText('');
     setDescription('');
     setSelectedPriority('p4');
-    setSelectedProjectId(filter.projectId || 'inbox');
+    setSelectedProjectId(defaultProjectId || filter.projectId || 'inbox');
     setSelectedAssigneeId('');
     setSelectedDueDate('');
     setSelectedDueTime('');
     setSelectedRecurring('none');
     setShowDetails(false);
+    onCreated?.();
   };
 
   return (
-    <form {...getThemeComponentProps(ThemeComponent.TaskInput)} className="task-input-card" onSubmit={handleSubmit}>
+    <form
+      {...getThemeComponentProps(ThemeComponent.TaskInput)}
+      className={`task-input-card ${className}`}
+      onSubmit={handleSubmit}
+    >
       <div className="task-input-main">
         <button type="submit" className={`btn-primary ${styles.submitButton}`}>
           <Plus size={20} />
@@ -95,9 +118,10 @@ export const TaskInput: React.FC = () => {
 
         <input
           type="text"
-          placeholder="Add task... try 'Buy groceries tomorrow at 5pm p1 #shopping @personal'"
+          placeholder={placeholder}
           value={rawText}
           onChange={e => setRawText(e.target.value)}
+          autoFocus={autoFocus}
         />
 
         <button

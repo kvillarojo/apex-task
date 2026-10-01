@@ -17,6 +17,7 @@ export const CommandPaletteModal: React.FC = () => {
     handleSelectTask,
     handleSelectView,
     handleSelectProject,
+    handleCreateTask,
     handleCreateProject,
     handleManageTags,
     handleToggleTheme,
@@ -40,6 +41,7 @@ export const CommandPaletteModal: React.FC = () => {
         onSelectView={handleSelectView}
         onSelectTask={handleSelectTask}
         onSelectProject={handleSelectProject}
+        onCreateTask={handleCreateTask}
         onCreateProject={handleCreateProject}
         onManageTags={handleManageTags}
         onToggleTheme={handleToggleTheme}

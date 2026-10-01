@@ -38,13 +38,13 @@ function formFromTask(task: Task): TaskFormState {
   };
 }
 
-function emptyForm(): TaskFormState {
+function emptyForm(defaultProjectId: string = 'inbox'): TaskFormState {
   return {
     title: '',
     description: '',
     priority: 'p4',
     status: 'todo',
-    projectId: '',
+    projectId: defaultProjectId,
     assigneeId: '',
     startDate: '',
     startTime: '',
@@ -96,20 +96,24 @@ export function useTaskDetailModal() {
   const {
     editingTask,
     setEditingTask,
+    addTask,
     updateTask,
     deleteTask,
     projects,
     assignees,
     addSubtask,
-    toggleSubtask,
-    deleteSubtask,
+    toggleSubtask: contextToggleSubtask,
+    deleteSubtask: contextDeleteSubtask,
     addComment,
     updateComment,
     deleteComment,
     allTags,
     getTagColor,
+    filter,
     requestNotificationPermission
   } = useTodo();
+
+  const isNew = !editingTask || !editingTask.id || editingTask.id.startsWith('draft-');
 
   const [title, setTitle] = useState(editingTask?.title || '');
   const [description, setDescription] = useState(editingTask?.description || '');
@@ -124,13 +128,14 @@ export function useTaskDetailModal() {
   const [recurring, setRecurring] = useState<RecurrenceRule>(editingTask?.recurring || 'none');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState<string[]>(editingTask?.tags || []);
+  const [draftSubtasks, setDraftSubtasks] = useState(editingTask?.subtasks ? [...editingTask.subtasks] : []);
   const [newSubtaskTitle, setNewSubtaskTitle] = useState('');
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle');
   const [notificationsEnabled, setNotificationsEnabled] = useState(
     () => typeof Notification !== 'undefined' && Notification.permission === 'granted'
   );
 
-  const taskId = editingTask?.id ?? null;
+  const taskId = editingTask?.id || null;
   const formRef = useRef<TaskFormState>(emptyForm());
   const lastSavedRef = useRef('');
   const skipAutosaveRef = useRef(true);
@@ -160,7 +165,7 @@ export function useTaskDetailModal() {
   // Hydrate local form only when switching tickets — not after each autosave write.
   useEffect(() => {
     if (!editingTask) {
-      const blank = emptyForm();
+      const blank = emptyForm(filter.projectId || 'inbox');
       setTitle(blank.title);
       setDescription(blank.description);
       setPriority(blank.priority);
@@ -173,6 +178,7 @@ export function useTaskDetailModal() {
       setDueTime(blank.dueTime);
       setRecurring(blank.recurring);
       setTags(blank.tags);
+      setDraftSubtasks([]);
       setTagInput('');
       setNewSubtaskTitle('');
       setSaveStatus('idle');
@@ -186,7 +192,7 @@ export function useTaskDetailModal() {
     setDescription(form.description);
     setPriority(form.priority);
     setStatus(form.status);
-    setProjectId(form.projectId);
+    setProjectId(form.projectId || filter.projectId || 'inbox');
     setAssigneeId(form.assigneeId);
     setStartDate(form.startDate);
     setStartTime(form.startTime);
@@ -194,18 +200,19 @@ export function useTaskDetailModal() {
     setDueTime(form.dueTime);
     setRecurring(form.recurring);
     setTags(form.tags);
+    setDraftSubtasks(editingTask.subtasks ? [...editingTask.subtasks] : []);
     setTagInput('');
     setNewSubtaskTitle('');
     setSaveStatus('idle');
     lastSavedRef.current = serializeForm(form);
     skipAutosaveRef.current = true;
-    // Intentionally depend on id only so context updates from autosave don't reset the form.
+    // Intentionally depend on id and isNew only so context updates from autosave don't reset the form.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [taskId]);
 
   const persistForm = (form: TaskFormState): boolean => {
     const id = taskIdRef.current;
-    if (!id) return false;
+    if (!id || isNew) return false;
     const updates = buildUpdates(form, completedAtRef.current);
     if (!updates) return false;
     const snapshot = serializeForm(form);
@@ -225,9 +232,9 @@ export function useTaskDetailModal() {
     }
   };
 
-  // Debounced autosave while the ticket is open.
+  // Debounced autosave while the ticket is open (only for existing tasks).
   useEffect(() => {
-    if (!taskId) return;
+    if (!taskId || isNew) return;
 
     if (skipAutosaveRef.current) {
       skipAutosaveRef.current = false;
@@ -265,12 +272,15 @@ export function useTaskDetailModal() {
     };
   }, [
     taskId,
+    isNew,
     title,
     description,
     priority,
     status,
     projectId,
     assigneeId,
+    startDate,
+    startTime,
     dueDate,
     dueTime,
     recurring,
@@ -293,17 +303,49 @@ export function useTaskDetailModal() {
     setEditingTask(null);
   };
 
-  const completedSubtasksCount = editingTask?.subtasks.filter(subtask => subtask.completed).length ?? 0;
-  const totalSubtasksCount = editingTask?.subtasks.length ?? 0;
+  const currentSubtasks = isNew ? draftSubtasks : (editingTask?.subtasks ?? []);
+  const completedSubtasksCount = currentSubtasks.filter(subtask => subtask.completed).length;
+  const totalSubtasksCount = currentSubtasks.length;
   const subtasksPercent =
     totalSubtasksCount > 0 ? Math.round((completedSubtasksCount / totalSubtasksCount) * 100) : 0;
 
   const handleSave = () => {
-    close();
+    if (isNew) {
+      const trimmedTitle = title.trim();
+      if (!trimmedTitle) {
+        close();
+        return;
+      }
+      const targetProject = projectId || editingTask?.projectId || filter.projectId || 'inbox';
+      addTask({
+        title: trimmedTitle,
+        description: description.trim() || undefined,
+        priority,
+        status,
+        completed: status === 'done',
+        completedAt: status === 'done' ? new Date().toISOString() : undefined,
+        projectId: targetProject,
+        assigneeId: assigneeId || undefined,
+        startDate: startDate || undefined,
+        startTime: startTime || undefined,
+        dueDate: dueDate || undefined,
+        dueTime: dueTime || undefined,
+        recurring,
+        tags,
+        subtasks: draftSubtasks,
+        comments: []
+      });
+      close();
+    } else {
+      close();
+    }
   };
 
   const handleDelete = () => {
-    if (!editingTask) return;
+    if (!editingTask || isNew) {
+      close();
+      return;
+    }
     if (saveTimerRef.current) {
       clearTimeout(saveTimerRef.current);
       saveTimerRef.current = null;
@@ -319,13 +361,41 @@ export function useTaskDetailModal() {
 
   const handleAddSubtask = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!editingTask || !newSubtaskTitle.trim()) return;
-    addSubtask(editingTask.id, newSubtaskTitle.trim());
+    if (!newSubtaskTitle.trim()) return;
+    if (isNew) {
+      const newSub = {
+        id: 'sub-' + Date.now() + '-' + Math.random().toString(36).substring(2, 5),
+        title: newSubtaskTitle.trim(),
+        completed: false
+      };
+      setDraftSubtasks(prev => [...prev, newSub]);
+    } else if (editingTask) {
+      addSubtask(editingTask.id, newSubtaskTitle.trim());
+    }
     setNewSubtaskTitle('');
+  };
+
+  const toggleSubtask = (tId: string, subtaskId: string) => {
+    if (isNew) {
+      setDraftSubtasks(prev =>
+        prev.map(st => (st.id === subtaskId ? { ...st, completed: !st.completed } : st))
+      );
+    } else {
+      contextToggleSubtask(tId, subtaskId);
+    }
+  };
+
+  const deleteSubtask = (tId: string, subtaskId: string) => {
+    if (isNew) {
+      setDraftSubtasks(prev => prev.filter(st => st.id !== subtaskId));
+    } else {
+      contextDeleteSubtask(tId, subtaskId);
+    }
   };
 
   return {
     open: Boolean(editingTask),
+    isNew,
     editingTask,
     close,
     title,
@@ -354,6 +424,7 @@ export function useTaskDetailModal() {
     setTagInput,
     tags,
     setTags,
+    subtasks: currentSubtasks,
     newSubtaskTitle,
     setNewSubtaskTitle,
     projects,

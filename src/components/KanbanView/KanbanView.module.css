@@ -1,6 +1,283 @@
-.columnTitle { display: flex; align-items: center; gap: 8px; }
-.columnDot { width: 8px; height: 8px; border-radius: 50%; }
-.taskList { display: flex; flex: 1; flex-direction: column; gap: 10px; overflow-y: auto; }
-.draggableTask { cursor: grab; }
-.draggableTask:active { cursor: grabbing; }
-.emptyColumn { border: 1px dashed var(--border-color); border-radius: 8px; padding: 24px; color: var(--text-muted); font-size: .8rem; text-align: center; }
+.columnTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.columnDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.columnHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.columnAddBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-input);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.columnAddBtn:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+  transform: scale(1.05);
+}
+
+.taskList {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.draggableTask {
+  cursor: grab;
+}
+
+.draggableTask:active {
+  cursor: grabbing;
+}
+
+.emptyColumn {
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* Quick Create Task Popover Card */
+.quickCreateBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background-color: rgba(4, 8, 17, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  animation: backdropFadeIn 180ms ease-out forwards;
+}
+
+.quickCreateCard {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  width: min(540px, calc(100vw - 48px));
+  background-color: var(--bg-modal);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  box-shadow: 0 20px 48px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 16px 18px;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: quickCreateCardIn 240ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.quickCreateCard.pomodoroOpen {
+  bottom: 400px;
+}
+
+.quickCreateCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.quickCreateCardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.statusSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 3px 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.statusSelect:focus {
+  border-color: var(--primary);
+}
+
+.quickCreateHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.headerActionBtn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.headerActionBtn:hover {
+  background-color: var(--bg-input);
+  color: var(--text-primary);
+}
+
+@keyframes backdropFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes quickCreateCardIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Quick Create Task Ticket Floating Button (Positioned on top of Floating Pomodoro) */
+.quickCreateBtn {
+  position: fixed;
+  bottom: 92px;
+  right: 24px;
+  background: linear-gradient(135deg, var(--primary), #6366f1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px var(--accent-glow), var(--shadow-lg);
+  width: 56px;
+  height: 56px;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              bottom 0.25s ease,
+              left 0.25s ease,
+              right 0.25s ease,
+              width 0.2s ease,
+              height 0.2s ease,
+              background-color 0.2s ease;
+  animation: quickCreateBtnIn 260ms ease-out forwards;
+}
+
+.quickCreateBtn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 28px var(--accent-glow);
+  filter: brightness(1.08);
+}
+
+.quickCreateBtn:active {
+  transform: scale(0.96);
+}
+
+.quickCreateBtn.pomodoroOpen {
+  bottom: 400px;
+}
+
+.quickCreateIcon {
+  transition: transform 0.2s ease;
+}
+
+.quickCreateBtn:hover .quickCreateIcon {
+  transform: rotate(90deg);
+}
+
+@keyframes quickCreateBtnIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.7) translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .quickCreateBtn {
+    bottom: calc(76px + env(safe-area-inset-bottom) + 60px);
+    left: 18px;
+    right: auto;
+    width: 50px;
+    height: 50px;
+  }
+
+  .quickCreateBtn.pomodoroOpen {
+    bottom: calc(76px + env(safe-area-inset-bottom) + 380px);
+    left: 18px;
+    right: auto;
+  }
+
+  .quickCreateCard {
+    bottom: calc(76px + env(safe-area-inset-bottom) + 8px);
+    left: 14px;
+    right: 14px;
+    width: auto;
+    max-width: calc(100vw - 28px);
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .quickCreateCard.pomodoroOpen {
+    bottom: calc(76px + env(safe-area-inset-bottom) + 8px);
+  }
+}
+
+@media (max-width: 600px) {
+  .quickCreateBtn {
+    bottom: calc(76px + env(safe-area-inset-bottom) + 56px);
+    left: 16px;
+    width: 48px;
+    height: 48px;
+  }
+
+  .quickCreateBtn.pomodoroOpen {
+    bottom: calc(76px + env(safe-area-inset-bottom) + 390px);
+    left: 16px;
+  }
+
+  .quickCreateCard {
+    bottom: calc(72px + env(safe-area-inset-bottom) + 6px);
+    left: 10px;
+    right: 10px;
+    max-width: calc(100vw - 20px);
+    padding: 12px 14px;
+  }
+}

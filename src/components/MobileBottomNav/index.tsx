@@ -15,6 +15,7 @@ export const MobileBottomNav: React.FC = () => {
     viewMode,
     setViewMode,
     openCreateNoteModal,
+    openCreateTaskModal,
     mobileDrawerOpen,
     setMobileDrawerOpen,
     notes,
@@ -25,11 +26,13 @@ export const MobileBottomNav: React.FC = () => {
     if (viewMode === 'notes') {
       openCreateNoteModal();
     } else {
-      // Focus task input or scroll to top
+      // Focus task input or open create task ticket modal
       const inputEl = document.querySelector('.task-input-main input') as HTMLInputElement | null;
       if (inputEl) {
         inputEl.focus();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        openCreateTaskModal();
       }
     }
   };

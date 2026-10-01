@@ -10,6 +10,7 @@ import { TaskDetailsPanel, TaskPlanningPanel } from './TaskSidePanels';
 export const TaskDetailModal: React.FC = () => {
   const {
     editingTask,
+    isNew,
     close,
     title,
     setTitle,
@@ -37,6 +38,7 @@ export const TaskDetailModal: React.FC = () => {
     setTagInput,
     tags,
     setTags,
+    subtasks,
     newSubtaskTitle,
     setNewSubtaskTitle,
     projects,
@@ -78,7 +80,7 @@ export const TaskDetailModal: React.FC = () => {
       themeComponent={ModalId.TaskDetail}
       className="ticket-modal-card"
     >
-      <ModalHeader variant="ticket" title="Task details" onClose={close}>
+      <ModalHeader variant="ticket" title={isNew ? 'Create Task Ticket' : 'Task details'} onClose={close}>
         <span className={`badge badge-priority ${priority}`}>{priority.toUpperCase()}</span>
       </ModalHeader>
 
@@ -88,9 +90,11 @@ export const TaskDetailModal: React.FC = () => {
             <label>TITLE</label>
             <input
               type="text"
+              placeholder="Task ticket title..."
               value={title}
               onChange={event => setTitle(event.target.value)}
               className="form-input form-input-title"
+              autoFocus={isNew}
             />
           </div>
 
@@ -100,8 +104,8 @@ export const TaskDetailModal: React.FC = () => {
           </div>
 
           <SubtasksSection
-            taskId={editingTask.id}
-            subtasks={editingTask.subtasks}
+            taskId={editingTask.id || 'draft'}
+            subtasks={subtasks}
             completedCount={completedSubtasksCount}
             totalCount={totalSubtasksCount}
             percent={subtasksPercent}
@@ -112,13 +116,15 @@ export const TaskDetailModal: React.FC = () => {
             onAdd={handleAddSubtask}
           />
 
-          <CommentsSection
-            taskId={editingTask.id}
-            comments={editingTask.comments}
-            onAdd={addComment}
-            onUpdate={updateComment}
-            onDelete={deleteComment}
-          />
+          {!isNew && editingTask.id && (
+            <CommentsSection
+              taskId={editingTask.id}
+              comments={editingTask.comments}
+              onAdd={addComment}
+              onUpdate={updateComment}
+              onDelete={deleteComment}
+            />
+          )}
         </div>
 
         <aside className="ticket-modal-column-right">
@@ -160,26 +166,36 @@ export const TaskDetailModal: React.FC = () => {
 
       <ModalFooter variant="ticket">
         <div className="footer-left">
-          <button type="button" className="btn-secondary btn-danger" onClick={handleDelete}>
-            Delete Task
-          </button>
-          {editingTask.createdAt && (
-            <span className="ticket-created-at">
-              Created {formatISODateTime(editingTask.createdAt)}
-            </span>
+          {isNew ? (
+            <button type="button" className="btn-secondary" onClick={close}>
+              Cancel
+            </button>
+          ) : (
+            <>
+              <button type="button" className="btn-secondary btn-danger" onClick={handleDelete}>
+                Delete Task
+              </button>
+              {editingTask.createdAt && (
+                <span className="ticket-created-at">
+                  Created {formatISODateTime(editingTask.createdAt)}
+                </span>
+              )}
+            </>
           )}
         </div>
         <div className="footer-actions">
-          <span
-            className={`ticket-save-status${
-              saveStatus === 'pending' || saveStatus === 'saving' ? ' is-saving' : ''
-            }${saveStatus === 'saved' ? ' is-saved' : ''}`}
-            aria-live="polite"
-          >
-            {saveStatusLabel}
-          </span>
+          {!isNew && (
+            <span
+              className={`ticket-save-status${
+                saveStatus === 'pending' || saveStatus === 'saving' ? ' is-saving' : ''
+              }${saveStatus === 'saved' ? ' is-saved' : ''}`}
+              aria-live="polite"
+            >
+              {saveStatusLabel}
+            </span>
+          )}
           <button type="button" className="btn-primary" onClick={handleSave}>
-            Done
+            {isNew ? 'Create Ticket' : 'Done'}
           </button>
         </div>
       </ModalFooter>

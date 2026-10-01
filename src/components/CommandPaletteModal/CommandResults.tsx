@@ -37,6 +37,7 @@ interface CommandResultsProps {
   onSelectView: (mode: ViewMode) => void;
   onSelectTask: (task: Task) => void;
   onSelectProject: (projectId: string) => void;
+  onCreateTask: () => void;
   onCreateProject: () => void;
   onManageTags: () => void;
   onToggleTheme: () => void;
@@ -50,6 +51,7 @@ export const CommandResults: React.FC<CommandResultsProps> = ({
   onSelectView,
   onSelectTask,
   onSelectProject,
+  onCreateTask,
   onCreateProject,
   onManageTags,
   onToggleTheme,
@@ -57,6 +59,12 @@ export const CommandResults: React.FC<CommandResultsProps> = ({
 }) => (
   <div className={styles.results}>
     <Section title="ACTIONS">
+      <button type="button" className="nav-item" onClick={onCreateTask}>
+        <div className="nav-item-left">
+          <Plus size={16} color="var(--primary)" />
+          <span>Create New Task Ticket</span>
+        </div>
+      </button>
       <button type="button" className="nav-item" onClick={onToggleFocusTimer}>
         <div className="nav-item-left">
           <Timer size={16} color="var(--primary)" />
