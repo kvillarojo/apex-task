@@ -26,6 +26,17 @@ export interface Assignee {
   role?: string;
 }
 
+export type TaskHistoryType = 'created' | 'status_change' | 'priority_change';
+
+export interface TaskHistoryItem {
+  id: string;
+  type: TaskHistoryType;
+  timestamp: string; // ISO string
+  fromValue?: string;
+  toValue?: string;
+  description?: string;
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -45,6 +56,7 @@ export interface Task {
   tags: string[];
   subtasks: Subtask[];
   comments: Comment[];
+  history?: TaskHistoryItem[];
   createdAt: string; // ISO string
   updatedAt: string; // ISO string
 }

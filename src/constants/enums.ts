@@ -138,3 +138,33 @@ export const VIEW_MODE_OPTIONS = [
   { value: ViewMode.Calendar, label: 'Calendar Grid' },
   { value: ViewMode.Analytics, label: 'Analytics Dashboard' }
 ] as const;
+
+export function getPriorityLabel(priority?: string): string {
+  switch (priority) {
+    case Priority.P1:
+      return 'P1 - Urgent';
+    case Priority.P2:
+      return 'P2 - High';
+    case Priority.P3:
+      return 'P3 - Medium';
+    case Priority.P4:
+      return 'P4 - Low';
+    default:
+      return priority ? priority.toUpperCase() : 'P4 - Low';
+  }
+}
+
+export function getStatusLabel(status?: string): string {
+  switch (status) {
+    case TaskStatus.Todo:
+      return 'To Do';
+    case TaskStatus.InProgress:
+      return 'In Progress';
+    case TaskStatus.Done:
+      return 'Done';
+    case TaskStatus.Archived:
+      return 'Archived';
+    default:
+      return status || 'To Do';
+  }
+}

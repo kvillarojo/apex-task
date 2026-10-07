@@ -4,7 +4,7 @@ import { formatISODateTime } from '../../utils/dateUtils';
 import { DescriptionEditor } from '../DescriptionEditor';
 import { useTaskDetailModal } from './useTaskDetailModal';
 import { SubtasksSection } from './SubtasksSection';
-import { CommentsSection } from './CommentsSection';
+import { TaskActivitySection } from './TaskActivitySection';
 import { TaskDetailsPanel, TaskPlanningPanel } from './TaskSidePanels';
 
 export const TaskDetailModal: React.FC = () => {
@@ -117,12 +117,13 @@ export const TaskDetailModal: React.FC = () => {
           />
 
           {!isNew && editingTask.id && (
-            <CommentsSection
+            <TaskActivitySection
               taskId={editingTask.id}
               comments={editingTask.comments}
-              onAdd={addComment}
-              onUpdate={updateComment}
-              onDelete={deleteComment}
+              history={editingTask.history || []}
+              onAddComment={addComment}
+              onUpdateComment={updateComment}
+              onDeleteComment={deleteComment}
             />
           )}
         </div>

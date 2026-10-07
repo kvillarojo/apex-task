@@ -175,8 +175,22 @@ export function loadTasksFromStorage(): Task[] {
       saveTasksToStorage(defaults);
       return defaults;
     }
-    // Migration guard: ensure all tasks have a comments array (added in v2)
-    return parsed.map(t => ({ ...t, comments: t.comments ?? [] }));
+    // Migration guard: ensure all tasks have comments and history arrays
+    return parsed.map(t => ({
+      ...t,
+      comments: t.comments ?? [],
+      history: Array.isArray(t.history) && t.history.length > 0
+        ? t.history
+        : [
+            {
+              id: 'hist-init-' + t.id,
+              type: 'created' as const,
+              timestamp: t.createdAt || new Date().toISOString(),
+              toValue: t.status,
+              description: 'Ticket created'
+            }
+          ]
+    }));
   } catch (err) {
     console.error('Failed to load tasks from localStorage', err);
     return getDefaultTasks();

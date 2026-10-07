@@ -9,6 +9,7 @@ interface CommentsSectionProps {
   onAdd: (taskId: string, content: string, parentId?: string) => void;
   onUpdate: (taskId: string, commentId: string, content: string) => void;
   onDelete: (taskId: string, commentId: string) => void;
+  hideHeader?: boolean;
 }
 
 // ─── Single comment bubble ───────────────────────────────────────────────────
@@ -189,6 +190,7 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
   onAdd,
   onUpdate,
   onDelete,
+  hideHeader = false,
 }) => {
   const [newComment, setNewComment] = useState('');
 
@@ -205,12 +207,14 @@ export const CommentsSection: React.FC<CommentsSectionProps> = ({
 
   return (
     <div className="comments-section">
-      <div className="comments-section-header">
-        <label className="comments-label">COMMENTS</label>
-        {comments.length > 0 && (
-          <span className="subtasks-count-pill">{comments.length}</span>
-        )}
-      </div>
+      {!hideHeader && (
+        <div className="comments-section-header">
+          <label className="comments-label">COMMENTS</label>
+          {comments.length > 0 && (
+            <span className="subtasks-count-pill">{comments.length}</span>
+          )}
+        </div>
+      )}
 
       {/* Existing comments */}
       {topLevel.length > 0 ? (

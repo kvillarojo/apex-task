@@ -13,8 +13,10 @@ import type {
   TagDefinition,
   Note,
   Comment,
+  TaskHistoryItem,
   ActiveReminderAlert
 } from '../types/todo';
+import { getPriorityLabel, getStatusLabel } from '../constants/enums';
 import {
   loadTasksFromStorage,
   saveTasksToStorage,
@@ -329,12 +331,22 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Task Actions
   const addTask = (taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>): Task => {
+    const nowIso = new Date().toISOString();
+    const creationHistory: TaskHistoryItem = {
+      id: 'hist-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+      type: 'created',
+      timestamp: nowIso,
+      toValue: taskData.status || 'todo',
+      description: 'Ticket created'
+    };
+
     const newTask: Task = {
       ...taskData,
       comments: taskData.comments ?? [],
+      history: taskData.history && taskData.history.length > 0 ? taskData.history : [creationHistory],
       id: 'task-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      createdAt: nowIso,
+      updatedAt: nowIso
     };
     setTasks(prev => [newTask, ...prev]);
     soundEffects.playClickSound();
@@ -347,6 +359,36 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (t.id !== id) return t;
 
         const next: Task = { ...t, ...updates, updatedAt: new Date().toISOString() };
+
+        // Record history for status or priority changes
+        const newHistoryItems: TaskHistoryItem[] = [];
+        const nowIso = new Date().toISOString();
+
+        if (updates.status && updates.status !== t.status) {
+          newHistoryItems.push({
+            id: 'hist-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+            type: 'status_change',
+            timestamp: nowIso,
+            fromValue: t.status,
+            toValue: updates.status,
+            description: `Status changed from ${getStatusLabel(t.status)} to ${getStatusLabel(updates.status)}`
+          });
+        }
+
+        if (updates.priority && updates.priority !== t.priority) {
+          newHistoryItems.push({
+            id: 'hist-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7) + (newHistoryItems.length ? '-2' : ''),
+            type: 'priority_change',
+            timestamp: nowIso,
+            fromValue: t.priority,
+            toValue: updates.priority,
+            description: `Priority changed from ${getPriorityLabel(t.priority)} to ${getPriorityLabel(updates.priority)}`
+          });
+        }
+
+        if (newHistoryItems.length > 0) {
+          next.history = [...(t.history ?? []), ...newHistoryItems];
+        }
 
         // Reschedule reminder whenever due date/time changes (unless caller sets the flag).
         if (('dueDate' in updates || 'dueTime' in updates) && !('reminderNotified' in updates)) {
@@ -377,6 +419,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
       prev.map(t => {
         if (t.id === id) {
           const isNowCompleted = !t.completed;
+          const nextStatus: TaskStatus = isNowCompleted ? 'done' : 'todo';
           if (isNowCompleted) {
             soundEffects.playCompleteSound();
             // Trigger celebration confetti on task completion
@@ -386,12 +429,23 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
               origin: { y: 0.65 }
             });
           }
+          const nowIso = new Date().toISOString();
+          const historyItem: TaskHistoryItem | null = t.status !== nextStatus ? {
+            id: 'hist-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+            type: 'status_change',
+            timestamp: nowIso,
+            fromValue: t.status,
+            toValue: nextStatus,
+            description: `Status changed from ${getStatusLabel(t.status)} to ${getStatusLabel(nextStatus)}`
+          } : null;
+
           return {
             ...t,
             completed: isNowCompleted,
-            status: isNowCompleted ? 'done' : 'todo',
-            completedAt: isNowCompleted ? new Date().toISOString() : undefined,
-            updatedAt: new Date().toISOString()
+            status: nextStatus,
+            completedAt: isNowCompleted ? nowIso : undefined,
+            history: historyItem ? [...(t.history ?? []), historyItem] : (t.history ?? []),
+            updatedAt: nowIso
           };
         }
         return t;
@@ -407,12 +461,23 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
           if (isDone && !t.completed) {
             soundEffects.playCompleteSound();
           }
+          const nowIso = new Date().toISOString();
+          const historyItem: TaskHistoryItem | null = t.status !== newStatus ? {
+            id: 'hist-' + Date.now() + '-' + Math.random().toString(36).substring(2, 7),
+            type: 'status_change',
+            timestamp: nowIso,
+            fromValue: t.status,
+            toValue: newStatus,
+            description: `Status changed from ${getStatusLabel(t.status)} to ${getStatusLabel(newStatus)}`
+          } : null;
+
           return {
             ...t,
             status: newStatus,
             completed: isDone,
-            completedAt: isDone ? new Date().toISOString() : t.completedAt,
-            updatedAt: new Date().toISOString()
+            completedAt: isDone ? nowIso : t.completedAt,
+            history: historyItem ? [...(t.history ?? []), historyItem] : (t.history ?? []),
+            updatedAt: nowIso
           };
         }
         return t;
