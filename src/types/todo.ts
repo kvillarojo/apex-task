@@ -134,4 +134,6 @@ export interface PomodoroState {
   totalCompletedSessions: number;
   isMaximized: boolean;
   isVisible: boolean;
+  soundEnabled: boolean;
+  soundVolume: number; // 0 to 100 percentage
 }

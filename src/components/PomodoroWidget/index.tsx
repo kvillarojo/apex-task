@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Pause, RotateCcw, Timer, Settings, Plus, Minus, Check, Edit3, Maximize2, Minimize2, X } from 'lucide-react';
+import { Play, Pause, RotateCcw, Timer, Settings, Plus, Minus, Check, Edit3, Maximize2, Minimize2, X, Volume2, Volume1, VolumeX } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
 import { mergeThemeStyles } from '../../theme';
+import { soundEffects } from '../../utils/audio';
 import styles from './PomodoroWidget.module.css';
 
 export const PomodoroWidget: React.FC = () => {
@@ -17,6 +18,8 @@ export const PomodoroWidget: React.FC = () => {
     setCustomTimeLeft,
     adjustTimeLeft,
     setModeDuration,
+    setPomodoroSoundEnabled,
+    setPomodoroSoundVolume,
     tasks
   } = useTodo();
 
@@ -102,7 +105,7 @@ export const PomodoroWidget: React.FC = () => {
             type="button"
             className={styles.iconBtn}
             onClick={() => setShowSettings(!showSettings)}
-            title="Configure Timer Durations"
+            title="Configure Timer Durations & Audio"
           >
             <Settings size={isMaximized ? 17 : 15} />
           </button>
@@ -153,7 +156,7 @@ export const PomodoroWidget: React.FC = () => {
         </button>
       </div>
 
-      {/* Mode Duration Settings Drawer */}
+      {/* Mode Duration & Sound Settings Drawer */}
       {showSettings && (
         <div className={styles.settingsDrawer}>
           <div className={styles.settingsHeading}>CUSTOM DURATION SETTINGS</div>
@@ -189,6 +192,77 @@ export const PomodoroWidget: React.FC = () => {
               value={Math.round(pomodoro.longBreakDuration / 60)}
               onChange={e => setModeDuration('longBreak', parseInt(e.target.value, 10) || 15)}
             />
+          </div>
+
+          <div className={styles.settingsDivider} />
+
+          <div className={styles.settingsHeading}>SOUND & TICKING SETTINGS</div>
+          <div className={styles.settingsRow}>
+            <span>Ticking Sound:</span>
+            <button
+              type="button"
+              className={`${styles.settingsToggleBtn} ${pomodoro.soundEnabled ? styles.toggleActive : ''}`}
+              onClick={() => {
+                const next = !pomodoro.soundEnabled;
+                setPomodoroSoundEnabled(next);
+                if (next) {
+                  soundEffects.playTickSound((pomodoro.soundVolume ?? 50) / 100);
+                }
+              }}
+              title={pomodoro.soundEnabled ? 'Disable Ticking Sound' : 'Enable Ticking Sound'}
+            >
+              {pomodoro.soundEnabled ? (
+                <>
+                  <Volume2 size={13} color="var(--primary)" />
+                  <span>ON</span>
+                </>
+              ) : (
+                <>
+                  <VolumeX size={13} color="var(--text-muted)" />
+                  <span>OFF</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          <div className={styles.settingsRow} style={{ flexDirection: 'column', alignItems: 'stretch', gap: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Ticking Volume:</span>
+              <span className={styles.volumeBadge}>{pomodoro.soundVolume}%</span>
+            </div>
+            <div className={styles.volumeControlWrapper}>
+              {pomodoro.soundVolume === 0 ? (
+                <VolumeX size={15} color="var(--text-muted)" />
+              ) : pomodoro.soundVolume < 50 ? (
+                <Volume1 size={15} color="var(--text-secondary)" />
+              ) : (
+                <Volume2 size={15} color="var(--primary)" />
+              )}
+              <input
+                type="range"
+                min={0}
+                max={100}
+                step={1}
+                className={styles.volumeSlider}
+                value={pomodoro.soundVolume}
+                disabled={!pomodoro.soundEnabled}
+                onChange={e => {
+                  const newVol = parseInt(e.target.value, 10) || 0;
+                  setPomodoroSoundVolume(newVol);
+                }}
+                onMouseUp={() => {
+                  if (pomodoro.soundEnabled) {
+                    soundEffects.playTickSound(pomodoro.soundVolume / 100);
+                  }
+                }}
+                onTouchEnd={() => {
+                  if (pomodoro.soundEnabled) {
+                    soundEffects.playTickSound(pomodoro.soundVolume / 100);
+                  }
+                }}
+                title="Adjust Ticking Volume"
+              />
+            </div>
           </div>
         </div>
       )}

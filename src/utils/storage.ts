@@ -7,6 +7,7 @@ const ASSIGNEES_STORAGE_KEY = 'mytodo_assignees_v1';
 const THEME_STORAGE_KEY = 'mytodo_theme_v1';
 const TAG_DEFINITIONS_STORAGE_KEY = 'mytodo_tag_definitions_v1';
 const CUSTOM_TAGS_STORAGE_KEY = 'mytodo_custom_tags_v1';
+const POMODORO_SETTINGS_STORAGE_KEY = 'mytodo_pomodoro_settings_v1';
 
 import { getTodayString, addDays } from './dateUtils';
 
@@ -327,5 +328,48 @@ export function saveNotesToStorage(notes: Note[]): void {
     localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notes));
   } catch (err) {
     console.error('Failed to save notes to localStorage', err);
+  }
+}
+
+export interface PomodoroSettings {
+  workDuration: number;
+  shortBreakDuration: number;
+  longBreakDuration: number;
+  soundEnabled: boolean;
+  soundVolume: number; // 0 to 100
+}
+
+export const DEFAULT_POMODORO_SETTINGS: PomodoroSettings = {
+  workDuration: 25 * 60,
+  shortBreakDuration: 5 * 60,
+  longBreakDuration: 15 * 60,
+  soundEnabled: true,
+  soundVolume: 50
+};
+
+export function loadPomodoroSettingsFromStorage(): PomodoroSettings {
+  try {
+    const raw = localStorage.getItem(POMODORO_SETTINGS_STORAGE_KEY);
+    if (!raw) return DEFAULT_POMODORO_SETTINGS;
+    const parsed = JSON.parse(raw);
+    return {
+      workDuration: typeof parsed.workDuration === 'number' && parsed.workDuration > 0 ? parsed.workDuration : DEFAULT_POMODORO_SETTINGS.workDuration,
+      shortBreakDuration: typeof parsed.shortBreakDuration === 'number' && parsed.shortBreakDuration > 0 ? parsed.shortBreakDuration : DEFAULT_POMODORO_SETTINGS.shortBreakDuration,
+      longBreakDuration: typeof parsed.longBreakDuration === 'number' && parsed.longBreakDuration > 0 ? parsed.longBreakDuration : DEFAULT_POMODORO_SETTINGS.longBreakDuration,
+      soundEnabled: typeof parsed.soundEnabled === 'boolean' ? parsed.soundEnabled : DEFAULT_POMODORO_SETTINGS.soundEnabled,
+      soundVolume: typeof parsed.soundVolume === 'number' && parsed.soundVolume >= 0 && parsed.soundVolume <= 100 ? parsed.soundVolume : DEFAULT_POMODORO_SETTINGS.soundVolume
+    };
+  } catch {
+    return DEFAULT_POMODORO_SETTINGS;
+  }
+}
+
+export function savePomodoroSettingsToStorage(settings: Partial<PomodoroSettings>): void {
+  try {
+    const current = loadPomodoroSettingsFromStorage();
+    const updated = { ...current, ...settings };
+    localStorage.setItem(POMODORO_SETTINGS_STORAGE_KEY, JSON.stringify(updated));
+  } catch (err) {
+    console.error('Failed to save pomodoro settings to localStorage', err);
   }
 }

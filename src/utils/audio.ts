@@ -106,6 +106,55 @@ class SoundEffects {
     osc.start(now);
     osc.stop(now + 0.035);
   }
+
+  public playTickSound(volume: number = 0.5, isTock: boolean = false) {
+    if (!this.enabled) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const clampedVolume = Math.max(0, Math.min(1, volume));
+    if (clampedVolume <= 0) return;
+
+    const now = this.ctx.currentTime;
+
+    // 1. Primary body tone of the clock tick / tock
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sine';
+    const startFreq = isTock ? 850 : 1250;
+    const endFreq = isTock ? 300 : 450;
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.025);
+
+    const peakGain = (isTock ? 0.08 : 0.11) * clampedVolume;
+    gain.gain.setValueAtTime(peakGain, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.03);
+
+    // 2. High-frequency crisp mechanical escapement transient
+    const transientOsc = this.ctx.createOscillator();
+    const transientGain = this.ctx.createGain();
+
+    transientOsc.type = 'triangle';
+    transientOsc.frequency.setValueAtTime(isTock ? 2200 : 2800, now);
+    transientOsc.frequency.exponentialRampToValueAtTime(800, now + 0.008);
+
+    const transientPeak = 0.04 * clampedVolume;
+    transientGain.gain.setValueAtTime(transientPeak, now);
+    transientGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.008);
+
+    transientOsc.connect(transientGain);
+    transientGain.connect(this.ctx.destination);
+
+    transientOsc.start(now);
+    transientOsc.stop(now + 0.01);
+  }
 }
 
 export const soundEffects = new SoundEffects();

@@ -29,7 +29,9 @@ import {
   loadTagDefinitionsFromStorage,
   saveTagDefinitionsToStorage,
   loadAssigneesFromStorage,
-  saveAssigneesToStorage
+  saveAssigneesToStorage,
+  loadPomodoroSettingsFromStorage,
+  savePomodoroSettingsToStorage
 } from '../utils/storage';
 import { isToday, isUpcoming, getTodayString } from '../utils/dateUtils';
 import { soundEffects } from '../utils/audio';
@@ -140,6 +142,8 @@ interface TodoContextType {
   setCustomTimeLeft: (seconds: number) => void;
   adjustTimeLeft: (deltaSeconds: number) => void;
   setModeDuration: (mode: 'work' | 'shortBreak' | 'longBreak', minutes: number) => void;
+  setPomodoroSoundEnabled: (enabled: boolean) => void;
+  setPomodoroSoundVolume: (volume: number) => void;
 
   // Data Actions
   exportData: () => void;
@@ -171,17 +175,21 @@ const initialFilter: FilterState = {
   sortOrder: 'asc'
 };
 
+const savedPomodoroSettings = loadPomodoroSettingsFromStorage();
+
 const initialPomodoro: PomodoroState = {
   activeTaskId: null,
   mode: 'work',
-  workDuration: 25 * 60,
-  shortBreakDuration: 5 * 60,
-  longBreakDuration: 15 * 60,
-  timeLeft: 25 * 60,
+  workDuration: savedPomodoroSettings.workDuration,
+  shortBreakDuration: savedPomodoroSettings.shortBreakDuration,
+  longBreakDuration: savedPomodoroSettings.longBreakDuration,
+  timeLeft: savedPomodoroSettings.workDuration,
   isRunning: false,
   totalCompletedSessions: 0,
   isMaximized: false,
-  isVisible: false
+  isVisible: false,
+  soundEnabled: savedPomodoroSettings.soundEnabled,
+  soundVolume: savedPomodoroSettings.soundVolume
 };
 
 const TodoContext = createContext<TodoContextType | undefined>(undefined);
@@ -308,7 +316,15 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let interval: ReturnType<typeof setInterval> | null = null;
     if (pomodoro.isRunning && pomodoro.timeLeft > 0) {
       interval = setInterval(() => {
-        setPomodoro(prev => ({ ...prev, timeLeft: prev.timeLeft - 1 }));
+        setPomodoro(prev => {
+          if (!prev.isRunning || prev.timeLeft <= 0) return prev;
+          const nextTimeLeft = prev.timeLeft - 1;
+          if (prev.soundEnabled) {
+            const isTock = nextTimeLeft % 2 === 0;
+            soundEffects.playTickSound(prev.soundVolume / 100, isTock);
+          }
+          return { ...prev, timeLeft: nextTimeLeft };
+        });
       }, 1000);
     } else if (pomodoro.isRunning && pomodoro.timeLeft === 0) {
       soundEffects.playTimerFinishSound();
@@ -1096,14 +1112,35 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const durationInSeconds = Math.max(1, Math.min(180, minutes)) * 60;
     setPomodoro(prev => {
       const isCurrentMode = prev.mode === mode;
+      const workDuration = mode === 'work' ? durationInSeconds : prev.workDuration;
+      const shortBreakDuration = mode === 'shortBreak' ? durationInSeconds : prev.shortBreakDuration;
+      const longBreakDuration = mode === 'longBreak' ? durationInSeconds : prev.longBreakDuration;
+
+      savePomodoroSettingsToStorage({
+        workDuration,
+        shortBreakDuration,
+        longBreakDuration
+      });
+
       return {
         ...prev,
-        workDuration: mode === 'work' ? durationInSeconds : prev.workDuration,
-        shortBreakDuration: mode === 'shortBreak' ? durationInSeconds : prev.shortBreakDuration,
-        longBreakDuration: mode === 'longBreak' ? durationInSeconds : prev.longBreakDuration,
+        workDuration,
+        shortBreakDuration,
+        longBreakDuration,
         timeLeft: isCurrentMode && !prev.isRunning ? durationInSeconds : prev.timeLeft
       };
     });
+  };
+
+  const setPomodoroSoundEnabled = (enabled: boolean) => {
+    setPomodoro(prev => ({ ...prev, soundEnabled: enabled }));
+    savePomodoroSettingsToStorage({ soundEnabled: enabled });
+  };
+
+  const setPomodoroSoundVolume = (volume: number) => {
+    const clamped = Math.max(0, Math.min(100, Math.round(volume)));
+    setPomodoro(prev => ({ ...prev, soundVolume: clamped }));
+    savePomodoroSettingsToStorage({ soundVolume: clamped });
   };
 
   // Data Actions
@@ -1390,6 +1427,8 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setCustomTimeLeft,
         adjustTimeLeft,
         setModeDuration,
+        setPomodoroSoundEnabled,
+        setPomodoroSoundVolume,
         exportData,
         importData,
         filteredTasks,
