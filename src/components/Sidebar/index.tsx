@@ -21,7 +21,6 @@ import {
   Users,
   Download,
   Upload,
-  Timer,
   X,
   Check,
   ChevronDown,
@@ -65,9 +64,6 @@ export const Sidebar: React.FC = () => {
     openPeopleModal,
     exportData,
     importData,
-    pomodoro,
-    setPomodoroVisible,
-    setPomodoroMaximized
   } = useTodo();
 
   // Smart count calculations

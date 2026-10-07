@@ -1,13 +1,6 @@
 import React from 'react';
 import {
   Search,
-  List,
-  Kanban,
-  Grid,
-  Calendar as CalendarIcon,
-  CalendarRange,
-  BarChart3,
-  StickyNote,
   Menu,
   Sun,
   Moon,
@@ -17,7 +10,6 @@ import {
   Download,
   Upload,
   Command,
-  Timer
 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
@@ -28,8 +20,6 @@ export const Header: React.FC = () => {
   const {
     filter,
     setFilter,
-    viewMode,
-    setViewMode,
     theme,
     setTheme,
     soundEnabled,
@@ -39,10 +29,7 @@ export const Header: React.FC = () => {
     exportData,
     importData,
     mobileDrawerOpen,
-    setMobileDrawerOpen,
-    pomodoro,
-    setPomodoroVisible,
-    setPomodoroMaximized
+    setMobileDrawerOpen
   } = useTodo();
 
   const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
