@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   CheckSquare,
   Inbox,
@@ -22,7 +22,12 @@ import {
   Download,
   Upload,
   Timer,
-  X
+  X,
+  Check,
+  ChevronDown,
+  MoreVertical,
+  LayoutGrid,
+  Layers
 } from 'lucide-react';
 import { useTodo } from '../../context/TodoContext';
 import { ThemeComponent } from '../../constants/enums';
@@ -77,6 +82,30 @@ export const Sidebar: React.FC = () => {
   const visibleProjects = viewMode === 'notes' ? noteProjects : taskProjects;
 
   const isTaskView = viewMode === 'list' || viewMode === 'kanban' || viewMode === 'eisenhower';
+
+  const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
+  const [openDropdownProjectId, setOpenDropdownProjectId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!openDropdownProjectId) return;
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.project-dropdown-container')) {
+        setOpenDropdownProjectId(null);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setOpenDropdownProjectId(null);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openDropdownProjectId]);
 
   const handleSmartClick = (smart: SmartFilter) => {
     if (!isTaskView) {
@@ -301,9 +330,24 @@ export const Sidebar: React.FC = () => {
           {/* Projects Section */}
           <div className="nav-section">
             <div className="nav-section-title">
-              <span>Projects</span>
               <button
-                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                type="button"
+                className="nav-section-header-btn"
+                onClick={() => setIsProjectsExpanded(prev => !prev)}
+                aria-expanded={isProjectsExpanded}
+                title={isProjectsExpanded ? 'Collapse Projects' : 'Expand Projects'}
+              >
+                <ChevronDown
+                  size={14}
+                  className={`nav-section-chevron ${isProjectsExpanded ? 'expanded' : ''}`}
+                />
+                <span>Projects</span>
+                <span className="nav-section-badge">{visibleProjects.length}</span>
+              </button>
+
+              <button
+                type="button"
+                className="nav-section-add-btn"
                 onClick={openCreateProjectModal}
                 title="Create New Project"
               >
@@ -311,58 +355,210 @@ export const Sidebar: React.FC = () => {
               </button>
             </div>
 
-            {visibleProjects.map(project => {
-              const count = viewMode === 'notes'
-                ? notes.filter(note => note.projectId === project.id).length
-                : tasks.filter(task => task.projectId === project.id && !task.completed).length;
-              const isActive = filter.projectId === project.id;
-              const IconComponent = PROJECT_ICONS[project.icon] || Folder;
+            {isProjectsExpanded && (
+              <div className="nav-section-collapsible-content">
+                {visibleProjects.map(project => {
+                  const count = viewMode === 'notes'
+                    ? notes.filter(note => note.projectId === project.id).length
+                    : tasks.filter(task => task.projectId === project.id && !task.completed).length;
+                  const isActive = filter.projectId === project.id;
+                  const IconComponent = PROJECT_ICONS[project.icon] || Folder;
+                  const isDropdownOpen = openDropdownProjectId === project.id;
 
-              return (
-                <div
-                  key={project.id}
-                  className={`nav-item project-nav-item ${isActive ? 'active' : ''}`}
-                  onClick={() => handleProjectClick(project.id)}
-                >
-                  <div className="nav-item-left" style={{ minWidth: 0 }}>
-                    <span style={{ color: project.color, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-                      <IconComponent size={16} />
-                    </span>
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {project.name}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
-                    {count > 0 && <span className="nav-badge">{count}</span>}
-
-                    {project.id !== 'inbox' && (
-                      <div className="project-item-actions">
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            openEditProjectModal(project);
-                          }}
-                          className="project-action-btn"
-                          title="Edit Project"
-                        >
-                          <Edit2 size={12} />
-                        </button>
-                        <button
-                          onClick={e => {
-                            e.stopPropagation();
-                            deleteProject(project.id);
-                          }}
-                          className="project-action-btn delete-proj-btn"
-                          title="Delete Project"
-                        >
-                          <Trash2 size={12} />
-                        </button>
+                  return (
+                    <div
+                      key={project.id}
+                      className={`nav-item project-nav-item ${isActive ? 'active' : ''}`}
+                      onClick={() => handleProjectClick(project.id)}
+                    >
+                      <div className="nav-item-left" style={{ minWidth: 0 }}>
+                        <span style={{ color: project.color, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                          <IconComponent size={16} />
+                        </span>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {project.name}
+                        </span>
                       </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                        {count > 0 && <span className="nav-badge">{count}</span>}
+
+                        <div className="project-dropdown-container">
+                          <button
+                            type="button"
+                            className={`project-dropdown-trigger ${isDropdownOpen ? 'active' : ''}`}
+                            onClick={e => {
+                              e.stopPropagation();
+                              setOpenDropdownProjectId(prev => (prev === project.id ? null : project.id));
+                            }}
+                            title="Project Views & Options"
+                            aria-expanded={isDropdownOpen}
+                            aria-haspopup="menu"
+                          >
+                            <MoreVertical size={14} />
+                          </button>
+
+                          {isDropdownOpen && (
+                            <div
+                              className="project-dropdown-menu"
+                              onClick={e => e.stopPropagation()}
+                              role="menu"
+                            >
+                              <div className="project-dropdown-header">Open in View</div>
+
+                              <button
+                                type="button"
+                                className={`project-dropdown-item ${isActive && viewMode === 'list' ? 'active' : ''}`}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setViewMode('list');
+                                  setFilter({ projectId: project.id, smartFilter: 'all', tag: null });
+                                  setOpenDropdownProjectId(null);
+                                  setMobileDrawerOpen(false);
+                                }}
+                              >
+                                <div className="project-dropdown-item-left">
+                                  <List size={14} color="#6366f1" />
+                                  <span>List View</span>
+                                </div>
+                                {isActive && viewMode === 'list' && <Check size={13} color="var(--primary)" />}
+                              </button>
+
+                              <button
+                                type="button"
+                                className={`project-dropdown-item ${isActive && viewMode === 'kanban' ? 'active' : ''}`}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setViewMode('kanban');
+                                  setFilter({ projectId: project.id, smartFilter: 'all', tag: null });
+                                  setOpenDropdownProjectId(null);
+                                  setMobileDrawerOpen(false);
+                                }}
+                              >
+                                <div className="project-dropdown-item-left">
+                                  <LayoutGrid size={14} color="#3b82f6" />
+                                  <span>Kanban Board</span>
+                                </div>
+                                {isActive && viewMode === 'kanban' && <Check size={13} color="var(--primary)" />}
+                              </button>
+
+                              <button
+                                type="button"
+                                className={`project-dropdown-item ${isActive && viewMode === 'eisenhower' ? 'active' : ''}`}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setViewMode('eisenhower');
+                                  setFilter({ projectId: project.id, smartFilter: 'all', tag: null });
+                                  setOpenDropdownProjectId(null);
+                                  setMobileDrawerOpen(false);
+                                }}
+                              >
+                                <div className="project-dropdown-item-left">
+                                  <Layers size={14} color="#f59e0b" />
+                                  <span>Eisenhower Matrix</span>
+                                </div>
+                                {isActive && viewMode === 'eisenhower' && <Check size={13} color="var(--primary)" />}
+                              </button>
+
+                              <button
+                                type="button"
+                                className={`project-dropdown-item ${isActive && viewMode === 'calendar' ? 'active' : ''}`}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setViewMode('calendar');
+                                  setFilter({ projectId: project.id, smartFilter: 'all', tag: null });
+                                  setOpenDropdownProjectId(null);
+                                  setMobileDrawerOpen(false);
+                                }}
+                              >
+                                <div className="project-dropdown-item-left">
+                                  <Calendar size={14} color="#10b981" />
+                                  <span>Calendar Schedule</span>
+                                </div>
+                                {isActive && viewMode === 'calendar' && <Check size={13} color="var(--primary)" />}
+                              </button>
+
+                              <button
+                                type="button"
+                                className={`project-dropdown-item ${isActive && viewMode === 'timeline' ? 'active' : ''}`}
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  setViewMode('timeline');
+                                  setFilter({ projectId: project.id, smartFilter: 'all', tag: null });
+                                  setOpenDropdownProjectId(null);
+                                  setMobileDrawerOpen(false);
+                                }}
+                              >
+                                <div className="project-dropdown-item-left">
+                                  <CalendarRange size={14} color="#8b5cf6" />
+                                  <span>Timeline Roadmap</span>
+                                </div>
+                                {isActive && viewMode === 'timeline' && <Check size={13} color="var(--primary)" />}
+                              </button>
+
+                              {project.scope !== 'tasks' && (
+                                <button
+                                  type="button"
+                                  className={`project-dropdown-item ${isActive && viewMode === 'notes' ? 'active' : ''}`}
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    setViewMode('notes');
+                                    setFilter({ projectId: project.id, smartFilter: 'all', tag: null });
+                                    setOpenDropdownProjectId(null);
+                                    setMobileDrawerOpen(false);
+                                  }}
+                                >
+                                  <div className="project-dropdown-item-left">
+                                    <StickyNote size={14} color="#ec4899" />
+                                    <span>Notes Workspace</span>
+                                  </div>
+                                  {isActive && viewMode === 'notes' && <Check size={13} color="var(--primary)" />}
+                                </button>
+                              )}
+
+                              <div className="project-dropdown-divider" />
+
+                              <div className="project-dropdown-header">Manage</div>
+
+                              <button
+                                type="button"
+                                className="project-dropdown-item"
+                                onClick={e => {
+                                  e.stopPropagation();
+                                  openEditProjectModal(project);
+                                  setOpenDropdownProjectId(null);
+                                }}
+                              >
+                                <div className="project-dropdown-item-left">
+                                  <Edit2 size={14} />
+                                  <span>Edit Project</span>
+                                </div>
+                              </button>
+
+                              {project.id !== 'inbox' && (
+                                <button
+                                  type="button"
+                                  className="project-dropdown-item danger"
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    deleteProject(project.id);
+                                    setOpenDropdownProjectId(null);
+                                  }}
+                                >
+                                  <div className="project-dropdown-item-left">
+                                    <Trash2 size={14} />
+                                    <span>Delete Project</span>
+                                  </div>
+                                </button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Tags Section */}
@@ -467,22 +663,6 @@ export const Sidebar: React.FC = () => {
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '12px', paddingTop: '8px', borderTop: '1px solid var(--border-color)' }}>
-            <button
-              type="button"
-              className="icon-button"
-              onClick={() => {
-                setPomodoroVisible(!pomodoro.isVisible);
-                if (!pomodoro.isVisible) {
-                  setPomodoroMaximized(false);
-                }
-                setMobileDrawerOpen(false);
-              }}
-              title="Focus Timer"
-              style={{ width: '32px', height: '32px' }}
-            >
-              <Timer size={16} color={pomodoro.isRunning ? '#10b981' : undefined} />
-            </button>
-
             <button
               type="button"
               className="icon-button"
